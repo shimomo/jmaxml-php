@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace JmaXml\Feed;
+
+use DateTimeImmutable;
+use Override;
+use Psr\Clock\ClockInterface;
+
+/**
+ * A StateStore that lives only as long as the process. Useful for tests and short scripts.
+ *
+ * @author shimomo
+ */
+final class InMemoryStateStore implements StateStore
+{
+    /**
+     * @var array<string, DateTimeImmutable> entry id => expiry
+     */
+    private array $seen = [];
+
+    /**
+     * @var array<string, FeedState>
+     */
+    private array $states = [];
+
+    public function __construct(private readonly ClockInterface $clock)
+    {
+        //
+    }
+
+    #[Override]
+    public function isSeen(string $entryId): bool
+    {
+        return isset($this->seen[$entryId]) && $this->seen[$entryId] > $this->clock->now();
+    }
+
+    #[Override]
+    public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void
+    {
+        $now = $this->clock->now();
+        $this->seen = array_filter($this->seen, static fn(DateTimeImmutable $expiry): bool => $expiry > $now);
+        $this->seen[$entryId] = $expiresAt;
+    }
+
+    #[Override]
+    public function load(string $feedUrl): ?FeedState
+    {
+        return $this->states[$feedUrl] ?? null;
+    }
+
+    #[Override]
+    public function save(string $feedUrl, FeedState $state): void
+    {
+        $this->states[$feedUrl] = $state;
+    }
+}
