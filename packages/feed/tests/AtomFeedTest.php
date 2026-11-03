@@ -68,9 +68,22 @@ final class AtomFeedTest extends TestCase
         yield 'not xml' => ['<feed'];
         yield 'doctype' => ['<?xml version="1.0"?><!DOCTYPE feed [<!ENTITY a "x">]><feed xmlns="http://www.w3.org/2005/Atom"/>'];
         yield 'not atom' => ['<?xml version="1.0"?><Report xmlns="http://xml.kishou.go.jp/jmaxml1/"/>'];
-        yield 'entry without link' => [
-            '<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"><id>f</id><updated>2026-11-03T12:00:00Z</updated>'
-            . '<entry><id>e</id><updated>2026-11-03T12:00:00Z</updated></entry></feed>',
-        ];
+        yield 'feed without updated' => ['<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"><id>f</id></feed>'];
+    }
+
+    #[Test]
+    public function skipsInvalidEntriesWithAWarning(): void
+    {
+        $xml = '<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"><id>f</id><updated>2026-11-03T12:00:00Z</updated>'
+            . '<entry><id>e</id><updated>2026-11-03T12:00:00Z</updated></entry>'
+            . '<entry><id>https://www.data.jma.go.jp/developer/xml/data/20261103115930_0_VXSE51_270000.xml</id><updated>2026-11-03T11:59:30Z</updated>'
+            . '<link href="https://www.data.jma.go.jp/developer/xml/data/20261103115930_0_VXSE51_270000.xml"/></entry></feed>';
+
+        $feed = AtomFeed::fromString($xml, FeedType::EarthquakeVolcano->highFrequencyUrl());
+
+        $this->assertCount(1, $feed->entries);
+        $this->assertSame('VXSE51', $feed->entries[0]->file?->dataTypeCode);
+        $this->assertCount(1, $feed->warnings);
+        $this->assertStringContainsString('entry 1', $feed->warnings[0]);
     }
 }

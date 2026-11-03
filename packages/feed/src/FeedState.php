@@ -20,6 +20,7 @@ final readonly class FeedState
      * @param DateTimeImmutable $fetchedAt when the feed was last fetched successfully (200 or 304)
      * @param DateTimeImmutable|null $gapSince start of a gap not yet covered (high-frequency feed only)
      * @param list<string> $retryUrls telegrams to download again after a transient failure (high-frequency feed only)
+     * @param string|null $subscription fingerprint of the Subscription that uses this state (high-frequency feed only)
      */
     public function __construct(
         public ?string $etag,
@@ -28,12 +29,13 @@ final readonly class FeedState
         public DateTimeImmutable $fetchedAt,
         public ?DateTimeImmutable $gapSince = null,
         public array $retryUrls = [],
+        public ?string $subscription = null,
     ) {
         //
     }
 
     /**
-     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>}
+     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>, subscription: ?string}
      */
     public function toArray(): array
     {
@@ -44,6 +46,7 @@ final readonly class FeedState
             'fetchedAt' => $this->fetchedAt->format(DATE_ATOM),
             'gapSince' => $this->gapSince?->format(DATE_ATOM),
             'retryUrls' => $this->retryUrls,
+            'subscription' => $this->subscription,
         ];
     }
 
@@ -75,6 +78,7 @@ final readonly class FeedState
             self::optionalDateTime($data, 'fetchedAt') ?? throw new InvalidArgumentException('fetchedAt is required'),
             self::optionalDateTime($data, 'gapSince'),
             $urls,
+            self::optionalString($data, 'subscription'),
         );
     }
 

@@ -22,11 +22,13 @@ final readonly class AtomFeed
 
     /**
      * @param list<Entry> $entries in feed order
+     * @param list<string> $warnings entries that were skipped because they lack an id, an updated time or a link
      */
     public function __construct(
         public string $id,
         public DateTimeImmutable $updated,
         public array $entries,
+        public array $warnings = [],
     ) {
         //
     }
@@ -35,19 +37,25 @@ final readonly class AtomFeed
     {
         $root = self::load($xml, $url);
         $entries = [];
+        $warnings = [];
 
+        // One broken entry must not hide the others, so entries are checked one by one.
         foreach (self::children($root, 'entry') as $index => $entry) {
             $link = self::children($entry, 'link')[0] ?? null;
             $href = $link?->getAttribute('href') ?? '';
+            $id = self::text($entry, 'id');
+            $updated = W3cDateTime::parse(self::text($entry, 'updated'));
 
-            if ($href === '') {
-                throw new FeedException('Entry ' . ($index + 1) . ' has no link', $url);
+            if ($href === '' || $id === '' || $updated === null) {
+                $warnings[] = 'Skipped entry ' . ($index + 1) . ' of ' . $url . ': it needs an id, a valid updated time and a link';
+
+                continue;
             }
 
             $entries[] = new Entry(
-                self::requiredText($entry, 'id', $url),
+                $id,
                 self::text($entry, 'title'),
-                self::dateTime($entry, $url),
+                $updated,
                 self::text(self::children($entry, 'author')[0] ?? null, 'name'),
                 $href,
                 self::text($entry, 'content'),
@@ -55,7 +63,7 @@ final readonly class AtomFeed
             );
         }
 
-        return new self(self::requiredText($root, 'id', $url), self::dateTime($root, $url), $entries);
+        return new self(self::requiredText($root, 'id', $url), self::dateTime($root, $url), $entries, $warnings);
     }
 
     private static function load(string $xml, string $url): DOMElement

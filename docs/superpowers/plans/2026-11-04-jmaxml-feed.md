@@ -29,6 +29,7 @@
 - Atom の `entry` は `title`（管理部の Title）、`id`、`updated`、`author/name`、`link`（`type="application/xml"`、`href`）、`content` を持つ。**`id` と `link/@href` は同じ電文の URL**
 - 電文 URL のファイル名は `{yyyymmddhhmmss}_{n}_{データ種類コード}_{官署コード 6 桁}.xml`（例：`20261103054436_0_VXSE53_010000.xml`）。先頭の日時は管理部の `DateTime`（UTC）と一致する
 - フィードの `updated` は `+09:00`、エントリの `updated` は `Z` で書かれている
+- **（最終レビューで追記）** フィードのファイルは内容が変わったときにだけ書き換わる。2026-11-04 17:28Z の観測では、高頻度・長期とも `Last-Modified` が 17:01:13 で、高頻度フィードには 08:00Z〜17:00Z の 25 件が載っていた。つまり高頻度フィードは「直近 10 分以上」を載せ、静かなときはもっと長く残る。この事実を受けて、実装では「304 なら抜けにしない」「抜けの判定と『埋まった』の判定はフィード自身の `<updated>` で行う」「6 日を超えたら取り直す」に改めた
 - `packages/feed/tests/Fixtures/eqvol.xml` は 2026-11-04 に取得した実物（25 エントリ）。フィードの `id` は `https://www.data.jma.go.jp/developer/xml/feed/eqvol.xml#short_1793725258`、`updated` は `2026-11-04T02:00:58+09:00`。1 件目は `id` が `https://www.data.jma.go.jp/developer/xml/data/20261103170033_0_VFVO53_010000.xml`、`title` が `降灰予報（定時）`、`updated` が `2026-11-03T17:00:00Z`、`author` が `気象庁`
 
 ## 設計の要点（この計画で決めること）

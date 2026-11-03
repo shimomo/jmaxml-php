@@ -25,6 +25,7 @@ final class FeedStateTest extends TestCase
             new DateTimeImmutable('2026-11-03T12:00:00Z'),
             new DateTimeImmutable('2026-11-03T11:20:00Z'),
             ['https://www.data.jma.go.jp/developer/xml/data/a.xml', 'https://www.data.jma.go.jp/developer/xml/data/b.xml'],
+            '["eqvol",["VXSE51"],["通常"]]',
         );
         $empty = new FeedState(null, null, null, new DateTimeImmutable('2026-11-03T12:00:00Z'));
 

@@ -17,6 +17,8 @@ final readonly class PollResult
      * @param bool $notModified the high-frequency feed answered 304
      * @param bool $primed the state was (re)built: everything in the feeds was marked seen and nothing was returned
      * @param Gap|null $gap the gap handled by this poll, if any
+     * @param list<string> $warnings problems that did not stop the poll, e.g. a long-term feed that could not be fetched
+     *                               or feed entries that were skipped
      */
     public function __construct(
         public array $telegrams,
@@ -24,6 +26,7 @@ final readonly class PollResult
         public bool $notModified,
         public bool $primed,
         public ?Gap $gap,
+        public array $warnings = [],
     ) {
         //
     }

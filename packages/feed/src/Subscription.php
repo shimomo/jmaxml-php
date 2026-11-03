@@ -39,4 +39,17 @@ final readonly class Subscription
     {
         return in_array($status, $this->statuses, true);
     }
+
+    /**
+     * Identifies the subscription regardless of the order of its codes and statuses.
+     */
+    public function fingerprint(): string
+    {
+        $codes = $this->dataTypeCodes;
+        $statuses = $this->statuses;
+        sort($codes, SORT_STRING);
+        sort($statuses, SORT_STRING);
+
+        return json_encode([$this->feed->value, $codes, $statuses], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    }
 }
