@@ -1,0 +1,61 @@
+{
+    "name": "shimomo/jmaxml-php",
+    "description": "Unofficial PHP libraries for JMA (Japan Meteorological Agency) disaster information XML",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "shimomo",
+            "email": "yuichi@shimomo.net"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "ext-dom": "*",
+        "ext-libxml": "*"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.52",
+        "laravel/pint": "^1.27",
+        "phpunit/phpunit": "^13.2",
+        "vimeo/psalm": "^6.0"
+    },
+    "replace": {
+        "jmaxml/core": "self.version"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/*",
+            "canonical": false,
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "JmaXml\\": "packages/core/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JmaXml\\Codegen\\": "tools/codegen/src/",
+            "JmaXml\\Codegen\\Tests\\": "tools/codegen/tests/",
+            "JmaXml\\Tests\\": "packages/core/tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
+    },
+    "scripts": {
+        "analyse": "psalm",
+        "fix": "pint",
+        "generate": "php tools/codegen/bin/generate",
+        "lint": "pint --test",
+        "test": "phpunit"
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}

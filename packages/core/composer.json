@@ -1,0 +1,44 @@
+{
+    "name": "jmaxml/core",
+    "description": "Unofficial parser for JMA (Japan Meteorological Agency) disaster information XML",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "jma",
+        "jmaxml",
+        "earthquake",
+        "weather",
+        "xml"
+    ],
+    "authors": [
+        {
+            "name": "shimomo",
+            "email": "yuichi@shimomo.net"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "ext-dom": "*",
+        "ext-libxml": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.2",
+        "vimeo/psalm": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "JmaXml\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JmaXml\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}
