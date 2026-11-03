@@ -12,6 +12,12 @@
         </testsuite>
     </testsuites>
 
+    <groups>
+        <exclude>
+            <group>live</group>
+        </exclude>
+    </groups>
+
     <source>
         <include>
             <directory suffix=".php">packages/*/src/</directory>

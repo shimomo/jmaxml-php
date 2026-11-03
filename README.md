@@ -10,6 +10,7 @@ An **unofficial** set of PHP libraries for JMA (Japan Meteorological Agency) dis
 |---|---|
 | [`jmaxml/core`](packages/core) | 電文を公式 XML スキーマから生成した型付きオブジェクトとして読む |
 | [`jmaxml/codes`](packages/codes) | 地震関係のコード表（都道府県・細分区域・市町村・震度観測点・震央地名・津波予報区）を引く |
+| [`jmaxml/feed`](packages/feed) | 公開 Atom フィードをポーリングし、新着の電文を絞り込んで返す（抜けの検知つき） |
 
 使い方は各パッケージの README を参照してください。
 
@@ -17,7 +18,7 @@ An **unofficial** set of PHP libraries for JMA (Japan Meteorological Agency) dis
 
 ```bash
 composer install
-composer test       # PHPUnit
+composer test       # PHPUnit（実サーバーに接続するテストは除外。vendor/bin/phpunit --group live で実行）
 composer analyse    # Psalm
 composer lint       # Pint
 composer generate   # resources/jmaxml から packages/core/src の型と packages/codes/src/Data のコード表を再生成
