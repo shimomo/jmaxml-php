@@ -47,22 +47,80 @@ final class FeedClient
     public function poll(Subscription $subscription): PollResult
     {
         $now = $this->clock->now();
-        $url = $subscription->feed->highFrequencyUrl();
+        $highUrl = $subscription->feed->highFrequencyUrl();
+        $state = $this->store->load($highUrl);
+
+        if ($state === null || $now->getTimestamp() - $state->fetchedAt->getTimestamp() > $this->seenRetentionSeconds) {
+            return $this->prime($subscription, $state, $now);
+        }
+
+        $gapSince = $state->gapSince
+            ?? ($now->getTimestamp() - $state->fetchedAt->getTimestamp() > $this->gapThresholdSeconds ? $state->fetchedAt : null);
+
+        [$feed, $etag, $lastModified] = $this->fetchFeed($highUrl, $state);
+        $entries = $feed?->entries ?? [];
+        $gap = null;
+
+        if ($gapSince !== null) {
+            [$longEntries, $longUpdatedAt] = $this->fetchLongTermFeed($subscription, $now);
+            $entries = [...$longEntries, ...$entries];
+            $gap = new Gap($gapSince, $longUpdatedAt !== null && $longUpdatedAt->getTimestamp() >= $now->getTimestamp() - $this->gapThresholdSeconds);
+        }
+
+        [$telegrams, $failures, $retryUrls] = $this->process($subscription, $entries, $state->retryUrls, $now);
+
+        $this->store->save($highUrl, new FeedState(
+            $feed === null ? $state->etag : $etag,
+            $feed === null ? $state->lastModified : $lastModified,
+            $feed?->updated ?? $state->feedUpdatedAt,
+            $now,
+            $gap !== null && !$gap->covered ? $gap->since : null,
+            $retryUrls,
+        ));
+
+        return new PollResult($telegrams, $failures, $feed === null, false, $gap);
+    }
+
+    /**
+     * Builds the state from scratch: everything currently in both feeds is marked seen and nothing is returned,
+     * so that a first poll (or one after a pause longer than the seen retention) never reports old telegrams as new.
+     */
+    private function prime(Subscription $subscription, ?FeedState $previous, DateTimeImmutable $now): PollResult
+    {
+        $expiresAt = $now->modify('+' . $this->seenRetentionSeconds . ' seconds');
+
+        foreach ([$subscription->feed->longTermUrl(), $subscription->feed->highFrequencyUrl()] as $url) {
+            [$feed, $etag, $lastModified] = $this->fetchFeed($url, null);
+
+            foreach ($feed?->entries ?? [] as $entry) {
+                $this->store->markSeen($entry->id, $expiresAt);
+            }
+
+            $this->store->save($url, new FeedState($etag, $lastModified, $feed?->updated, $now));
+        }
+
+        return new PollResult([], [], false, true, $previous === null ? null : new Gap($previous->fetchedAt, false));
+    }
+
+    /**
+     * @return array{list<Entry>, ?DateTimeImmutable} the long-term feed's entries (empty on 304) and when it was last updated
+     */
+    private function fetchLongTermFeed(Subscription $subscription, DateTimeImmutable $now): array
+    {
+        $url = $subscription->feed->longTermUrl();
         $state = $this->store->load($url);
 
         [$feed, $etag, $lastModified] = $this->fetchFeed($url, $state);
-        [$telegrams, $failures, $retryUrls] = $this->process($subscription, $feed?->entries ?? [], $state?->retryUrls ?? [], $now);
+        $updatedAt = $feed?->updated ?? $state?->feedUpdatedAt;
 
         $this->store->save($url, new FeedState(
             $feed === null ? $state?->etag : $etag,
             $feed === null ? $state?->lastModified : $lastModified,
-            $feed?->updated ?? $state?->feedUpdatedAt,
+            $updatedAt,
             $now,
-            null,
-            $retryUrls,
         ));
 
-        return new PollResult($telegrams, $failures, $feed === null, false, null);
+        return [$feed?->entries ?? [], $updatedAt];
     }
 
     /**
