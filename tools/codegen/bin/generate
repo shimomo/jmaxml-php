@@ -3,7 +3,10 @@
 
 declare(strict_types=1);
 
+use JmaXml\Codegen\Codes\CodesGenerator;
+use JmaXml\Codegen\Codes\EarthquakeCodeTables;
 use JmaXml\Codegen\Dictionary\Dictionary;
+use JmaXml\Codegen\GeneratedFiles;
 use JmaXml\Codegen\Generator;
 use JmaXml\Codegen\Schema\SchemaSet;
 
@@ -28,3 +31,8 @@ $mini = new Generator(
 $mini->writeTo($root . '/tools/codegen/tests');
 
 fwrite(STDOUT, sprintf("Generated %d files.\n", count($written)));
+
+$codes = new CodesGenerator(EarthquakeCodeTables::fromXlsx($root . '/resources/jmaxml/codes/地震火山関連コード表.xlsx'));
+$writtenCodes = GeneratedFiles::write($root . '/packages/codes/src', $codes->generate());
+
+fwrite(STDOUT, sprintf("Generated %d code table files.\n", count($writtenCodes)));

@@ -21,6 +21,7 @@
         "vimeo/psalm": "^6.0"
     },
     "replace": {
+        "jmaxml/codes": "self.version",
         "jmaxml/core": "self.version"
     },
     "repositories": [
@@ -35,13 +36,15 @@
     ],
     "autoload": {
         "psr-4": {
-            "JmaXml\\": "packages/core/src/"
+            "JmaXml\\": "packages/core/src/",
+            "JmaXml\\Codes\\": "packages/codes/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "JmaXml\\Codegen\\": "tools/codegen/src/",
             "JmaXml\\Codegen\\Tests\\": "tools/codegen/tests/",
+            "JmaXml\\Codes\\Tests\\": "packages/codes/tests/",
             "JmaXml\\Tests\\": "packages/core/tests/"
         }
     },
