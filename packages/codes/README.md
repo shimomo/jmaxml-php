@@ -35,13 +35,30 @@ echo EarthquakeCodes::prefecture($area->prefectureCode)->name;   // 東京都
 
 ```php
 // 登録者の市町村 → 細分区域
-$areaCode = EarthquakeCodes::city($registeredCityCode)?->areaCode;
+$city = EarthquakeCodes::city($registeredCityCode);
+
+if ($city === null) {
+    // この表に無い市町村コード。照合できないので、黙って見送らずに扱いを決める
+    // （登録の見直しを促す、念のため対象に含める、など）
+    throw new UnmappedCityException($registeredCityCode);
+}
+
+$areaCode = $city->areaCode;
 
 // 逆に、震度速報に出た細分区域 → その中の市町村
 $cities = EarthquakeCodes::citiesInArea('350');
 ```
 
 続いて届く震源・震度に関する情報（VXSE53）には、市町村単位の震度も載ります。
+
+> [!WARNING]
+> `city()` が `null` を返す市町村コードは、震度速報とも、震源・震度に関する情報とも照合できません。照合に失敗すると、その人には何も届きません。次のようなコードは `null` になります。
+>
+> - **政令指定都市の市全体のコード**。たとえば `0110000`（札幌市）。地震情報では区単位（`0110100` 札幌中央区など）で扱われます
+> - **区の再編や市町村合併で無くなったコード**。たとえば浜松市の区の再編（2024 年）より前の `2213100`。いまは `2213800`（浜松中央区）などです
+> - 気象の情報にしか使われないコード（`AreaInformationCity` のうち、地震情報で使われないもの）
+>
+> 登録した時点で `city()` が `null` でないことを確かめてください。コード表を更新したときにも、すでに登録してあるコードを確かめ直してください。
 
 ## 収録している表
 

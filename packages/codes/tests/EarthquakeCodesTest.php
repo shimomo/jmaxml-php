@@ -72,6 +72,16 @@ final class EarthquakeCodesTest extends TestCase
     }
 
     #[Test]
+    public function parentCityAndRetiredWardCodesAreNotInTheEarthquakeTable(): void
+    {
+        // The README warns about these: they must be caught when a registration is stored.
+        $this->assertNull(EarthquakeCodes::city('0110000'));
+        $this->assertSame('札幌中央区', EarthquakeCodes::city('0110100')?->name);
+        $this->assertNull(EarthquakeCodes::city('2213100'));
+        $this->assertSame('浜松中央区', EarthquakeCodes::city('2213800')?->name);
+    }
+
+    #[Test]
     public function unknownCodesReturnNothing(): void
     {
         $this->assertNull(EarthquakeCodes::city('9999999'));
