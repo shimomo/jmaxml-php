@@ -37,8 +37,8 @@ final readonly class VolcanoObservation
             colorPlume: Node::mapOptional(Node::optional($element, self::NS, 'ColorPlume'), $path . '/ColorPlume', static fn(DOMElement $e, string $p): Plume => Plume::fromElement($e, $p)),
             whitePlume: Node::mapOptional(Node::optional($element, self::NS, 'WhitePlume'), $path . '/WhitePlume', static fn(DOMElement $e, string $p): Plume => Plume::fromElement($e, $p)),
             windAboveCrater: Node::mapOptional(Node::optional($element, self::NS, 'WindAboveCrater'), $path . '/WindAboveCrater', static fn(DOMElement $e, string $p): WindAboveCrater => WindAboveCrater::fromElement($e, $p)),
-            otherObservation: Node::mapOptional(Node::optional($element, self::NS, 'OtherObservation'), $path . '/OtherObservation', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            appendix: Node::mapOptional(Node::optional($element, self::NS, 'Appendix'), $path . '/Appendix', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            otherObservation: Node::mapOptional(Node::optional($element, self::NS, 'OtherObservation'), $path . '/OtherObservation', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            appendix: Node::mapOptional(Node::optional($element, self::NS, 'Appendix'), $path . '/Appendix', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

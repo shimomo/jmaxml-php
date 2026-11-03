@@ -48,7 +48,7 @@ final readonly class PrecipitationPart
             subArea: Node::mapMany(Node::many($element, self::NS, 'SubArea'), $path . '/SubArea', static fn(DOMElement $e, string $p): SubAreaPrecipitation => SubAreaPrecipitation::fromElement($e, $p)),
             precipitation: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Precipitation'), $path . '/Precipitation', static fn(DOMElement $e, string $p): Precipitation => Precipitation::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }

@@ -33,11 +33,11 @@ final readonly class BaseHumidity
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             humidity: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Humidity'), $path . '/Humidity', static fn(DOMElement $e, string $p): Humidity => Humidity::fromElement($e, $p)),
             local: Node::mapMany(Node::many($element, self::NS, 'Local'), $path . '/Local', static fn(DOMElement $e, string $p): LocalHumidity => LocalHumidity::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

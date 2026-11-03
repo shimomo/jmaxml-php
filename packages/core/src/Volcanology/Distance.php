@@ -28,10 +28,10 @@ final readonly class Distance
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::attribute($element, 'type'),
-            unit: Node::attribute($element, 'unit'),
-            description: Node::attribute($element, 'description'),
+            value: Node::toText(Node::text($element)),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

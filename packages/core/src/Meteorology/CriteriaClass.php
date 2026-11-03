@@ -33,11 +33,11 @@ final readonly class CriteriaClass
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            type: Node::attribute($element, 'type'),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }

@@ -31,7 +31,7 @@ final readonly class Hypocenter
     {
         return new self(
             area: HypoArea::fromElement(Node::one($element, self::NS, 'Area', $path), $path . '/Area'),
-            source: Node::mapOptional(Node::optional($element, self::NS, 'Source'), $path . '/Source', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            source: Node::mapOptional(Node::optional($element, self::NS, 'Source'), $path . '/Source', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             accuracy: Node::mapOptional(Node::optional($element, self::NS, 'Accuracy'), $path . '/Accuracy', static fn(DOMElement $e, string $p): Accuracy => Accuracy::fromElement($e, $p)),
         );
     }

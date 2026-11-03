@@ -29,8 +29,8 @@ final readonly class Naming
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            english: Node::attribute($element, 'english'),
+            value: Node::toText(Node::text($element)),
+            english: Node::attribute($element, 'english') === null ? null : Node::toText(Node::requiredAttribute($element, 'english', $path)),
         );
     }
 }

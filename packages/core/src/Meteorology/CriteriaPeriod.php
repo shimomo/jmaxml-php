@@ -49,7 +49,7 @@ final readonly class CriteriaPeriod
             criteriaClass: Node::mapOptional(Node::optional($element, self::NS, 'CriteriaClass'), $path . '/CriteriaClass', static fn(DOMElement $e, string $p): CriteriaClass => CriteriaClass::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             duration: Node::mapOptional(Node::optional($element, self::NS, 'Duration'), $path . '/Duration', static fn(DOMElement $e, string $p): DateInterval => Node::toDuration(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

@@ -23,7 +23,7 @@ final readonly class Item
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
             score: Node::toInt(Node::text(Node::one($element, self::NS, 'Score', $path)), $path . '/Score'),
         );
     }

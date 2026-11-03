@@ -33,10 +33,10 @@ final readonly class LgIntPerPeriod
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
+            value: Node::toText(Node::text($element)),
             periodicBand: Node::attribute($element, 'PeriodicBand') === null ? null : Node::toInt(Node::requiredAttribute($element, 'PeriodicBand', $path), $path . '/@PeriodicBand'),
             period: Node::attribute($element, 'Period') === null ? null : Node::toFloat(Node::requiredAttribute($element, 'Period', $path), $path . '/@Period'),
-            periodUnit: Node::attribute($element, 'PeriodUnit'),
+            periodUnit: Node::attribute($element, 'PeriodUnit') === null ? null : Node::toText(Node::requiredAttribute($element, 'PeriodUnit', $path)),
         );
     }
 }

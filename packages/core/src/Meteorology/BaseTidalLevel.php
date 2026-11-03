@@ -38,13 +38,13 @@ final readonly class BaseTidalLevel
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             tidalLevel: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalLevel'), $path . '/TidalLevel', static fn(DOMElement $e, string $p): TidalLevel => TidalLevel::fromElement($e, $p)),
             tidalPeriod: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalPeriod'), $path . '/TidalPeriod', static fn(DOMElement $e, string $p): TidalPeriod => TidalPeriod::fromElement($e, $p)),
             local: Node::mapMany(Node::many($element, self::NS, 'Local'), $path . '/Local', static fn(DOMElement $e, string $p): LocalTidalLevel => LocalTidalLevel::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             sequence: Node::mapMany(Node::many($element, self::NS, 'Sequence'), $path . '/Sequence', static fn(DOMElement $e, string $p): SequenceTidalLevel => SequenceTidalLevel::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

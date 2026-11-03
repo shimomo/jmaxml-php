@@ -32,7 +32,7 @@ final readonly class Tsunami
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            release: Node::mapOptional(Node::optional($element, self::NS, 'Release'), $path . '/Release', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            release: Node::mapOptional(Node::optional($element, self::NS, 'Release'), $path . '/Release', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             observation: Node::mapOptional(Node::optional($element, self::NS, 'Observation'), $path . '/Observation', static fn(DOMElement $e, string $p): TsunamiDetail => TsunamiDetail::fromElement($e, $p)),
             estimation: Node::mapOptional(Node::optional($element, self::NS, 'Estimation'), $path . '/Estimation', static fn(DOMElement $e, string $p): TsunamiDetail => TsunamiDetail::fromElement($e, $p)),
             forecast: Node::mapOptional(Node::optional($element, self::NS, 'Forecast'), $path . '/Forecast', static fn(DOMElement $e, string $p): TsunamiDetail => TsunamiDetail::fromElement($e, $p)),

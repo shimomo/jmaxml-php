@@ -75,22 +75,22 @@ final readonly class Area
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             prefecture: Node::mapOptional(Node::optional($element, self::NS, 'Prefecture'), $path . '/Prefecture', static fn(DOMElement $e, string $p): PrefectureCity => PrefectureCity::fromElement($e, $p)),
-            prefectureCode: Node::mapOptional(Node::optional($element, self::NS, 'PrefectureCode'), $path . '/PrefectureCode', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            prefectureCode: Node::mapOptional(Node::optional($element, self::NS, 'PrefectureCode'), $path . '/PrefectureCode', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             prefectureList: Node::mapOptional(Node::optional($element, self::NS, 'PrefectureList'), $path . '/PrefectureList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             prefectureCodeList: Node::mapOptional(Node::optional($element, self::NS, 'PrefectureCodeList'), $path . '/PrefectureCodeList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
-            subPrefecture: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefecture'), $path . '/SubPrefecture', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            subPrefectureCode: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefectureCode'), $path . '/SubPrefectureCode', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            subPrefecture: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefecture'), $path . '/SubPrefecture', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            subPrefectureCode: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefectureCode'), $path . '/SubPrefectureCode', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             subPrefectureList: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefectureList'), $path . '/SubPrefectureList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             subPrefectureCodeList: Node::mapOptional(Node::optional($element, self::NS, 'SubPrefectureCodeList'), $path . '/SubPrefectureCodeList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             city: Node::mapOptional(Node::optional($element, self::NS, 'City'), $path . '/City', static fn(DOMElement $e, string $p): PrefectureCity => PrefectureCity::fromElement($e, $p)),
-            cityCode: Node::mapOptional(Node::optional($element, self::NS, 'CityCode'), $path . '/CityCode', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            cityCode: Node::mapOptional(Node::optional($element, self::NS, 'CityCode'), $path . '/CityCode', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             cityList: Node::mapOptional(Node::optional($element, self::NS, 'CityList'), $path . '/CityList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             cityCodeList: Node::mapOptional(Node::optional($element, self::NS, 'CityCodeList'), $path . '/CityCodeList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
-            subCity: Node::mapOptional(Node::optional($element, self::NS, 'SubCity'), $path . '/SubCity', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            subCityCode: Node::mapOptional(Node::optional($element, self::NS, 'SubCityCode'), $path . '/SubCityCode', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            subCity: Node::mapOptional(Node::optional($element, self::NS, 'SubCity'), $path . '/SubCity', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            subCityCode: Node::mapOptional(Node::optional($element, self::NS, 'SubCityCode'), $path . '/SubCityCode', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             subCityList: Node::mapOptional(Node::optional($element, self::NS, 'SubCityList'), $path . '/SubCityList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             subCityCodeList: Node::mapOptional(Node::optional($element, self::NS, 'SubCityCodeList'), $path . '/SubCityCodeList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
             codeList: Node::mapOptional(Node::optional($element, self::NS, 'CodeList'), $path . '/CodeList', static fn(DOMElement $e, string $p): array => Node::toList(Node::text($e))),
@@ -98,9 +98,9 @@ final readonly class Area
             coordinate: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             line: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Line'), $path . '/Line', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             polygon: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Polygon'), $path . '/Polygon', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
-            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            codeType: Node::attribute($element, 'codeType'),
+            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            codeType: Node::attribute($element, 'codeType') === null ? null : Node::toText(Node::requiredAttribute($element, 'codeType', $path)),
         );
     }
 }

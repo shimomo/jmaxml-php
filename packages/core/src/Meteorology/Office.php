@@ -31,11 +31,11 @@ final readonly class Office
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            contactInfo: Node::mapOptional(Node::optional($element, self::NS, 'ContactInfo'), $path . '/ContactInfo', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            uRI: Node::mapOptional(Node::optional($element, self::NS, 'URI'), $path . '/URI', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            type: Node::requiredAttribute($element, 'type', $path),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            contactInfo: Node::mapOptional(Node::optional($element, self::NS, 'ContactInfo'), $path . '/ContactInfo', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            uRI: Node::mapOptional(Node::optional($element, self::NS, 'URI'), $path . '/URI', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

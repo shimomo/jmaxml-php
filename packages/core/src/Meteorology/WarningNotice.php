@@ -26,7 +26,7 @@ final readonly class WarningNotice
     {
         return new self(
             startTime: ForecastTerm::fromElement(Node::one($element, self::NS, 'StartTime', $path), $path . '/StartTime'),
-            note: Node::text(Node::one($element, self::NS, 'Note', $path)),
+            note: Node::toText(Node::text(Node::one($element, self::NS, 'Note', $path))),
         );
     }
 }

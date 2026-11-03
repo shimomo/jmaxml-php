@@ -25,8 +25,8 @@ final readonly class ForecastTerm
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            date: Node::mapOptional(Node::optional($element, self::NS, 'Date'), $path . '/Date', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            term: Node::mapOptional(Node::optional($element, self::NS, 'Term'), $path . '/Term', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            date: Node::mapOptional(Node::optional($element, self::NS, 'Date'), $path . '/Date', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            term: Node::mapOptional(Node::optional($element, self::NS, 'Term'), $path . '/Term', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

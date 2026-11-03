@@ -34,9 +34,9 @@ final readonly class WindSpeedLevel
     {
         return new self(
             value: Node::toNullableFloat(Node::text($element), $path),
-            type: Node::requiredAttribute($element, 'type', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            description: Node::attribute($element, 'description'),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
             range: Node::toList(Node::requiredAttribute($element, 'range', $path)),
         );
     }

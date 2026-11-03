@@ -30,7 +30,7 @@ final readonly class HypoAreaDistance
     {
         return new self(
             value: Node::toInt(Node::text($element), $path),
-            unit: Node::requiredAttribute($element, 'unit', $path),
+            unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
         );
     }
 }

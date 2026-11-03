@@ -34,10 +34,10 @@ final readonly class PlumeHeight
     {
         return new self(
             value: Node::toNullableInt(Node::text($element), $path),
-            type: Node::attribute($element, 'type'),
-            unit: Node::attribute($element, 'unit'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

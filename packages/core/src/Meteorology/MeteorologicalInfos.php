@@ -29,7 +29,7 @@ final readonly class MeteorologicalInfos
         return new self(
             meteorologicalInfo: Node::mapMany(Node::many($element, self::NS, 'MeteorologicalInfo'), $path . '/MeteorologicalInfo', static fn(DOMElement $e, string $p): MeteorologicalInfo => MeteorologicalInfo::fromElement($e, $p)),
             timeSeriesInfo: Node::mapMany(Node::many($element, self::NS, 'TimeSeriesInfo'), $path . '/TimeSeriesInfo', static fn(DOMElement $e, string $p): TimeSeriesInfo => TimeSeriesInfo::fromElement($e, $p)),
-            type: Node::requiredAttribute($element, 'type', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

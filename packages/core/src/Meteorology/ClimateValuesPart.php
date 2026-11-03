@@ -49,8 +49,8 @@ final readonly class ClimateValuesPart
             snowfallDepth: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'SnowfallDepth'), $path . '/SnowfallDepth', static fn(DOMElement $e, string $p): SnowfallDepth => SnowfallDepth::fromElement($e, $p)),
             snowDepth: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'SnowDepth'), $path . '/SnowDepth', static fn(DOMElement $e, string $p): SnowDepth => SnowDepth::fromElement($e, $p)),
             comparison: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Comparison'), $path . '/Comparison', static fn(DOMElement $e, string $p): Comparison => Comparison::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            type: Node::requiredAttribute($element, 'type', $path),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

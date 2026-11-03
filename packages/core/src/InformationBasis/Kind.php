@@ -27,9 +27,9 @@ final readonly class Kind
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

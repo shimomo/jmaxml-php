@@ -27,9 +27,9 @@ final readonly class ObservationAddition
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            deviationFromNormal: Node::mapOptional(Node::optional($element, self::NS, 'DeviationFromNormal'), $path . '/DeviationFromNormal', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            deviationFromLastYear: Node::mapOptional(Node::optional($element, self::NS, 'DeviationFromLastYear'), $path . '/DeviationFromLastYear', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            deviationFromNormal: Node::mapOptional(Node::optional($element, self::NS, 'DeviationFromNormal'), $path . '/DeviationFromNormal', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            deviationFromLastYear: Node::mapOptional(Node::optional($element, self::NS, 'DeviationFromLastYear'), $path . '/DeviationFromLastYear', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

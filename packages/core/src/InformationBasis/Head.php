@@ -47,17 +47,17 @@ final readonly class Head
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            title: Node::text(Node::one($element, self::NS, 'Title', $path)),
+            title: Node::toText(Node::text(Node::one($element, self::NS, 'Title', $path))),
             reportDateTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'ReportDateTime', $path)), $path . '/ReportDateTime'),
             targetDateTime: Node::toNillableDateTime(Node::one($element, self::NS, 'TargetDateTime', $path), $path . '/TargetDateTime'),
-            targetDTDubious: Node::mapOptional(Node::optional($element, self::NS, 'TargetDTDubious'), $path . '/TargetDTDubious', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            targetDTDubious: Node::mapOptional(Node::optional($element, self::NS, 'TargetDTDubious'), $path . '/TargetDTDubious', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             targetDuration: Node::mapOptional(Node::optional($element, self::NS, 'TargetDuration'), $path . '/TargetDuration', static fn(DOMElement $e, string $p): DateInterval => Node::toDuration(Node::text($e), $p)),
             validDateTime: Node::mapOptional(Node::optional($element, self::NS, 'ValidDateTime'), $path . '/ValidDateTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            eventID: Node::text(Node::one($element, self::NS, 'EventID', $path)),
-            infoType: Node::text(Node::one($element, self::NS, 'InfoType', $path)),
-            serial: Node::text(Node::one($element, self::NS, 'Serial', $path)),
-            infoKind: Node::text(Node::one($element, self::NS, 'InfoKind', $path)),
-            infoKindVersion: Node::text(Node::one($element, self::NS, 'InfoKindVersion', $path)),
+            eventID: Node::toText(Node::text(Node::one($element, self::NS, 'EventID', $path))),
+            infoType: Node::toText(Node::text(Node::one($element, self::NS, 'InfoType', $path))),
+            serial: Node::toText(Node::text(Node::one($element, self::NS, 'Serial', $path))),
+            infoKind: Node::toText(Node::text(Node::one($element, self::NS, 'InfoKind', $path))),
+            infoKindVersion: Node::toText(Node::text(Node::one($element, self::NS, 'InfoKindVersion', $path))),
             headline: Headline::fromElement(Node::one($element, self::NS, 'Headline', $path), $path . '/Headline'),
         );
     }

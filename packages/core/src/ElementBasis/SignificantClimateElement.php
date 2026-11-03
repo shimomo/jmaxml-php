@@ -56,7 +56,7 @@ final readonly class SignificantClimateElement
             thresholdOfAboveNormal: Node::mapOptional(Node::optional($element, self::NS, 'ThresholdOfAboveNormal'), $path . '/ThresholdOfAboveNormal', static fn(DOMElement $e, string $p): Threshold => Threshold::fromElement($e, $p)),
             thresholdOfSignificantlyBelowNormal: Node::mapOptional(Node::optional($element, self::NS, 'ThresholdOfSignificantlyBelowNormal'), $path . '/ThresholdOfSignificantlyBelowNormal', static fn(DOMElement $e, string $p): Threshold => Threshold::fromElement($e, $p)),
             thresholdOfSignificantlyAboveNormal: Node::mapOptional(Node::optional($element, self::NS, 'ThresholdOfSignificantlyAboveNormal'), $path . '/ThresholdOfSignificantlyAboveNormal', static fn(DOMElement $e, string $p): Threshold => Threshold::fromElement($e, $p)),
-            kind: Node::requiredAttribute($element, 'kind', $path),
+            kind: Node::toText(Node::requiredAttribute($element, 'kind', $path)),
         );
     }
 }

@@ -32,7 +32,7 @@ final readonly class Circle
         return new self(
             basePoint: Node::mapMany(Node::many($element, self::NS, 'BasePoint'), $path . '/BasePoint', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             axes: Node::mapOptional(Node::optional($element, self::NS, 'Axes'), $path . '/Axes', static fn(DOMElement $e, string $p): Axes => Axes::fromElement($e, $p)),
-            type: Node::attribute($element, 'type'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

@@ -32,10 +32,10 @@ final readonly class Station
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
             code: Node::mapMany(Node::atLeastOne($element, self::NS, 'Code', $path), $path . '/Code', static fn(DOMElement $e, string $p): StationCode => StationCode::fromElement($e, $p)),
-            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             coordinate: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
         );
     }

@@ -33,7 +33,7 @@ final readonly class LocalSignificancy
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            areaName: Node::text(Node::one($element, self::NS, 'AreaName', $path)),
+            areaName: Node::toText(Node::text(Node::one($element, self::NS, 'AreaName', $path))),
             significancy: Node::mapMany(Node::many($element, self::NS, 'Significancy'), $path . '/Significancy', static fn(DOMElement $e, string $p): Significancy => Significancy::fromElement($e, $p)),
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
             peakTime: Node::mapOptional(Node::optional($element, self::NS, 'PeakTime'), $path . '/PeakTime', static fn(DOMElement $e, string $p): ForecastTerm => ForecastTerm::fromElement($e, $p)),

@@ -86,6 +86,16 @@ final class NodeTest extends TestCase
     }
 
     #[Test]
+    public function trimsSingleLineTextButKeepsMultiLineTextVerbatim(): void
+    {
+        $this->assertSame('4', Node::toText('4 '));
+        $this->assertSame('9074', Node::toText("9074\n"));
+        $this->assertSame('　調査結果がまとまり次第お知らせします。', Node::toText("\n　調査結果がまとまり次第お知らせします。\n"));
+        $this->assertSame('', Node::toText("\n          "));
+        $this->assertSame("  見出し\n本文\n", Node::toText("  見出し\n本文\n"));
+    }
+
+    #[Test]
     public function convertsDateTimeKeepingTimezone(): void
     {
         $this->assertSame('2009-10-01T04:50:01+00:00', Node::toDateTime('2009-10-01T04:50:01Z', 'p')->format(DATE_ATOM));

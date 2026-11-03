@@ -38,7 +38,7 @@ final readonly class Earthquake
         return new self(
             originTime: Node::mapOptional(Node::optional($element, self::NS, 'OriginTime'), $path . '/OriginTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             arrivalTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'ArrivalTime', $path)), $path . '/ArrivalTime'),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             hypocenter: Node::mapOptional(Node::optional($element, self::NS, 'Hypocenter'), $path . '/Hypocenter', static fn(DOMElement $e, string $p): Hypocenter => Hypocenter::fromElement($e, $p)),
             magnitude: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Magnitude', $path), $path . '/Magnitude', static fn(DOMElement $e, string $p): Magnitude => Magnitude::fromElement($e, $p)),
         );

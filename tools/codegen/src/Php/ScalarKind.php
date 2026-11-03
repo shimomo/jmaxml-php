@@ -95,7 +95,7 @@ enum ScalarKind
     public function conversion(string $raw, string $path): string
     {
         return match ($this) {
-            self::String => $raw,
+            self::String => 'Node::toText(' . $raw . ')',
             self::Token => 'Node::toToken(' . $raw . ')',
             self::DateTime => 'Node::toDateTime(' . $raw . ', ' . $path . ')',
             self::Duration => 'Node::toDuration(' . $raw . ', ' . $path . ')',

@@ -32,7 +32,7 @@ final readonly class EventDatePart
             date: Node::mapMany(Node::many($element, self::NS, 'Date'), $path . '/Date', static fn(DOMElement $e, string $p): EventDate => EventDate::fromElement($e, $p)),
             normal: Node::mapMany(Node::many($element, self::NS, 'Normal'), $path . '/Normal', static fn(DOMElement $e, string $p): EventDate => EventDate::fromElement($e, $p)),
             lastYear: Node::mapMany(Node::many($element, self::NS, 'LastYear'), $path . '/LastYear', static fn(DOMElement $e, string $p): EventDate => EventDate::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

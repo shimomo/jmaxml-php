@@ -33,11 +33,11 @@ final readonly class LocalPrecipitationBasedIndex
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            areaName: Node::mapOptional(Node::optional($element, self::NS, 'AreaName'), $path . '/AreaName', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            areaName: Node::mapOptional(Node::optional($element, self::NS, 'AreaName'), $path . '/AreaName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
             precipitationBasedIndex: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PrecipitationBasedIndex'), $path . '/PrecipitationBasedIndex', static fn(DOMElement $e, string $p): PrecipitationBasedIndex => PrecipitationBasedIndex::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

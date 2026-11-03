@@ -35,12 +35,12 @@ final readonly class Icing
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::requiredAttribute($element, 'type', $path),
-            unit: Node::attribute($element, 'unit'),
+            value: Node::toText(Node::text($element)),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

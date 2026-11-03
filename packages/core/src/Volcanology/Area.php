@@ -34,11 +34,11 @@ final readonly class Area
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
             coordinate: Node::mapOptional(Node::optional($element, self::NS, 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
-            areaFromMark: Node::mapOptional(Node::optional($element, self::NS, 'AreaFromMark'), $path . '/AreaFromMark', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            craterName: Node::mapOptional(Node::optional($element, self::NS, 'CraterName'), $path . '/CraterName', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            areaFromMark: Node::mapOptional(Node::optional($element, self::NS, 'AreaFromMark'), $path . '/AreaFromMark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            craterName: Node::mapOptional(Node::optional($element, self::NS, 'CraterName'), $path . '/CraterName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             craterCoordinate: Node::mapOptional(Node::optional($element, self::NS, 'CraterCoordinate'), $path . '/CraterCoordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
         );
     }

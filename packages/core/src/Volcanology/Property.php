@@ -36,7 +36,7 @@ final readonly class Property
             polygon: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Polygon', $path), $path . '/Polygon', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             plumeDirection: PlumeDirection::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PlumeDirection', $path), $path . '/PlumeDirection'),
             distance: Distance::fromElement(Node::one($element, self::NS, 'Distance', $path), $path . '/Distance'),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

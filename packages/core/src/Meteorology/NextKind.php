@@ -32,11 +32,11 @@ final readonly class NextKind
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             dateTime: Node::mapOptional(Node::optional($element, self::NS, 'DateTime'), $path . '/DateTime', static fn(DOMElement $e, string $p): DateTime => DateTime::fromElement($e, $p)),
-            sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

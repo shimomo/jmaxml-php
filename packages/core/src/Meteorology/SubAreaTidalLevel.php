@@ -46,7 +46,7 @@ final readonly class SubAreaTidalLevel
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            areaName: Node::mapOptional(Node::optional($element, self::NS, 'AreaName'), $path . '/AreaName', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            areaName: Node::mapOptional(Node::optional($element, self::NS, 'AreaName'), $path . '/AreaName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
             base: Node::mapOptional(Node::optional($element, self::NS, 'Base'), $path . '/Base', static fn(DOMElement $e, string $p): BaseTidalLevel => BaseTidalLevel::fromElement($e, $p)),
             temporary: Node::mapMany(Node::many($element, self::NS, 'Temporary'), $path . '/Temporary', static fn(DOMElement $e, string $p): BaseTidalLevel => BaseTidalLevel::fromElement($e, $p)),
@@ -56,7 +56,7 @@ final readonly class SubAreaTidalLevel
             tidalPeriod: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalPeriod'), $path . '/TidalPeriod', static fn(DOMElement $e, string $p): TidalPeriod => TidalPeriod::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             sequence: Node::mapMany(Node::many($element, self::NS, 'Sequence'), $path . '/Sequence', static fn(DOMElement $e, string $p): SequenceTidalLevel => SequenceTidalLevel::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

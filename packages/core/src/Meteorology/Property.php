@@ -124,7 +124,7 @@ final readonly class Property
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            type: Node::text(Node::one($element, self::NS, 'Type', $path)),
+            type: Node::toText(Node::text(Node::one($element, self::NS, 'Type', $path))),
             significancyPart: Node::mapMany(Node::many($element, self::NS, 'SignificancyPart'), $path . '/SignificancyPart', static fn(DOMElement $e, string $p): SignificancyPart => SignificancyPart::fromElement($e, $p)),
             subsequentSignificancyPart: Node::mapMany(Node::many($element, self::NS, 'SubsequentSignificancyPart'), $path . '/SubsequentSignificancyPart', static fn(DOMElement $e, string $p): SignificancyPart => SignificancyPart::fromElement($e, $p)),
             warningPeriod: Node::mapOptional(Node::optional($element, self::NS, 'WarningPeriod'), $path . '/WarningPeriod', static fn(DOMElement $e, string $p): Period => Period::fromElement($e, $p)),

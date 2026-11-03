@@ -39,11 +39,11 @@ final readonly class SequenceTidalLevel
     {
         return new self(
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
-            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             tidalLevel: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalLevel'), $path . '/TidalLevel', static fn(DOMElement $e, string $p): TidalLevel => TidalLevel::fromElement($e, $p)),
             tidalPeriod: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalPeriod'), $path . '/TidalPeriod', static fn(DOMElement $e, string $p): TidalPeriod => TidalPeriod::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }

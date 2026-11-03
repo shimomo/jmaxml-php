@@ -232,9 +232,7 @@ final class ClassRenderer
         }
 
         $optional = self::nullable($kind->phpType());
-        $expression = $kind === ScalarKind::String
-            ? 'Node::attribute($element, ' . $name . ')'
-            : 'Node::attribute($element, ' . $name . ') === null ? null : ' . $kind->conversion($required, $path);
+        $expression = 'Node::attribute($element, ' . $name . ') === null ? null : ' . $kind->conversion($required, $path);
 
         return new Property($property, $optional, self::listDoc($optional, $kind), $expression, $description);
     }

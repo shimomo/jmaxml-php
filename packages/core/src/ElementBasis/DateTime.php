@@ -37,11 +37,11 @@ final readonly class DateTime
     {
         return new self(
             value: Node::toDateTime(Node::text($element), $path),
-            type: Node::attribute($element, 'type'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
             significant: Node::attribute($element, 'significant') === null ? null : Node::toToken(Node::requiredAttribute($element, 'significant', $path)),
             precision: Node::attribute($element, 'precision') === null ? null : Node::toToken(Node::requiredAttribute($element, 'precision', $path)),
             dubious: Node::attribute($element, 'dubious') === null ? null : Node::toToken(Node::requiredAttribute($element, 'dubious', $path)),
-            description: Node::attribute($element, 'description'),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

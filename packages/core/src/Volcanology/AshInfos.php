@@ -26,7 +26,7 @@ final readonly class AshInfos
     {
         return new self(
             ashInfo: Node::mapMany(Node::atLeastOne($element, self::NS, 'AshInfo', $path), $path . '/AshInfo', static fn(DOMElement $e, string $p): AshInfo => AshInfo::fromElement($e, $p)),
-            type: Node::requiredAttribute($element, 'type', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

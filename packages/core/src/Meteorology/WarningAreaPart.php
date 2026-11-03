@@ -30,7 +30,7 @@ final readonly class WarningAreaPart
         return new self(
             windSpeed: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindSpeed', $path), $path . '/WindSpeed', static fn(DOMElement $e, string $p): WindSpeed => WindSpeed::fromElement($e, $p)),
             circle: Circle::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Circle', $path), $path . '/Circle'),
-            type: Node::requiredAttribute($element, 'type', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

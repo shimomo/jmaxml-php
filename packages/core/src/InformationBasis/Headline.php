@@ -25,7 +25,7 @@ final readonly class Headline
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            text: Node::text(Node::one($element, self::NS, 'Text', $path)),
+            text: Node::toText(Node::text(Node::one($element, self::NS, 'Text', $path))),
             information: Node::mapMany(Node::many($element, self::NS, 'Information'), $path . '/Information', static fn(DOMElement $e, string $p): Information => Information::fromElement($e, $p)),
         );
     }

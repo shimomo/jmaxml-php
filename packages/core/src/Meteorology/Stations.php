@@ -26,7 +26,7 @@ final readonly class Stations
     {
         return new self(
             station: Node::mapMany(Node::atLeastOne($element, self::NS, 'Station', $path), $path . '/Station', static fn(DOMElement $e, string $p): Station => Station::fromElement($e, $p)),
-            codeType: Node::attribute($element, 'codeType'),
+            codeType: Node::attribute($element, 'codeType') === null ? null : Node::toText(Node::requiredAttribute($element, 'codeType', $path)),
         );
     }
 }

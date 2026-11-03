@@ -35,12 +35,12 @@ final readonly class LocalCriteria
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            areaName: Node::text(Node::one($element, self::NS, 'AreaName', $path)),
+            areaName: Node::toText(Node::text(Node::one($element, self::NS, 'AreaName', $path))),
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
             criteriaClass: CriteriaClass::fromElement(Node::one($element, self::NS, 'CriteriaClass', $path), $path . '/CriteriaClass'),
             time: Node::toDateTime(Node::text(Node::one($element, self::NS, 'Time', $path)), $path . '/Time'),
             duration: Node::mapOptional(Node::optional($element, self::NS, 'Duration'), $path . '/Duration', static fn(DOMElement $e, string $p): DateInterval => Node::toDuration(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

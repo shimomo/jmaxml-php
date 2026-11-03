@@ -46,11 +46,11 @@ final readonly class Kind
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            className: Node::mapOptional(Node::optional($element, self::NS, 'ClassName'), $path . '/ClassName', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            status: Node::mapOptional(Node::optional($element, self::NS, 'Status'), $path . '/Status', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            className: Node::mapOptional(Node::optional($element, self::NS, 'ClassName'), $path . '/ClassName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             lastKind: Node::mapOptional(Node::optional($element, self::NS, 'LastKind'), $path . '/LastKind', static fn(DOMElement $e, string $p): NextKind => NextKind::fromElement($e, $p)),
             nextKinds: Node::mapOptional(Node::optional($element, self::NS, 'NextKinds'), $path . '/NextKinds', static fn(DOMElement $e, string $p): NextKinds => NextKinds::fromElement($e, $p)),
             attention: Node::mapOptional(Node::optional($element, self::NS, 'Attention'), $path . '/Attention', static fn(DOMElement $e, string $p): Attention => Attention::fromElement($e, $p)),

@@ -125,6 +125,19 @@ final class Node
         return $element->textContent;
     }
 
+    /**
+     * Converts an xs:string value: single-line values lose surrounding XML whitespace, while text that spans
+     * several lines (plain text, spec 1.3.8) is returned verbatim so that its layout survives.
+     *
+     * Telegrams carry values such as <MaxInt>4 </MaxInt> and <Code>9074\n</Code>.
+     */
+    public static function toText(string $raw): string
+    {
+        $trimmed = trim($raw, self::XML_WHITESPACE);
+
+        return str_contains($trimmed, "\n") || str_contains($trimmed, "\r") ? $raw : $trimmed;
+    }
+
     public static function toToken(string $raw): string
     {
         return (string) preg_replace('/[ \t\n\r]+/', ' ', trim($raw, self::XML_WHITESPACE));

@@ -46,7 +46,7 @@ final readonly class WaveHeightPart
             subArea: Node::mapMany(Node::many($element, self::NS, 'SubArea'), $path . '/SubArea', static fn(DOMElement $e, string $p): SubAreaWaveHeight => SubAreaWaveHeight::fromElement($e, $p)),
             waveHeight: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WaveHeight'), $path . '/WaveHeight', static fn(DOMElement $e, string $p): WaveHeight => WaveHeight::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

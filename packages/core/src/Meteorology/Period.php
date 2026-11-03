@@ -31,7 +31,7 @@ final readonly class Period
         return new self(
             startTime: Node::mapOptional(Node::optional($element, self::NS, 'StartTime'), $path . '/StartTime', static fn(DOMElement $e, string $p): ForecastTerm => ForecastTerm::fromElement($e, $p)),
             endTime: Node::mapOptional(Node::optional($element, self::NS, 'EndTime'), $path . '/EndTime', static fn(DOMElement $e, string $p): ForecastTerm => ForecastTerm::fromElement($e, $p)),
-            overTime: Node::mapOptional(Node::optional($element, self::NS, 'OverTime'), $path . '/OverTime', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            overTime: Node::mapOptional(Node::optional($element, self::NS, 'OverTime'), $path . '/OverTime', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             zoneTime: Node::mapOptional(Node::optional($element, self::NS, 'ZoneTime'), $path . '/ZoneTime', static fn(DOMElement $e, string $p): ForecastTerm => ForecastTerm::fromElement($e, $p)),
         );
     }

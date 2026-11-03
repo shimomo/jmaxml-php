@@ -31,7 +31,7 @@ final readonly class SynopsisPart
         return new self(
             synopsis: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Synopsis', $path), $path . '/Synopsis', static fn(DOMElement $e, string $p): Synopsis => Synopsis::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

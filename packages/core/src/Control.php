@@ -32,10 +32,10 @@ final readonly class Control
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            title: Node::text(Node::one($element, self::NS, 'Title', $path)),
+            title: Node::toText(Node::text(Node::one($element, self::NS, 'Title', $path))),
             dateTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'DateTime', $path)), $path . '/DateTime'),
-            status: Node::text(Node::one($element, self::NS, 'Status', $path)),
-            editorialOffice: Node::text(Node::one($element, self::NS, 'EditorialOffice', $path)),
+            status: Node::toText(Node::text(Node::one($element, self::NS, 'Status', $path))),
+            editorialOffice: Node::toText(Node::text(Node::one($element, self::NS, 'EditorialOffice', $path))),
             publishingOffice: Node::toList(Node::text(Node::one($element, self::NS, 'PublishingOffice', $path))),
         );
     }

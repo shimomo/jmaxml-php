@@ -50,7 +50,7 @@ final readonly class TidalLevelPart
             tidalLevel: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalLevel'), $path . '/TidalLevel', static fn(DOMElement $e, string $p): TidalLevel => TidalLevel::fromElement($e, $p)),
             tidalPeriod: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalPeriod'), $path . '/TidalPeriod', static fn(DOMElement $e, string $p): TidalPeriod => TidalPeriod::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

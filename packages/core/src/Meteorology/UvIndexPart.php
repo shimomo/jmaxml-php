@@ -27,7 +27,7 @@ final readonly class UvIndexPart
     {
         return new self(
             uvIndex: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'UvIndex', $path), $path . '/UvIndex', static fn(DOMElement $e, string $p): UvIndex => UvIndex::fromElement($e, $p)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

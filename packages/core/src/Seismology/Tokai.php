@@ -27,9 +27,9 @@ final readonly class Tokai
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            infoKind: Node::text(Node::one($element, self::NS, 'InfoKind', $path)),
+            infoKind: Node::toText(Node::text(Node::one($element, self::NS, 'InfoKind', $path))),
             infoSerial: Node::mapOptional(Node::optional($element, self::NS, 'InfoSerial'), $path . '/InfoSerial', static fn(DOMElement $e, string $p): InfoSerial => InfoSerial::fromElement($e, $p)),
-            text: Node::text(Node::one($element, self::NS, 'Text', $path)),
+            text: Node::toText(Node::text(Node::one($element, self::NS, 'Text', $path))),
         );
     }
 }

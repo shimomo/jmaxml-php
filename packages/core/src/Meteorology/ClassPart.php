@@ -36,7 +36,7 @@ final readonly class ClassPart
             areaClass: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'AreaClass'), $path . '/AreaClass', static fn(DOMElement $e, string $p): AreaClass => AreaClass::fromElement($e, $p)),
             intensityClass: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'IntensityClass'), $path . '/IntensityClass', static fn(DOMElement $e, string $p): IntensityClass => IntensityClass::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

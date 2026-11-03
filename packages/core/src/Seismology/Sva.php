@@ -30,7 +30,7 @@ final readonly class Sva
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            unit: Node::requiredAttribute($element, 'unit', $path),
+            unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
         );
     }
 }

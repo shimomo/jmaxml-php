@@ -26,7 +26,7 @@ final readonly class Aftershocks
     {
         return new self(
             item: Node::mapMany(Node::atLeastOne($element, self::NS, 'Item', $path), $path . '/Item', static fn(DOMElement $e, string $p): AftershockItem => AftershockItem::fromElement($e, $p)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

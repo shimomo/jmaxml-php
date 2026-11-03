@@ -35,8 +35,8 @@ final readonly class Area
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::mapOptional(Node::optional($element, self::NS, 'Code'), $path . '/Code', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             circle: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Circle'), $path . '/Circle', static fn(DOMElement $e, string $p): Circle => Circle::fromElement($e, $p)),
             coordinate: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             line: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Line'), $path . '/Line', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),

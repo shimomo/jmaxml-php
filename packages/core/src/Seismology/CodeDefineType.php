@@ -29,8 +29,8 @@ final readonly class CodeDefineType
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            xpath: Node::requiredAttribute($element, 'xpath', $path),
+            value: Node::toText(Node::text($element)),
+            xpath: Node::toText(Node::requiredAttribute($element, 'xpath', $path)),
         );
     }
 }

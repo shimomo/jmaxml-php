@@ -29,7 +29,7 @@ final readonly class FloodAssumptionTable
         return new self(
             area: Area::fromElement(Node::one($element, self::NS, 'Area', $path), $path . '/Area'),
             floodAssumptionPart: Node::mapMany(Node::many($element, self::NS, 'FloodAssumptionPart'), $path . '/FloodAssumptionPart', static fn(DOMElement $e, string $p): FloodAssumptionPart => FloodAssumptionPart::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

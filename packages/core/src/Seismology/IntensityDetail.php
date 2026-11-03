@@ -41,9 +41,9 @@ final readonly class IntensityDetail
     {
         return new self(
             codeDefine: Node::mapOptional(Node::optional($element, self::NS, 'CodeDefine'), $path . '/CodeDefine', static fn(DOMElement $e, string $p): CodeDefine => CodeDefine::fromElement($e, $p)),
-            maxInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxInt'), $path . '/MaxInt', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            maxLgInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgInt'), $path . '/MaxLgInt', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            lgCategory: Node::mapOptional(Node::optional($element, self::NS, 'LgCategory'), $path . '/LgCategory', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            maxInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxInt'), $path . '/MaxInt', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            maxLgInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgInt'), $path . '/MaxLgInt', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            lgCategory: Node::mapOptional(Node::optional($element, self::NS, 'LgCategory'), $path . '/LgCategory', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             forecastInt: Node::mapOptional(Node::optional($element, self::NS, 'ForecastInt'), $path . '/ForecastInt', static fn(DOMElement $e, string $p): ForecastInt => ForecastInt::fromElement($e, $p)),
             forecastLgInt: Node::mapOptional(Node::optional($element, self::NS, 'ForecastLgInt'), $path . '/ForecastLgInt', static fn(DOMElement $e, string $p): ForecastLgInt => ForecastLgInt::fromElement($e, $p)),
             appendix: Node::mapOptional(Node::optional($element, self::NS, 'Appendix'), $path . '/Appendix', static fn(DOMElement $e, string $p): IntensityAppendix => IntensityAppendix::fromElement($e, $p)),

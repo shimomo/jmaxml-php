@@ -34,8 +34,8 @@ final readonly class WindAboveCraterElements
             windHeightAboveSeaLevel: PlumeHeight::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindHeightAboveSeaLevel', $path), $path . '/WindHeightAboveSeaLevel'),
             windDegree: WindDegree::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindDegree', $path), $path . '/WindDegree'),
             windSpeed: WindSpeed::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindSpeed', $path), $path . '/WindSpeed'),
-            heightProperty: Node::attribute($element, 'heightProperty'),
-            description: Node::attribute($element, 'description'),
+            heightProperty: Node::attribute($element, 'heightProperty') === null ? null : Node::toText(Node::requiredAttribute($element, 'heightProperty', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

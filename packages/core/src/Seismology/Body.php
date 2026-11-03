@@ -55,8 +55,8 @@ final readonly class Body implements BodyContract
             earthquakeInfo: Node::mapOptional(Node::optional($element, self::NS, 'EarthquakeInfo'), $path . '/EarthquakeInfo', static fn(DOMElement $e, string $p): EarthquakeInfo => EarthquakeInfo::fromElement($e, $p)),
             earthquakeCount: Node::mapOptional(Node::optional($element, self::NS, 'EarthquakeCount'), $path . '/EarthquakeCount', static fn(DOMElement $e, string $p): EarthquakeCount => EarthquakeCount::fromElement($e, $p)),
             aftershock: Node::mapOptional(Node::optional($element, self::NS, 'Aftershock'), $path . '/Aftershock', static fn(DOMElement $e, string $p): Aftershocks => Aftershocks::fromElement($e, $p)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            nextAdvisory: Node::mapOptional(Node::optional($element, self::NS, 'NextAdvisory'), $path . '/NextAdvisory', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            nextAdvisory: Node::mapOptional(Node::optional($element, self::NS, 'NextAdvisory'), $path . '/NextAdvisory', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             comments: Node::mapOptional(Node::optional($element, self::NS, 'Comments'), $path . '/Comments', static fn(DOMElement $e, string $p): Comment => Comment::fromElement($e, $p)),
         );
     }

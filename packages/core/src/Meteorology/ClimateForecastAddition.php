@@ -29,10 +29,10 @@ final readonly class ClimateForecastAddition
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            targetDateTimeNotice: Node::mapOptional(Node::optional($element, self::NS, 'TargetDateTimeNotice'), $path . '/TargetDateTimeNotice', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            targetDateTimeNotice: Node::mapOptional(Node::optional($element, self::NS, 'TargetDateTimeNotice'), $path . '/TargetDateTimeNotice', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             nextForecastSchedule: Node::mapMany(Node::many($element, self::NS, 'NextForecastSchedule'), $path . '/NextForecastSchedule', static fn(DOMElement $e, string $p): ForecastSchedule => ForecastSchedule::fromElement($e, $p)),
-            noticeOfSchedule: Node::mapOptional(Node::optional($element, self::NS, 'NoticeOfSchedule'), $path . '/NoticeOfSchedule', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            additionalNotice: Node::mapOptional(Node::optional($element, self::NS, 'AdditionalNotice'), $path . '/AdditionalNotice', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            noticeOfSchedule: Node::mapOptional(Node::optional($element, self::NS, 'NoticeOfSchedule'), $path . '/NoticeOfSchedule', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            additionalNotice: Node::mapOptional(Node::optional($element, self::NS, 'AdditionalNotice'), $path . '/AdditionalNotice', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

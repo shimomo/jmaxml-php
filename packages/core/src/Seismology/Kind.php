@@ -28,8 +28,8 @@ final readonly class Kind
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
         );
     }
 }

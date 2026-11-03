@@ -29,8 +29,8 @@ final readonly class ReferableString
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::attribute($element, 'type'),
+            value: Node::toText(Node::text($element)),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }

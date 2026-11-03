@@ -74,7 +74,7 @@ XSD による検証はしません。次の方針で寛容に読みます。
 - 未知の要素・属性は無視します。将来、要素が追加されても読み込みは失敗しません
 - 子要素の順序は検査しません
 - 必須の要素・属性が無い場合や、値を型に変換できない場合は `ParseException` になります
-- `xs:string` の値は加工しません。たとえば `<MaxInt>4 </MaxInt>` は `'4 '` のまま返します
+- 1 行の `xs:string` の値は、前後の空白（半角スペース・タブ・改行）を除きます。たとえば `<MaxInt>4 </MaxInt>` は `'4'`、`<Code>9074⏎</Code>` は `'9074'` になります。複数行にわたる平文は、レイアウトを保つためそのまま返します
 - `xs:token`、数値、日時、期間、真偽値は、前後の空白を除いてから変換します
 - 数値の `NaN`（演算してはいけない値）は `null` にします。`condition` や `description` などの属性はそのまま残ります
 - 空要素は、`jmx_eb:nullablefloat` / `nullableinteger` なら `null`、文字列なら空文字列です
@@ -99,7 +99,7 @@ XSD による検証はしません。次の方針で寛容に読みます。
 
 | XSD | PHP |
 |---|---|
-| `xs:string`、`xs:anyURI`、列挙 | `string` |
+| `xs:string`、`xs:anyURI`、列挙 | `string`（1 行なら前後の空白を除く） |
 | `xs:token` | `string`（空白を正規化） |
 | `xs:dateTime` | `DateTimeImmutable` |
 | `xs:duration` | `DateInterval` |

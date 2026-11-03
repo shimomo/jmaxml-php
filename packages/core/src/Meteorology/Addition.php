@@ -23,7 +23,7 @@ final readonly class Addition
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            note: Node::mapMany(Node::atLeastOne($element, self::NS, 'Note', $path), $path . '/Note', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            note: Node::mapMany(Node::atLeastOne($element, self::NS, 'Note', $path), $path . '/Note', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

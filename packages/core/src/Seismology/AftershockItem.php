@@ -37,7 +37,7 @@ final readonly class AftershockItem
             endTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'EndTime', $path)), $path . '/EndTime'),
             probabilityOfAftershock: ProbabilityOfAftershock::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'ProbabilityOfAftershock', $path), $path . '/ProbabilityOfAftershock'),
             targetMagnitude: Magnitude::fromElement(Node::one($element, self::NS, 'TargetMagnitude', $path), $path . '/TargetMagnitude'),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

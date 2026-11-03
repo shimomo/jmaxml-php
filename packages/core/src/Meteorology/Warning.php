@@ -26,7 +26,7 @@ final readonly class Warning
     {
         return new self(
             item: Node::mapMany(Node::atLeastOne($element, self::NS, 'Item', $path), $path . '/Item', static fn(DOMElement $e, string $p): Item => Item::fromElement($e, $p)),
-            type: Node::requiredAttribute($element, 'type', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

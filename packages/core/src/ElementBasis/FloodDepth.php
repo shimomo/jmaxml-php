@@ -38,12 +38,12 @@ final readonly class FloodDepth
     {
         return new self(
             value: Node::toNullableFloat(Node::text($element), $path),
-            type: Node::requiredAttribute($element, 'type', $path),
-            unit: Node::attribute($element, 'unit'),
-            bound: Node::attribute($element, 'bound'),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            bound: Node::attribute($element, 'bound') === null ? null : Node::toText(Node::requiredAttribute($element, 'bound', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

@@ -46,7 +46,7 @@ final readonly class WindDirectionPart
             subArea: Node::mapMany(Node::many($element, self::NS, 'SubArea'), $path . '/SubArea', static fn(DOMElement $e, string $p): SubAreaWindDirection => SubAreaWindDirection::fromElement($e, $p)),
             windDirection: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindDirection'), $path . '/WindDirection', static fn(DOMElement $e, string $p): WindDirection => WindDirection::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

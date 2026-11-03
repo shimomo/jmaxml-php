@@ -47,16 +47,16 @@ final readonly class IntensityPref
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
             category: Node::mapOptional(Node::optional($element, self::NS, 'Category'), $path . '/Category', static fn(DOMElement $e, string $p): Category => Category::fromElement($e, $p)),
-            maxInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxInt'), $path . '/MaxInt', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            maxLgInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgInt'), $path . '/MaxLgInt', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            maxInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxInt'), $path . '/MaxInt', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            maxLgInt: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgInt'), $path . '/MaxLgInt', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             forecastInt: Node::mapOptional(Node::optional($element, self::NS, 'ForecastInt'), $path . '/ForecastInt', static fn(DOMElement $e, string $p): ForecastInt => ForecastInt::fromElement($e, $p)),
             forecastLgInt: Node::mapOptional(Node::optional($element, self::NS, 'ForecastLgInt'), $path . '/ForecastLgInt', static fn(DOMElement $e, string $p): ForecastLgInt => ForecastLgInt::fromElement($e, $p)),
             arrivalTime: Node::mapOptional(Node::optional($element, self::NS, 'ArrivalTime'), $path . '/ArrivalTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             area: Node::mapMany(Node::many($element, self::NS, 'Area'), $path . '/Area', static fn(DOMElement $e, string $p): IntensityArea => IntensityArea::fromElement($e, $p)),
         );
     }

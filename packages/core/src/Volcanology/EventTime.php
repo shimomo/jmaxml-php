@@ -30,7 +30,7 @@ final readonly class EventTime
         return new self(
             eventDateTime: Node::mapOptional(Node::optional($element, self::NS, 'EventDateTime'), $path . '/EventDateTime', static fn(DOMElement $e, string $p): DateTime => DateTime::fromElement($e, $p)),
             eventDateTimeUTC: Node::mapOptional(Node::optional($element, self::NS, 'EventDateTimeUTC'), $path . '/EventDateTimeUTC', static fn(DOMElement $e, string $p): DateTime => DateTime::fromElement($e, $p)),
-            eventDateTimeComment: Node::mapOptional(Node::optional($element, self::NS, 'EventDateTimeComment'), $path . '/EventDateTimeComment', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            eventDateTimeComment: Node::mapOptional(Node::optional($element, self::NS, 'EventDateTimeComment'), $path . '/EventDateTimeComment', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

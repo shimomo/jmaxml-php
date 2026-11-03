@@ -28,7 +28,7 @@ final readonly class WeatherForecastProbability
         return new self(
             value: Node::toFloat(Node::text($element), $path),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            unit: Node::attribute($element, 'unit'),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
         );
     }
 }

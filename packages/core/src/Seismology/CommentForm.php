@@ -30,9 +30,9 @@ final readonly class CommentForm
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            text: Node::text(Node::one($element, self::NS, 'Text', $path)),
+            text: Node::toText(Node::text(Node::one($element, self::NS, 'Text', $path))),
             code: Node::toList(Node::text(Node::one($element, self::NS, 'Code', $path))),
-            codeType: Node::requiredAttribute($element, 'codeType', $path),
+            codeType: Node::toText(Node::requiredAttribute($element, 'codeType', $path)),
         );
     }
 }

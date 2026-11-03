@@ -33,7 +33,7 @@ final readonly class TimeDefine
         return new self(
             dateTime: DateTime::fromElement(Node::one($element, self::NS, 'DateTime', $path), $path . '/DateTime'),
             duration: Node::mapOptional(Node::optional($element, self::NS, 'Duration'), $path . '/Duration', static fn(DOMElement $e, string $p): DateInterval => Node::toDuration(Node::text($e), $p)),
-            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             timeId: Node::toInt(Node::requiredAttribute($element, 'timeId', $path), $path . '/@timeId'),
         );
     }

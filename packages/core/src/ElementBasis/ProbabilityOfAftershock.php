@@ -32,8 +32,8 @@ final readonly class ProbabilityOfAftershock
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            type: Node::requiredAttribute($element, 'type', $path),
-            unit: Node::requiredAttribute($element, 'unit', $path),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
         );
     }
 }

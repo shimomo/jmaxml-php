@@ -27,8 +27,8 @@ final readonly class AreaClass
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::requiredAttribute($element, 'type', $path),
+            value: Node::toText(Node::text($element)),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

@@ -33,11 +33,11 @@ final readonly class Weather
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::requiredAttribute($element, 'type', $path),
+            value: Node::toText(Node::text($element)),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

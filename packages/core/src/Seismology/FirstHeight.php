@@ -44,10 +44,10 @@ final readonly class FirstHeight
             arrivalTimeFrom: Node::mapOptional(Node::optional($element, self::NS, 'ArrivalTimeFrom'), $path . '/ArrivalTimeFrom', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             arrivalTimeTo: Node::mapOptional(Node::optional($element, self::NS, 'ArrivalTimeTo'), $path . '/ArrivalTimeTo', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             arrivalTime: Node::mapOptional(Node::optional($element, self::NS, 'ArrivalTime'), $path . '/ArrivalTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            initial: Node::mapOptional(Node::optional($element, self::NS, 'Initial'), $path . '/Initial', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            initial: Node::mapOptional(Node::optional($element, self::NS, 'Initial'), $path . '/Initial', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             tsunamiHeight: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TsunamiHeight'), $path . '/TsunamiHeight', static fn(DOMElement $e, string $p): TsunamiHeight => TsunamiHeight::fromElement($e, $p)),
-            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             period: Node::mapOptional(Node::optional($element, self::NS, 'Period'), $path . '/Period', static fn(DOMElement $e, string $p): ?float => Node::toFloat(Node::text($e), $p)),
         );
     }

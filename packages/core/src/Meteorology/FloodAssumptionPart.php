@@ -31,7 +31,7 @@ final readonly class FloodAssumptionPart
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            floodAssumptionArea: Node::mapOptional(Node::optional($element, self::NS, 'FloodAssumptionArea'), $path . '/FloodAssumptionArea', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            floodAssumptionArea: Node::mapOptional(Node::optional($element, self::NS, 'FloodAssumptionArea'), $path . '/FloodAssumptionArea', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             attainmentTime: Node::mapOptional(Node::optional($element, self::NS, 'AttainmentTime'), $path . '/AttainmentTime', static fn(DOMElement $e, string $p): DateTime => DateTime::fromElement($e, $p)),
             floodDepth: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'FloodDepth'), $path . '/FloodDepth', static fn(DOMElement $e, string $p): FloodDepth => FloodDepth::fromElement($e, $p)),
             attainmentDeepestTime: Node::mapOptional(Node::optional($element, self::NS, 'AttainmentDeepestTime'), $path . '/AttainmentDeepestTime', static fn(DOMElement $e, string $p): DateTime => DateTime::fromElement($e, $p)),

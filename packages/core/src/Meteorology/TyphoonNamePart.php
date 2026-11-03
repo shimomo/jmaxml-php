@@ -32,11 +32,11 @@ final readonly class TyphoonNamePart
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            nameKana: Node::mapOptional(Node::optional($element, self::NS, 'NameKana'), $path . '/NameKana', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            number: Node::mapOptional(Node::optional($element, self::NS, 'Number'), $path . '/Number', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            nameKana: Node::mapOptional(Node::optional($element, self::NS, 'NameKana'), $path . '/NameKana', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            number: Node::mapOptional(Node::optional($element, self::NS, 'Number'), $path . '/Number', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

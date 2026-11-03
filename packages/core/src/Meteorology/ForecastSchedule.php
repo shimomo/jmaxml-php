@@ -27,9 +27,9 @@ final readonly class ForecastSchedule
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             dateTime: Node::mapOptional(Node::optional($element, self::NS, 'DateTime'), $path . '/DateTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            target: Node::requiredAttribute($element, 'target', $path),
+            target: Node::toText(Node::requiredAttribute($element, 'target', $path)),
         );
     }
 }

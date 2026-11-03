@@ -27,9 +27,9 @@ final readonly class InfoSerial
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
-            codeType: Node::requiredAttribute($element, 'codeType', $path),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
+            codeType: Node::toText(Node::requiredAttribute($element, 'codeType', $path)),
         );
     }
 }

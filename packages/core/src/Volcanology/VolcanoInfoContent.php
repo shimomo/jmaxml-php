@@ -35,13 +35,13 @@ final readonly class VolcanoInfoContent
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            volcanoHeadline: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoHeadline'), $path . '/VolcanoHeadline', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            volcanoActivity: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoActivity'), $path . '/VolcanoActivity', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            volcanoPrevention: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoPrevention'), $path . '/VolcanoPrevention', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            nextAdvisory: Node::mapOptional(Node::optional($element, self::NS, 'NextAdvisory'), $path . '/NextAdvisory', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            otherInfo: Node::mapOptional(Node::optional($element, self::NS, 'OtherInfo'), $path . '/OtherInfo', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            appendix: Node::mapOptional(Node::optional($element, self::NS, 'Appendix'), $path . '/Appendix', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            volcanoHeadline: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoHeadline'), $path . '/VolcanoHeadline', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            volcanoActivity: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoActivity'), $path . '/VolcanoActivity', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            volcanoPrevention: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoPrevention'), $path . '/VolcanoPrevention', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            nextAdvisory: Node::mapOptional(Node::optional($element, self::NS, 'NextAdvisory'), $path . '/NextAdvisory', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            otherInfo: Node::mapOptional(Node::optional($element, self::NS, 'OtherInfo'), $path . '/OtherInfo', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            appendix: Node::mapOptional(Node::optional($element, self::NS, 'Appendix'), $path . '/Appendix', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

@@ -34,10 +34,10 @@ final readonly class UvIndex
     {
         return new self(
             value: Node::toNullableFloat(Node::text($element), $path),
-            type: Node::attribute($element, 'type'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

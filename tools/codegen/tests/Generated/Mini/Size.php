@@ -25,8 +25,8 @@ final readonly class Size
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            unit: Node::requiredAttribute($element, 'unit', $path),
-            condition: Node::attribute($element, 'condition'),
+            unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
         );
     }
 }

@@ -39,9 +39,9 @@ final readonly class TsunamiStation
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
-            sensor: Node::mapOptional(Node::optional($element, self::NS, 'Sensor'), $path . '/Sensor', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
+            sensor: Node::mapOptional(Node::optional($element, self::NS, 'Sensor'), $path . '/Sensor', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             highTideDateTime: Node::mapOptional(Node::optional($element, self::NS, 'HighTideDateTime'), $path . '/HighTideDateTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             firstHeight: FirstHeight::fromElement(Node::one($element, self::NS, 'FirstHeight', $path), $path . '/FirstHeight'),
             maxHeight: Node::mapOptional(Node::optional($element, self::NS, 'MaxHeight'), $path . '/MaxHeight', static fn(DOMElement $e, string $p): MaxHeight => MaxHeight::fromElement($e, $p)),

@@ -40,8 +40,8 @@ final readonly class Comment
             forecastComment: Node::mapOptional(Node::optional($element, self::NS, 'ForecastComment'), $path . '/ForecastComment', static fn(DOMElement $e, string $p): CommentForm => CommentForm::fromElement($e, $p)),
             observationComment: Node::mapOptional(Node::optional($element, self::NS, 'ObservationComment'), $path . '/ObservationComment', static fn(DOMElement $e, string $p): CommentForm => CommentForm::fromElement($e, $p)),
             varComment: Node::mapOptional(Node::optional($element, self::NS, 'VarComment'), $path . '/VarComment', static fn(DOMElement $e, string $p): CommentForm => CommentForm::fromElement($e, $p)),
-            freeFormComment: Node::mapOptional(Node::optional($element, self::NS, 'FreeFormComment'), $path . '/FreeFormComment', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            uRI: Node::mapOptional(Node::optional($element, self::NS, 'URI'), $path . '/URI', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            freeFormComment: Node::mapOptional(Node::optional($element, self::NS, 'FreeFormComment'), $path . '/FreeFormComment', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            uRI: Node::mapOptional(Node::optional($element, self::NS, 'URI'), $path . '/URI', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

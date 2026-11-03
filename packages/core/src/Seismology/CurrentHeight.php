@@ -35,7 +35,7 @@ final readonly class CurrentHeight
         return new self(
             startTime: Node::mapOptional(Node::optional($element, self::NS, 'StartTime'), $path . '/StartTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             endTime: Node::mapOptional(Node::optional($element, self::NS, 'EndTime'), $path . '/EndTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             tsunamiHeight: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TsunamiHeight'), $path . '/TsunamiHeight', static fn(DOMElement $e, string $p): TsunamiHeight => TsunamiHeight::fromElement($e, $p)),
         );
     }

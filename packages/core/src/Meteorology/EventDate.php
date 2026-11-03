@@ -25,8 +25,8 @@ final readonly class EventDate
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            description: Node::attribute($element, 'description'),
+            value: Node::toText(Node::text($element)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
             dubious: Node::attribute($element, 'dubious') === null ? null : Node::toToken(Node::requiredAttribute($element, 'dubious', $path)),
         );
     }

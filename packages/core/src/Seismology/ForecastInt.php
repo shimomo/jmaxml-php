@@ -32,9 +32,9 @@ final readonly class ForecastInt
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            from: Node::mapOptional(Node::optional($element, self::NS, 'From'), $path . '/From', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            to: Node::mapOptional(Node::optional($element, self::NS, 'To'), $path . '/To', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            bound: Node::attribute($element, 'bound'),
+            from: Node::mapOptional(Node::optional($element, self::NS, 'From'), $path . '/From', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            to: Node::mapOptional(Node::optional($element, self::NS, 'To'), $path . '/To', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            bound: Node::attribute($element, 'bound') === null ? null : Node::toText(Node::requiredAttribute($element, 'bound', $path)),
         );
     }
 }

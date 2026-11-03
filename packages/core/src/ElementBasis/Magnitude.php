@@ -32,9 +32,9 @@ final readonly class Magnitude
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            type: Node::requiredAttribute($element, 'type', $path),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

@@ -26,7 +26,7 @@ final readonly class Areas
     {
         return new self(
             area: Node::mapMany(Node::atLeastOne($element, self::NS, 'Area', $path), $path . '/Area', static fn(DOMElement $e, string $p): Area => Area::fromElement($e, $p)),
-            codeType: Node::attribute($element, 'codeType'),
+            codeType: Node::attribute($element, 'codeType') === null ? null : Node::toText(Node::requiredAttribute($element, 'codeType', $path)),
         );
     }
 }

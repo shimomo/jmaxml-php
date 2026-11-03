@@ -24,8 +24,8 @@ final readonly class Sentence
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::attribute($element, 'type'),
+            value: Node::toText(Node::text($element)),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

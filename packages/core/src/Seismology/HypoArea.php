@@ -49,18 +49,18 @@ final readonly class HypoArea
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
             code: HypoAreaCode::fromElement(Node::one($element, self::NS, 'Code', $path), $path . '/Code'),
             coordinate: Node::mapMany(Node::atLeastOne($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Coordinate', $path), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
-            reduceName: Node::mapOptional(Node::optional($element, self::NS, 'ReduceName'), $path . '/ReduceName', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            reduceName: Node::mapOptional(Node::optional($element, self::NS, 'ReduceName'), $path . '/ReduceName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             reduceCode: Node::mapOptional(Node::optional($element, self::NS, 'ReduceCode'), $path . '/ReduceCode', static fn(DOMElement $e, string $p): HypoAreaReduceCode => HypoAreaReduceCode::fromElement($e, $p)),
-            detailedName: Node::mapOptional(Node::optional($element, self::NS, 'DetailedName'), $path . '/DetailedName', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            detailedName: Node::mapOptional(Node::optional($element, self::NS, 'DetailedName'), $path . '/DetailedName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             detailedCode: Node::mapOptional(Node::optional($element, self::NS, 'DetailedCode'), $path . '/DetailedCode', static fn(DOMElement $e, string $p): HypoAreaDetailedCode => HypoAreaDetailedCode::fromElement($e, $p)),
-            nameFromMark: Node::mapOptional(Node::optional($element, self::NS, 'NameFromMark'), $path . '/NameFromMark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            nameFromMark: Node::mapOptional(Node::optional($element, self::NS, 'NameFromMark'), $path . '/NameFromMark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             markCode: Node::mapOptional(Node::optional($element, self::NS, 'MarkCode'), $path . '/MarkCode', static fn(DOMElement $e, string $p): HypoAreaMarkCode => HypoAreaMarkCode::fromElement($e, $p)),
-            direction: Node::mapOptional(Node::optional($element, self::NS, 'Direction'), $path . '/Direction', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            direction: Node::mapOptional(Node::optional($element, self::NS, 'Direction'), $path . '/Direction', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             distance: Node::mapOptional(Node::optional($element, self::NS, 'Distance'), $path . '/Distance', static fn(DOMElement $e, string $p): HypoAreaDistance => HypoAreaDistance::fromElement($e, $p)),
-            landOrSea: Node::mapOptional(Node::optional($element, self::NS, 'LandOrSea'), $path . '/LandOrSea', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            landOrSea: Node::mapOptional(Node::optional($element, self::NS, 'LandOrSea'), $path . '/LandOrSea', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

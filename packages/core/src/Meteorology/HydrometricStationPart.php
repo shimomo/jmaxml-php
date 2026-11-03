@@ -30,9 +30,9 @@ final readonly class HydrometricStationPart
     {
         return new self(
             area: Area::fromElement(Node::one($element, self::NS, 'Area', $path), $path . '/Area'),
-            chargeSection: Node::mapMany(Node::many($element, self::NS, 'ChargeSection'), $path . '/ChargeSection', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            chargeSection: Node::mapMany(Node::many($element, self::NS, 'ChargeSection'), $path . '/ChargeSection', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             criteria: Node::mapMany(Node::many($element, self::NS, 'Criteria'), $path . '/Criteria', static fn(DOMElement $e, string $p): HydrometricStationCriteria => HydrometricStationCriteria::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

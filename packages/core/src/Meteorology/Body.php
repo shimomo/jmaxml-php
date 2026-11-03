@@ -37,7 +37,7 @@ final readonly class Body implements BodyContract
     {
         return new self(
             targetArea: Node::mapOptional(Node::optional($element, self::NS, 'TargetArea'), $path . '/TargetArea', static fn(DOMElement $e, string $p): Area => Area::fromElement($e, $p)),
-            notice: Node::mapMany(Node::many($element, self::NS, 'Notice'), $path . '/Notice', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            notice: Node::mapMany(Node::many($element, self::NS, 'Notice'), $path . '/Notice', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             warning: Node::mapMany(Node::many($element, self::NS, 'Warning'), $path . '/Warning', static fn(DOMElement $e, string $p): Warning => Warning::fromElement($e, $p)),
             meteorologicalInfos: Node::mapMany(Node::many($element, self::NS, 'MeteorologicalInfos'), $path . '/MeteorologicalInfos', static fn(DOMElement $e, string $p): MeteorologicalInfos => MeteorologicalInfos::fromElement($e, $p)),
             comment: Node::mapOptional(Node::optional($element, self::NS, 'Comment'), $path . '/Comment', static fn(DOMElement $e, string $p): Comment => Comment::fromElement($e, $p)),

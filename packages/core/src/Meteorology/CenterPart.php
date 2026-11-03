@@ -47,13 +47,13 @@ final readonly class CenterPart
         return new self(
             coordinate: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): Coordinate => Coordinate::fromElement($e, $p)),
             probabilityCircle: Node::mapMany(Node::many($element, self::NS, 'ProbabilityCircle'), $path . '/ProbabilityCircle', static fn(DOMElement $e, string $p): Circle => Circle::fromElement($e, $p)),
-            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             direction: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Direction'), $path . '/Direction', static fn(DOMElement $e, string $p): Direction => Direction::fromElement($e, $p)),
             speed: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Speed'), $path . '/Speed', static fn(DOMElement $e, string $p): Speed => Speed::fromElement($e, $p)),
             pressure: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Pressure'), $path . '/Pressure', static fn(DOMElement $e, string $p): Pressure => Pressure::fromElement($e, $p)),
             radius: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Radius'), $path . '/Radius', static fn(DOMElement $e, string $p): Radius => Radius::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

@@ -31,7 +31,7 @@ final readonly class Plume
             plumeHeightAboveCrater: PlumeHeight::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PlumeHeightAboveCrater', $path), $path . '/PlumeHeightAboveCrater'),
             plumeHeightAboveSeaLevel: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PlumeHeightAboveSeaLevel'), $path . '/PlumeHeightAboveSeaLevel', static fn(DOMElement $e, string $p): PlumeHeight => PlumeHeight::fromElement($e, $p)),
             plumeDirection: PlumeDirection::fromElement(Node::one($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PlumeDirection', $path), $path . '/PlumeDirection'),
-            plumeComment: Node::mapOptional(Node::optional($element, self::NS, 'PlumeComment'), $path . '/PlumeComment', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            plumeComment: Node::mapOptional(Node::optional($element, self::NS, 'PlumeComment'), $path . '/PlumeComment', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

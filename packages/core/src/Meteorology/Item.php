@@ -44,10 +44,10 @@ final readonly class Item
             stations: Node::mapOptional(Node::optional($element, self::NS, 'Stations'), $path . '/Stations', static fn(DOMElement $e, string $p): Stations => Stations::fromElement($e, $p)),
             area: Node::mapOptional(Node::optional($element, self::NS, 'Area'), $path . '/Area', static fn(DOMElement $e, string $p): Area => Area::fromElement($e, $p)),
             station: Node::mapOptional(Node::optional($element, self::NS, 'Station'), $path . '/Station', static fn(DOMElement $e, string $p): Station => Station::fromElement($e, $p)),
-            changeStatus: Node::mapOptional(Node::optional($element, self::NS, 'ChangeStatus'), $path . '/ChangeStatus', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            fullStatus: Node::mapOptional(Node::optional($element, self::NS, 'FullStatus'), $path . '/FullStatus', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            editingMark: Node::mapOptional(Node::optional($element, self::NS, 'EditingMark'), $path . '/EditingMark', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            otherReport: Node::mapMany(Node::many($element, self::NS, 'OtherReport'), $path . '/OtherReport', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            changeStatus: Node::mapOptional(Node::optional($element, self::NS, 'ChangeStatus'), $path . '/ChangeStatus', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            fullStatus: Node::mapOptional(Node::optional($element, self::NS, 'FullStatus'), $path . '/FullStatus', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            editingMark: Node::mapOptional(Node::optional($element, self::NS, 'EditingMark'), $path . '/EditingMark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            otherReport: Node::mapMany(Node::many($element, self::NS, 'OtherReport'), $path . '/OtherReport', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

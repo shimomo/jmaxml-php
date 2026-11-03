@@ -35,13 +35,13 @@ final readonly class BaseEvent
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            timeModifier: Node::mapOptional(Node::optional($element, self::NS, 'TimeModifier'), $path . '/TimeModifier', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
             local: Node::mapMany(Node::many($element, self::NS, 'Local'), $path . '/Local', static fn(DOMElement $e, string $p): LocalEvent => LocalEvent::fromElement($e, $p)),
             coordinate: Node::mapOptional(Node::optional($element, self::NS, 'Coordinate'), $path . '/Coordinate', static fn(DOMElement $e, string $p): CoordinatePart => CoordinatePart::fromElement($e, $p)),
-            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            location: Node::mapOptional(Node::optional($element, self::NS, 'Location'), $path . '/Location', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             event: Node::mapMany(Node::many($element, self::NS, 'Event'), $path . '/Event', static fn(DOMElement $e, string $p): Event => Event::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

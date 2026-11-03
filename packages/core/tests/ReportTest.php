@@ -69,8 +69,29 @@ final class ReportTest extends TestCase
             }
         }
 
-        // MaxInt is xs:string, so the trailing space in the telegram is kept as is.
-        $this->assertSame(['4 '], $atami);
+        // The telegram says <MaxInt>4 </MaxInt>; single-line strings are trimmed.
+        $this->assertSame(['4'], $atami);
+    }
+
+    #[Test]
+    public function trimsCodesPaddedWithLineBreaks(): void
+    {
+        $report = Report::fromFile(Fixtures::sample('11_04_01_110126_VPZU50.xml'));
+        $codes = [];
+
+        foreach ($report->head->headline->information as $information) {
+            foreach ($information->item as $item) {
+                foreach ($item->areas->area as $area) {
+                    if ($area->name === '東シナ海北部') {
+                        $codes[] = $area->code;
+                    }
+                }
+            }
+        }
+
+        // The telegram says <Code>9074\n</Code>.
+        $this->assertContains('9074', $codes);
+        $this->assertNotContains("9074\n", $codes);
     }
 
     #[Test]

@@ -40,11 +40,11 @@ final readonly class MaxHeight
     {
         return new self(
             dateTime: Node::mapOptional(Node::optional($element, self::NS, 'DateTime'), $path . '/DateTime', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
-            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             tsunamiHeightFrom: Node::mapOptional(Node::optional($element, self::NS, 'TsunamiHeightFrom'), $path . '/TsunamiHeightFrom', static fn(DOMElement $e, string $p): TsunamiHeight => TsunamiHeight::fromElement($e, $p)),
             tsunamiHeightTo: Node::mapOptional(Node::optional($element, self::NS, 'TsunamiHeightTo'), $path . '/TsunamiHeightTo', static fn(DOMElement $e, string $p): TsunamiHeight => TsunamiHeight::fromElement($e, $p)),
             tsunamiHeight: Node::mapOptional(Node::optional($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TsunamiHeight'), $path . '/TsunamiHeight', static fn(DOMElement $e, string $p): TsunamiHeight => TsunamiHeight::fromElement($e, $p)),
-            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             period: Node::mapOptional(Node::optional($element, self::NS, 'Period'), $path . '/Period', static fn(DOMElement $e, string $p): ?float => Node::toFloat(Node::text($e), $p)),
         );
     }

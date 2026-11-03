@@ -36,11 +36,11 @@ final readonly class Coordinate
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            type: Node::attribute($element, 'type'),
-            datum: Node::attribute($element, 'datum'),
-            condition: Node::attribute($element, 'condition'),
-            description: Node::attribute($element, 'description'),
+            value: Node::toText(Node::text($element)),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            datum: Node::attribute($element, 'datum') === null ? null : Node::toText(Node::requiredAttribute($element, 'datum', $path)),
+            condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );
     }
 }

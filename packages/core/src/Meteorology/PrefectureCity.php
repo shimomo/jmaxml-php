@@ -24,8 +24,8 @@ final readonly class PrefectureCity
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::text($element),
-            partType: Node::attribute($element, 'partType'),
+            value: Node::toText(Node::text($element)),
+            partType: Node::attribute($element, 'partType') === null ? null : Node::toText(Node::requiredAttribute($element, 'partType', $path)),
         );
     }
 }

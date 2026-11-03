@@ -42,15 +42,15 @@ final readonly class IntensityStation
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
-            int: Node::mapOptional(Node::optional($element, self::NS, 'Int'), $path . '/Int', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
+            int: Node::mapOptional(Node::optional($element, self::NS, 'Int'), $path . '/Int', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             k: Node::mapOptional(Node::optional($element, self::NS, 'K'), $path . '/K', static fn(DOMElement $e, string $p): ?float => Node::toFloat(Node::text($e), $p)),
-            lgInt: Node::mapOptional(Node::optional($element, self::NS, 'LgInt'), $path . '/LgInt', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            lgInt: Node::mapOptional(Node::optional($element, self::NS, 'LgInt'), $path . '/LgInt', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             lgIntPerPeriod: Node::mapMany(Node::many($element, self::NS, 'LgIntPerPeriod'), $path . '/LgIntPerPeriod', static fn(DOMElement $e, string $p): LgIntPerPeriod => LgIntPerPeriod::fromElement($e, $p)),
             sva: Node::mapOptional(Node::optional($element, self::NS, 'Sva'), $path . '/Sva', static fn(DOMElement $e, string $p): Sva => Sva::fromElement($e, $p)),
             svaPerPeriod: Node::mapMany(Node::many($element, self::NS, 'SvaPerPeriod'), $path . '/SvaPerPeriod', static fn(DOMElement $e, string $p): SvaPerPeriod => SvaPerPeriod::fromElement($e, $p)),
-            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            revise: Node::mapOptional(Node::optional($element, self::NS, 'Revise'), $path . '/Revise', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

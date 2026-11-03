@@ -35,9 +35,9 @@ final readonly class MeteorologicalInfo
         return new self(
             dateTime: DateTime::fromElement(Node::one($element, self::NS, 'DateTime', $path), $path . '/DateTime'),
             duration: Node::mapOptional(Node::optional($element, self::NS, 'Duration'), $path . '/Duration', static fn(DOMElement $e, string $p): DateInterval => Node::toDuration(Node::text($e), $p)),
-            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            name: Node::mapOptional(Node::optional($element, self::NS, 'Name'), $path . '/Name', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             item: Node::mapMany(Node::atLeastOne($element, self::NS, 'Item', $path), $path . '/Item', static fn(DOMElement $e, string $p): Item => Item::fromElement($e, $p)),
-            type: Node::attribute($element, 'type'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

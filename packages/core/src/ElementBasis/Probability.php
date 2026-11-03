@@ -32,8 +32,8 @@ final readonly class Probability
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            unit: Node::attribute($element, 'unit'),
-            bound: Node::attribute($element, 'bound'),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            bound: Node::attribute($element, 'bound') === null ? null : Node::toText(Node::requiredAttribute($element, 'bound', $path)),
             significant: Node::attribute($element, 'significant') === null ? null : Node::toBool(Node::requiredAttribute($element, 'significant', $path), $path . '/@significant'),
         );
     }

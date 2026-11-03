@@ -37,12 +37,12 @@ final readonly class Body implements BodyContract
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            notice: Node::mapOptional(Node::optional($element, self::NS, 'Notice'), $path . '/Notice', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            notice: Node::mapOptional(Node::optional($element, self::NS, 'Notice'), $path . '/Notice', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             volcanoInfo: Node::mapMany(Node::many($element, self::NS, 'VolcanoInfo'), $path . '/VolcanoInfo', static fn(DOMElement $e, string $p): VolcanoInfo => VolcanoInfo::fromElement($e, $p)),
             ashInfos: Node::mapOptional(Node::optional($element, self::NS, 'AshInfos'), $path . '/AshInfos', static fn(DOMElement $e, string $p): AshInfos => AshInfos::fromElement($e, $p)),
             volcanoInfoContent: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoInfoContent'), $path . '/VolcanoInfoContent', static fn(DOMElement $e, string $p): VolcanoInfoContent => VolcanoInfoContent::fromElement($e, $p)),
             volcanoObservation: Node::mapOptional(Node::optional($element, self::NS, 'VolcanoObservation'), $path . '/VolcanoObservation', static fn(DOMElement $e, string $p): VolcanoObservation => VolcanoObservation::fromElement($e, $p)),
-            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            text: Node::mapOptional(Node::optional($element, self::NS, 'Text'), $path . '/Text', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
         );
     }
 }

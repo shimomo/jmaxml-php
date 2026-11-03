@@ -26,7 +26,7 @@ final readonly class EventTime
     {
         return new self(
             value: Node::toDateTime(Node::text($element), $path),
-            type: Node::attribute($element, 'type'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );
     }
 }

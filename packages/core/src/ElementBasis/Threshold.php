@@ -34,10 +34,10 @@ final readonly class Threshold
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            type: Node::attribute($element, 'type'),
-            unit: Node::attribute($element, 'unit'),
-            description: Node::attribute($element, 'description'),
-            bound: Node::attribute($element, 'bound'),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
+            unit: Node::attribute($element, 'unit') === null ? null : Node::toText(Node::requiredAttribute($element, 'unit', $path)),
+            description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
+            bound: Node::attribute($element, 'bound') === null ? null : Node::toText(Node::requiredAttribute($element, 'bound', $path)),
         );
     }
 }

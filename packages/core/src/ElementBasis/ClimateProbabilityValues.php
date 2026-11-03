@@ -37,7 +37,7 @@ final readonly class ClimateProbabilityValues
             probabilityOfBelowNormal: Probability::fromElement(Node::one($element, self::NS, 'ProbabilityOfBelowNormal', $path), $path . '/ProbabilityOfBelowNormal'),
             probabilityOfNormal: Probability::fromElement(Node::one($element, self::NS, 'ProbabilityOfNormal', $path), $path . '/ProbabilityOfNormal'),
             probabilityOfAboveNormal: Probability::fromElement(Node::one($element, self::NS, 'ProbabilityOfAboveNormal', $path), $path . '/ProbabilityOfAboveNormal'),
-            kind: Node::requiredAttribute($element, 'kind', $path),
+            kind: Node::toText(Node::requiredAttribute($element, 'kind', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }

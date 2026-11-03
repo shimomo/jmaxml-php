@@ -30,12 +30,12 @@ final readonly class Root
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
             when: Node::mapOptional(Node::optional($element, self::NS, 'When'), $path . '/When', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             item: Node::mapMany(Node::many($element, self::NS, 'Item'), $path . '/Item', static fn(DOMElement $e, string $p): Item => Item::fromElement($e, $p)),
             size: Size::fromElement(Node::one($element, self::NS, 'Size', $path), $path . '/Size'),
-            tag: Node::mapMany(Node::many($element, self::NS, 'Tag'), $path . '/Tag', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            kind: Node::requiredAttribute($element, 'kind', $path),
+            tag: Node::mapMany(Node::many($element, self::NS, 'Tag'), $path . '/Tag', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            kind: Node::toText(Node::requiredAttribute($element, 'kind', $path)),
         );
     }
 }

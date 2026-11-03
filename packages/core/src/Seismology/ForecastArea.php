@@ -30,8 +30,8 @@ final readonly class ForecastArea
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            name: Node::text(Node::one($element, self::NS, 'Name', $path)),
-            code: Node::text(Node::one($element, self::NS, 'Code', $path)),
+            name: Node::toText(Node::text(Node::one($element, self::NS, 'Name', $path))),
+            code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
             city: Node::mapMany(Node::many($element, self::NS, 'City'), $path . '/City', static fn(DOMElement $e, string $p): ForecastCity => ForecastCity::fromElement($e, $p)),
         );
     }

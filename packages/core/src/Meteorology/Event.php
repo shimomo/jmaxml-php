@@ -38,12 +38,12 @@ final readonly class Event
     {
         return new self(
             sentence: Node::mapOptional(Node::optional($element, self::NS, 'Sentence'), $path . '/Sentence', static fn(DOMElement $e, string $p): Sentence => Sentence::fromElement($e, $p)),
-            eventName: Node::mapMany(Node::many($element, self::NS, 'EventName'), $path . '/EventName', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            eventClass: Node::mapMany(Node::many($element, self::NS, 'EventClass'), $path . '/EventClass', static fn(DOMElement $e, string $p): string => Node::text($e)),
+            eventName: Node::mapMany(Node::many($element, self::NS, 'EventName'), $path . '/EventName', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            eventClass: Node::mapMany(Node::many($element, self::NS, 'EventClass'), $path . '/EventClass', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             time: Node::mapMany(Node::many($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): EventTime => EventTime::fromElement($e, $p)),
             duration: Node::mapMany(Node::many($element, self::NS, 'Duration'), $path . '/Duration', static fn(DOMElement $e, string $p): EventDuration => EventDuration::fromElement($e, $p)),
-            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::text($e)),
-            type: Node::attribute($element, 'type'),
+            remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
+            type: Node::attribute($element, 'type') === null ? null : Node::toText(Node::requiredAttribute($element, 'type', $path)),
             refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
         );
     }
