@@ -12,17 +12,24 @@
     "require": {
         "php": "^8.4",
         "ext-dom": "*",
-        "ext-libxml": "*"
+        "ext-libxml": "*",
+        "psr/clock": "^1.0",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.1",
+        "psr/http-message": "^2.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.52",
         "laravel/pint": "^1.27",
+        "nyholm/psr7": "^1.8",
         "phpunit/phpunit": "^13.2",
+        "symfony/http-client": "^8.0",
         "vimeo/psalm": "^6.0"
     },
     "replace": {
         "jmaxml/codes": "self.version",
-        "jmaxml/core": "self.version"
+        "jmaxml/core": "self.version",
+        "jmaxml/feed": "self.version"
     },
     "repositories": [
         {
@@ -37,7 +44,8 @@
     "autoload": {
         "psr-4": {
             "JmaXml\\": "packages/core/src/",
-            "JmaXml\\Codes\\": "packages/codes/src/"
+            "JmaXml\\Codes\\": "packages/codes/src/",
+            "JmaXml\\Feed\\": "packages/feed/src/"
         }
     },
     "autoload-dev": {
@@ -45,6 +53,7 @@
             "JmaXml\\Codegen\\": "tools/codegen/src/",
             "JmaXml\\Codegen\\Tests\\": "tools/codegen/tests/",
             "JmaXml\\Codes\\Tests\\": "packages/codes/tests/",
+            "JmaXml\\Feed\\Tests\\": "packages/feed/tests/",
             "JmaXml\\Tests\\": "packages/core/tests/"
         }
     },

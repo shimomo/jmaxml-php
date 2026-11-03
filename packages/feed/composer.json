@@ -1,0 +1,53 @@
+{
+    "name": "jmaxml/feed",
+    "description": "Unofficial poller for JMA (Japan Meteorological Agency) XML Atom feeds",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "jma",
+        "jmaxml",
+        "atom",
+        "feed",
+        "earthquake"
+    ],
+    "authors": [
+        {
+            "name": "shimomo",
+            "email": "yuichi@shimomo.net"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "jmaxml/core": "^0.1.0",
+        "psr/clock": "^1.0",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.1",
+        "psr/http-message": "^2.0"
+    },
+    "require-dev": {
+        "nyholm/psr7": "^1.8",
+        "phpunit/phpunit": "^13.2",
+        "symfony/http-client": "^8.0",
+        "vimeo/psalm": "^6.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "A PSR-18 HTTP client",
+        "symfony/http-client": "A PSR-18 HTTP client (Psr18Client)"
+    },
+    "autoload": {
+        "psr-4": {
+            "JmaXml\\Feed\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JmaXml\\Feed\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}
