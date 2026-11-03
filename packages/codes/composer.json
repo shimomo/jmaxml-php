@@ -1,0 +1,41 @@
+{
+    "name": "jmaxml/codes",
+    "description": "Unofficial JMA (Japan Meteorological Agency) earthquake code tables for JMA XML",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "jma",
+        "jmaxml",
+        "earthquake",
+        "code-table"
+    ],
+    "authors": [
+        {
+            "name": "shimomo",
+            "email": "yuichi@shimomo.net"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.2",
+        "vimeo/psalm": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "JmaXml\\Codes\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JmaXml\\Codes\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}

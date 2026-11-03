@@ -28,6 +28,11 @@ final class Fixtures
         return self::resourcesDir() . '/dictionary.xlsx';
     }
 
+    public static function earthquakeCodeTablePath(): string
+    {
+        return self::resourcesDir() . '/codes/地震火山関連コード表.xlsx';
+    }
+
     public static function samplesDir(): string
     {
         return self::resourcesDir() . '/samples';
