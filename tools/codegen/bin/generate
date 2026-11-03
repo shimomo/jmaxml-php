@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use JmaXml\Codegen\Dictionary\Dictionary;
+use JmaXml\Codegen\Generator;
+use JmaXml\Codegen\Schema\SchemaSet;
+
+$root = dirname(__DIR__, 3);
+
+require $root . '/vendor/autoload.php';
+
+$core = new Generator(
+    SchemaSet::load($root . '/resources/jmaxml/xsd/jmx.xsd'),
+    Dictionary::fromXlsx($root . '/resources/jmaxml/dictionary.xlsx'),
+    Generator::defaultNamespaceMap(),
+);
+$written = $core->writeTo($root . '/packages/core/src');
+
+// The generator's own test fixture, committed so that its tests are type-checked.
+$mini = new Generator(
+    SchemaSet::load($root . '/tools/codegen/tests/Fixtures/mini/mini.xsd'),
+    Dictionary::empty(),
+    ['urn:mini' => 'JmaXml\\Codegen\\Tests\\Generated\\Mini'],
+    'JmaXml\\Codegen\\Tests',
+);
+$mini->writeTo($root . '/tools/codegen/tests');
+
+fwrite(STDOUT, sprintf("Generated %d files.\n", count($written)));
