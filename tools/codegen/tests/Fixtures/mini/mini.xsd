@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mini="urn:mini" targetNamespace="urn:mini" elementFormDefault="qualified">
+  <xs:element name="Root" type="mini:type.root"/>
+  <xs:complexType name="type.root">
+    <xs:sequence>
+      <xs:element maxOccurs="1" minOccurs="1" name="Name" type="xs:string"/>
+      <xs:element maxOccurs="1" minOccurs="0" name="When" type="xs:dateTime"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Item" type="mini:type.item"/>
+      <xs:element maxOccurs="1" minOccurs="1" name="Size" type="mini:type.size"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Tag" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="kind" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="type.item">
+    <xs:sequence>
+      <xs:element maxOccurs="1" minOccurs="1" name="Code" type="xs:string"/>
+      <xs:element maxOccurs="1" minOccurs="1" name="Score" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="type.size">
+    <xs:simpleContent>
+      <xs:extension base="xs:float">
+        <xs:attribute name="unit" type="xs:string" use="required"/>
+        <xs:attribute name="condition" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

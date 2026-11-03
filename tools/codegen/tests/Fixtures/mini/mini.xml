@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xmlns="urn:mini" kind="sample"><Name>mini</Name><When>2026-11-03T12:00:00+09:00</When><Item><Code>A</Code><Score>1</Score></Item><Item><Code>B</Code><Score>2</Score></Item><Size unit="m">NaN</Size><Tag>x</Tag><Tag>y</Tag></Root>

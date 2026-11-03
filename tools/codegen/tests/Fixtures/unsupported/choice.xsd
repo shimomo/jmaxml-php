@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="urn:test" targetNamespace="urn:test" elementFormDefault="qualified">
+  <xs:element name="Root" type="t:type.root"/>
+  <xs:complexType name="type.root">
+    <xs:choice>
+      <xs:element name="A" type="xs:string"/>
+      <xs:element name="B" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

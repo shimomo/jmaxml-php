@@ -1,0 +1,25 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.sh]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+# 気象庁の公式資料とテスト用フィクスチャは、配布物の verbatim コピー。
+# 改行コード・行末空白・末尾改行をそのまま保つ
+[{resources/jmaxml/**,**/tests/Fixtures/**}]
+end_of_line = unset
+insert_final_newline = false
+trim_trailing_whitespace = false

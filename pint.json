@@ -1,0 +1,33 @@
+{
+    "preset": "empty",
+    "rules": {
+        "encoding": true,
+        "full_opening_tag": true,
+        "no_closing_tag": true,
+        "blank_line_after_opening_tag": true,
+        "indentation_type": true,
+        "line_ending": true,
+        "no_trailing_whitespace": true,
+        "no_whitespace_in_blank_line": true,
+        "single_blank_line_at_eof": true,
+        "no_multiple_statements_per_line": true,
+        "array_syntax": { "syntax": "short" },
+        "single_quote": true,
+        "trailing_comma_in_multiline": true,
+        "no_unused_imports": true,
+        "ordered_imports": { "sort_algorithm": "alpha", "imports_order": ["class", "function", "const"] },
+        "unary_operator_spaces": true,
+        "binary_operator_spaces": true,
+        "concat_space": { "spacing": "one" },
+        "function_declaration": { "closure_fn_spacing": "none" },
+        "new_with_parentheses": { "anonymous_class": true, "named_class": true },
+        "class_definition": { "space_before_parenthesis": true },
+        "braces_position": { "anonymous_classes_opening_brace": "same_line" },
+        "class_attributes_separation": { "elements": { "method": "one", "property": "one", "const": "one" } },
+        "visibility_required": true,
+        "return_type_declaration": true,
+        "no_empty_statement": true,
+        "single_line_comment_spacing": true,
+        "no_extra_blank_lines": true
+    }
+}
