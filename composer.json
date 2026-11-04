@@ -29,6 +29,7 @@
     "replace": {
         "jmaxml/codes": "self.version",
         "jmaxml/core": "self.version",
+        "jmaxml/earthquake": "self.version",
         "jmaxml/feed": "self.version"
     },
     "repositories": [
@@ -45,6 +46,7 @@
         "psr-4": {
             "JmaXml\\": "packages/core/src/",
             "JmaXml\\Codes\\": "packages/codes/src/",
+            "JmaXml\\Earthquake\\": "packages/earthquake/src/",
             "JmaXml\\Feed\\": "packages/feed/src/"
         }
     },
@@ -53,6 +55,7 @@
             "JmaXml\\Codegen\\": "tools/codegen/src/",
             "JmaXml\\Codegen\\Tests\\": "tools/codegen/tests/",
             "JmaXml\\Codes\\Tests\\": "packages/codes/tests/",
+            "JmaXml\\Earthquake\\Tests\\": "packages/earthquake/tests/",
             "JmaXml\\Feed\\Tests\\": "packages/feed/tests/",
             "JmaXml\\Tests\\": "packages/core/tests/"
         }
