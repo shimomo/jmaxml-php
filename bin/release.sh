@@ -8,6 +8,7 @@
 #   例: bin/release.sh 0.1.0
 #
 # 全体の流れ:
+#   0. 事前確認。駄目なら何も変えずに止まる
 #   1. CHANGELOG.md の "Unreleased" セクションに今回のバージョンを
 #      書き込み、対象コミット一覧を反映する
 #   2. packages/*/composer.json と ルート composer.json の
@@ -20,6 +21,7 @@
 #      別コミットとして push する
 #
 # 依存:
+#   - bin/lib/preflight.sh         リリース前の確認（release_preflight）
 #   - bin/lib/changelog.sh         CHANGELOG.md の読み書き関数
 #   - bin/lib/composer-merge.sh    packages/* の require/autoload等を
 #                                  ルート composer.json へマージする関数
@@ -44,6 +46,15 @@ script_dir=$(cd "$(dirname "$0")" && pwd)
 . "$script_dir/lib/composer-version.sh"
 # shellcheck source=lib/package-release.sh
 . "$script_dir/lib/package-release.sh"
+# shellcheck source=lib/preflight.sh
+. "$script_dir/lib/preflight.sh"
+
+# ---------------------------------------------------------------------------
+# 0. 事前確認
+# ---------------------------------------------------------------------------
+# 何かを書き換えたり push したりする前に、版番号、ブランチ、作業ツリー、
+# タグ、origin との差、分割先のリポジトリを確かめる。駄目なら理由を出して止まる。
+release_preflight "$version"
 
 # ---------------------------------------------------------------------------
 # 1. CHANGELOG.md に今回バージョンのセクションを書き込む
