@@ -13,7 +13,7 @@ An **unofficial** PHP library for the earthquake code tables of JMA (Japan Meteo
 composer require jmaxml/codes
 ```
 
-PHP 8.4 以上が必要です。
+PHP 8.3 以上が必要です。
 
 ## 使い方
 

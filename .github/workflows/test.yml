@@ -16,13 +16,23 @@ jobs:
     strategy:
       matrix:
         php-version:
+          - '8.3'
           - '8.4'
           - '8.5'
         phpunit-version:
+          - '12.5'
           - '13.2'
         dependency-version:
           - prefer-lowest
           - prefer-stable
+        # PHPUnit 13 needs PHP 8.4, so PHP 8.3 runs PHPUnit 12.
+        exclude:
+          - php-version: '8.3'
+            phpunit-version: '13.2'
+          - php-version: '8.4'
+            phpunit-version: '12.5'
+          - php-version: '8.5'
+            phpunit-version: '12.5'
     steps:
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -35,8 +45,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Pin the minor version, not one release: "12.5" alone means exactly 12.5.0, which Composer refuses to install
+      # because of a security advisory (versions below 12.5.8). With ".*" it takes the lowest or newest safe patch.
       - name: Install dependencies
-        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:${{ matrix.phpunit-version }}"
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:${{ matrix.phpunit-version }}.*"
 
       - name: Run PHPUnit ${{ matrix.phpunit-version }}
         run: vendor/bin/phpunit --configuration=phpunit.xml.dist --no-progress

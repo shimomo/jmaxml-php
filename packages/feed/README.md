@@ -14,7 +14,7 @@ An **unofficial** poller for the public Atom feeds of JMA (Japan Meteorological 
 composer require jmaxml/feed symfony/http-client nyholm/psr7
 ```
 
-`symfony/http-client` と `nyholm/psr7` は一例です。PSR-18 クライアントと PSR-17 ファクトリなら何でも構いません。PHP 8.4 以上が必要です。
+`symfony/http-client` と `nyholm/psr7` は一例です。PSR-18 クライアントと PSR-17 ファクトリなら何でも構いません。PHP 8.3 以上が必要です。
 
 ## 使い方
 
