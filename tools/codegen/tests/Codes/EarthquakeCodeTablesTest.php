@@ -93,6 +93,42 @@ final class EarthquakeCodeTablesTest extends TestCase
     }
 
     #[Test]
+    public function tsunamiAreasNeedAKnownKindInColumnD(): void
+    {
+        $row = ['A' => '891', 'B' => '沖縄県地方', 'C' => 'おきなわけんちほう', 'D' => '領域表現（構成する津波予報区800,801,802）'];
+
+        $this->assertSame(['891' => ['沖縄県地方', 'おきなわけんちほう', '領域表現（構成する津波予報区800,801,802）']], EarthquakeCodeTables::tsunamiAreasFrom([$row]));
+
+        $messages = [];
+
+        $shifted = ['A' => '891', 'B' => '沖縄県地方', 'C' => 'おきなわけんちほう', 'D' => 'Okinawa'];
+        $missing = ['A' => '891', 'B' => '沖縄県地方', 'C' => 'おきなわけんちほう'];
+
+        foreach ([$shifted, $missing] as $broken) {
+            try {
+                EarthquakeCodeTables::tsunamiAreasFrom([$broken]);
+            } catch (LogicException $exception) {
+                $messages[] = $exception->getMessage();
+            }
+        }
+
+        $this->assertCount(2, $messages);
+        $this->assertStringContainsString('Sheet 31', $messages[0]);
+        $this->assertStringContainsString('891', $messages[0]);
+    }
+
+    #[Test]
+    public function sheet31HeaderLeavesColumnDUnlabelled(): void
+    {
+        try {
+            EarthquakeCodeTables::dataRows([['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな', 'D' => 'English']], '31', ['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな', 'D' => '']);
+            $this->fail('LogicException was not thrown');
+        } catch (LogicException $exception) {
+            $this->assertStringContainsString('column D', $exception->getMessage());
+        }
+    }
+
+    #[Test]
     public function requiresCompleteTables(): void
     {
         $rejected = 0;

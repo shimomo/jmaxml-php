@@ -16,7 +16,7 @@ use Psr\Clock\ClockInterface;
 final class InMemoryStateStore implements StateStore
 {
     /**
-     * @var array<string, DateTimeImmutable> entry id => expiry
+     * @var array<string, DateTimeImmutable> telegram URL => expiry
      */
     private array $seen = [];
 
@@ -33,13 +33,13 @@ final class InMemoryStateStore implements StateStore
     }
 
     #[Override]
-    public function isSeen(string $entryId): bool
+    public function isSeen(string $url): bool
     {
-        return isset($this->seen[$entryId]) && $this->seen[$entryId] > $this->clock->now();
+        return isset($this->seen[$url]) && $this->seen[$url] > $this->clock->now();
     }
 
     #[Override]
-    public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void
+    public function markSeen(string $url, DateTimeImmutable $expiresAt): void
     {
         // Expired entries are swept once every 1,000 marks, so that priming a big feed stays linear.
         if (++$this->marksSinceSweep >= 1000) {
@@ -48,7 +48,7 @@ final class InMemoryStateStore implements StateStore
             $this->marksSinceSweep = 0;
         }
 
-        $this->seen[$entryId] = $expiresAt;
+        $this->seen[$url] = $expiresAt;
     }
 
     #[Override]

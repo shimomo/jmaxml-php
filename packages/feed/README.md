@@ -104,8 +104,8 @@ DB::transaction(function () use ($client, $subscription) {
 ```php
 interface StateStore
 {
-    public function isSeen(string $entryId): bool;
-    public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void;   // 期限を過ぎたら忘れてよい
+    public function isSeen(string $url): bool;
+    public function markSeen(string $url, DateTimeImmutable $expiresAt): void;   // 期限を過ぎたら忘れてよい
     public function load(string $feedUrl): ?FeedState;
     public function save(string $feedUrl, FeedState $state): void;
 }

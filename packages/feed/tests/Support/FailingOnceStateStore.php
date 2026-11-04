@@ -25,13 +25,13 @@ final class FailingOnceStateStore implements StateStore
     }
 
     #[Override]
-    public function isSeen(string $entryId): bool
+    public function isSeen(string $url): bool
     {
-        return $this->inner->isSeen($entryId);
+        return $this->inner->isSeen($url);
     }
 
     #[Override]
-    public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void
+    public function markSeen(string $url, DateTimeImmutable $expiresAt): void
     {
         if (!$this->failed) {
             $this->failed = true;
@@ -39,7 +39,7 @@ final class FailingOnceStateStore implements StateStore
             throw new RuntimeException('Database unavailable');
         }
 
-        $this->inner->markSeen($entryId, $expiresAt);
+        $this->inner->markSeen($url, $expiresAt);
     }
 
     #[Override]

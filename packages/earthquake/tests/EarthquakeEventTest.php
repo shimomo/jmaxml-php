@@ -246,6 +246,29 @@ final class EarthquakeEventTest extends TestCase
     }
 
     #[Test]
+    public function mayBeAtLeastIsFalseWithoutIntensityData(): void
+    {
+        $hypocenterOnly = EarthquakeEvent::fromReports(Samples::reports('32-35_04_03_240613_VXSE52.xml'));
+
+        $this->assertSame(EventStage::WithHypocenter, $hypocenterOnly->stage);
+        $this->assertNull($hypocenterOnly->maxIntensity);
+        $this->assertFalse($hypocenterOnly->mayBeAtLeast(SeismicIntensity::One));
+        $this->assertSame([], $hypocenterOnly->citiesAtLeast(SeismicIntensity::One, ['4520100'])->matches);
+        $this->assertFalse(EarthquakeEvent::fromReports(Samples::reports('32-39_05_01_100831_VXSE53.xml'))->mayBeAtLeast(SeismicIntensity::One));
+    }
+
+    #[Test]
+    public function missingIntensityIsToldApartFromCancellation(): void
+    {
+        $hypocenterOnly = EarthquakeEvent::fromReports(Samples::reports('32-35_04_03_240613_VXSE52.xml'));
+        $cancelled = EarthquakeEvent::fromReports(Samples::reports('32-35_10_01_220510_VXSE51.xml'));
+
+        $this->assertTrue($hypocenterOnly->maxIntensity === null && !$hypocenterOnly->isCancelled());
+        $this->assertNull($cancelled->maxIntensity);
+        $this->assertTrue($cancelled->isCancelled());
+    }
+
+    #[Test]
     public function sameEventIdWithDifferentStatusesStaysApart(): void
     {
         $drill = Samples::edited('32-35_08_08_240613_VXSE53.xml', ['<Status>通常</Status>' => '<Status>訓練</Status>']);

@@ -65,7 +65,8 @@ final readonly class EarthquakeCodeTables
             $cities,
             $stations,
             self::simpleTable(self::dataRows($reader->rows('41'), '41', $codeName), '41', self::AREA_CODE, ['B']),
-            self::simpleTable(self::dataRows($reader->rows('31'), '31', $codeNameKana), '31', self::AREA_CODE, ['B', 'C', 'D']),
+            // Column D of sheet 31 has no label in the official file; a label there means the layout changed.
+            self::tsunamiAreasFrom(self::dataRows($reader->rows('31'), '31', [...$codeNameKana, 'D' => ''])),
         );
     }
 
@@ -140,6 +141,27 @@ final readonly class EarthquakeCodeTables
         }
 
         return self::sorted($table);
+    }
+
+    /**
+     * Reads sheet 31 (津波予報区). Column D has no header label; it says what kind of code the row is (津波予報区,
+     * 領域表現…, 結合表現…), so an unknown value there means the columns have moved.
+     *
+     * @param list<array<string, string>> $rows data rows
+     *
+     * @return array<array-key, list<string>> code => [name, kana, kind], sorted by code
+     */
+    public static function tsunamiAreasFrom(array $rows): array
+    {
+        $table = self::simpleTable($rows, '31', self::AREA_CODE, ['B', 'C', 'D']);
+
+        foreach ($table as $code => [, , $kind]) {
+            if (preg_match('/^(津波予報区|領域表現|結合表現)/u', $kind) !== 1) {
+                throw new LogicException('Sheet 31: code ' . (string) $code . ' has an unknown kind "' . $kind . '" in column D');
+            }
+        }
+
+        return $table;
     }
 
     /**

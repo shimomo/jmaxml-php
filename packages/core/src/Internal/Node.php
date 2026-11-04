@@ -23,7 +23,7 @@ final class Node
 
     private const string XML_WHITESPACE = " \t\n\r";
 
-    private const string DATE_TIME_PATTERN = '/^(-?\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-](?:0\d|1[0-4]):[0-5]\d)$/';
+    private const string DATE_TIME_PATTERN = '/^(-?\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-](?:(?:0\d|1[0-3]):[0-5]\d|14:00))$/';
 
     private const string DURATION_PATTERN = '/^(-)?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:\.(\d+))?S)?)?$/';
 

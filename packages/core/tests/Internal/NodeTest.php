@@ -206,6 +206,10 @@ final class NodeTest extends TestCase
         $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00+99:00', 'p'))->path);
         $this->assertSame('+14:00', Node::toDateTime('2026-11-03T12:00:00+14:00', 'p')->getTimezone()->getName());
         $this->assertSame('-12:00', Node::toDateTime('2026-11-03T12:00:00-12:00', 'p')->getTimezone()->getName());
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00+14:01', 'p'))->path);
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00-14:30', 'p'))->path);
+        $this->assertSame('-14:00', Node::toDateTime('2026-11-03T12:00:00-14:00', 'p')->getTimezone()->getName());
+        $this->assertSame('+13:59', Node::toDateTime('2026-11-03T12:00:00+13:59', 'p')->getTimezone()->getName());
     }
 
     #[Test]

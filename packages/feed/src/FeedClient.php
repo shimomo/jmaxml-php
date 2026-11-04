@@ -145,8 +145,8 @@ final class FeedClient
         // Phase 3: commit.
         $expiresAt = $now->modify('+' . $this->seenRetentionSeconds . ' seconds');
 
-        foreach ($seen as $entryId) {
-            $this->store->markSeen($entryId, $expiresAt);
+        foreach ($seen as $url) {
+            $this->store->markSeen($url, $expiresAt);
         }
 
         if ($longState !== null) {
