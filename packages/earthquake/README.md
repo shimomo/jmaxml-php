@@ -14,7 +14,7 @@ An **unofficial** PHP library that groups JMA (Japan Meteorological Agency) eart
 composer require jmaxml/earthquake
 ```
 
-PHP 8.4 以上が必要です。電文の取得には [`jmaxml/feed`](../feed) が使えます。
+PHP 8.3 以上が必要です。電文の取得には [`jmaxml/feed`](../feed) が使えます。
 
 ## 使い方
 

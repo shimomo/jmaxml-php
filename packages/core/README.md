@@ -14,7 +14,7 @@ An **unofficial** PHP parser for JMA (Japan Meteorological Agency) disaster info
 composer require jmaxml/core
 ```
 
-PHP 8.4 以上が必要です。
+PHP 8.3 以上が必要です。
 
 ## 使い方
 

@@ -16,13 +16,23 @@ jobs:
     strategy:
       matrix:
         php-version:
+          - '8.3'
           - '8.4'
           - '8.5'
         phpunit-version:
+          - '12.5'
           - '13.2'
         dependency-version:
           - prefer-lowest
           - prefer-stable
+        # PHPUnit 13 needs PHP 8.4, so PHP 8.3 runs PHPUnit 12.
+        exclude:
+          - php-version: '8.3'
+            phpunit-version: '13.2'
+          - php-version: '8.4'
+            phpunit-version: '12.5'
+          - php-version: '8.5'
+            phpunit-version: '12.5'
     steps:
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
