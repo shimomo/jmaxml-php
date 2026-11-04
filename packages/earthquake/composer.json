@@ -1,0 +1,43 @@
+{
+    "name": "jmaxml/earthquake",
+    "description": "Unofficial earthquake event aggregation for JMA (Japan Meteorological Agency) XML",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "jma",
+        "jmaxml",
+        "earthquake",
+        "seismic-intensity"
+    ],
+    "authors": [
+        {
+            "name": "shimomo",
+            "email": "yuichi@shimomo.net"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "jmaxml/codes": "^0.1.0",
+        "jmaxml/core": "^0.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.2",
+        "vimeo/psalm": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "JmaXml\\Earthquake\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JmaXml\\Earthquake\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "$schema": "https://getcomposer.org/schema.json"
+}

@@ -58,7 +58,7 @@
 
 - Packagist ベンダー: `jmaxml`（2026-11-03 時点で未使用）**[決定]**
 - PHP 名前空間: `JmaXml\` **[決定]**
-- GitHub: `shimomo/jmaxml-php`。分割先は `shimomo/jmaxml-php-{core,feed,codes,seismology}`。**[判断]** boatrace-php と同じ命名にした。
+- GitHub: `shimomo/jmaxml-php`。分割先は `shimomo/jmaxml-php-{core,feed,codes,earthquake}`。**[判断]** boatrace-php と同じ命名にした。
 - boatrace-php と同じく、モノレポから各パッケージを分割して公開する。**[判断]**
 - 作者名の入らないベンダー名なので、公式に見えないようにする。すべての `composer.json` の `description` と README の冒頭に「非公式（unofficial）」と明記する。**[判断]**
 
@@ -67,7 +67,7 @@
 | `jmaxml/core` | XSD から生成した型と、`Report` のパーサー | ext-dom |
 | `jmaxml/feed` | Atom フィードの取得、新着の判定、XML のダウンロード | core、PSR-18/17、PSR-20（clock） |
 | `jmaxml/codes` | 個別コード表（地域・観測点など）の参照 | なし |
-| `jmaxml/seismology` | 地震電文を地震イベントにまとめる高水準 API | core、codes |
+| `jmaxml/earthquake` | 地震電文を地震イベントにまとめる高水準 API（名前空間 `JmaXml\Earthquake\`） | core、codes |
 
 コード表は気象庁側で月1回程度更新されるため、`codes` は他と独立してリリースできるようにする。
 
@@ -123,7 +123,9 @@
 - ジェネレーターは xlsx を読む（開発時の依存として phpoffice/phpspreadsheet 等を使ってよい）。xlsx のセルにはふりがな（`<rPh>`）が混ざっているので、本文だけを取り出すこと。
 - コード表の版（気象庁のファイル日付）を、パッケージから参照できるようにする。
 
-### 5.4 `jmaxml/seismology`
+### 5.4 `jmaxml/earthquake`（当初の案は `jmaxml/seismology`）
+
+名前は 2026-11-04 に変更した。core の生成クラスが `JmaXml\Seismology\`（地震の内容部）を使っているため、取り違えを避ける。
 
 安否確認システムが直接使う層。
 
@@ -151,7 +153,7 @@
   - `jmx_eb` = `.../elementBasis1/`
   - `jmx_add` = `.../addition1/`
   - `jmx_mete` / `jmx_seis` / `jmx_volc` = `.../body/{meteorology1,seismology1,volcanology1}/`
-- XSD はすべての電文種別をまとめて受け付ける作りで緩い。電文ごとにどの要素が出るかは「解説資料」PDF にしか書かれていない。生成した型はほぼすべて nullable になることを受け入れ、使いやすさは seismology 層で補う。
+- XSD はすべての電文種別をまとめて受け付ける作りで緩い。電文ごとにどの要素が出るかは「解説資料」PDF にしか書かれていない。生成した型はほぼすべて nullable になることを受け入れ、使いやすさは earthquake 層で補う。
 - 2026-05-29 に新しい防災気象情報が始まり、気象警報の新しい電文（VPWW55〜61、VPWS50、VPWP50、VPBS50、VPZJ51 等）が加わった。旧電文（VPWW50/53/54、VXWW50、VPOA50 等）は令和10年度（FY2028）に廃止予定。XSD は共通なので、core は新旧どちらも追加の作業なしで読める。
 - 公開フィードはリアルタイムのサポートがなく、予告なく止まることがある（気象庁 FAQ）。README の注意書きに入れる。
 
@@ -160,7 +162,7 @@
 - core：公式サンプル電文 546件をすべて読み込むテスト。代表的な電文（VXSE51、VXSE53、取消の VXSE53、VTSE41、VPWW55、VPFD51）は、主要な値まで確認する。
 - feed：HTTP はモック（PSR-18）。実際のフィードの形をフィクスチャとして保存してテストする。304応答、抜けの検知、運用種別のフィルタ、データ種類コードによる絞り込みを確認する。
 - codes：生成した配列の件数と、既知の対応（例：千代田区 → 東京都23区の細分区域）を確認する。
-- seismology：公式サンプルの一連の電文を順に流し込み、集約結果を確認する。
+- earthquake：公式サンプルの一連の電文を順に流し込み、集約結果を確認する。
   - `32-35_08_*` と `32-35_04_*` は地震が2つの例。期待値はイベント2件で、地震 A は「震度速報のみ」、地震 B は「震源・震度あり」。A と B は「関連の可能性あり」として結び付く。
   - 取消（`32-35_06_02` の VXSE52、`32-35_06_06` の VXSE53）、訂正、未入電（`32-35_06_04_240613_VXSE53`）、訓練電文の除外も確認する。
 - 実際の気象庁サーバーに接続するテストは CI では既定で実行しない（手動か定期実行のみ）。
