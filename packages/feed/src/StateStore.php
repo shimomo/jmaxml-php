@@ -11,16 +11,18 @@ use DateTimeImmutable;
  *
  * Implement it on top of your cache or database. Only one poller should use a store at a time.
  *
+ * Seen telegrams are recorded by their URL (Entry::$url, the entry's link).
+ *
  * @author shimomo
  */
 interface StateStore
 {
-    public function isSeen(string $entryId): bool;
+    public function isSeen(string $url): bool;
 
     /**
      * Seen entries may be forgotten after $expiresAt; by then they are gone from the long-term feed.
      */
-    public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void;
+    public function markSeen(string $url, DateTimeImmutable $expiresAt): void;
 
     public function load(string $feedUrl): ?FeedState;
 
