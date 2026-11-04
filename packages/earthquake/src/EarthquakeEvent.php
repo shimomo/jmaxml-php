@@ -6,6 +6,7 @@ namespace JmaXml\Earthquake;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
+use JmaXml\Codes\EarthquakeCodes;
 use JmaXml\Report;
 use JmaXml\Seismology;
 
@@ -141,6 +142,89 @@ final readonly class EarthquakeEvent
     public function isCancelled(): bool
     {
         return $this->stage === EventStage::Cancelled;
+    }
+
+    /**
+     * Which of the given cities may have reached the threshold.
+     *
+     * With 震源・震度に関する情報, cities are judged by their own intensity; areas of a 震度速報 that is newer than it are
+     * added by area. With only 震度速報, every city of an area that reached the threshold matches. A city whose intensity
+     * was not yet received (震度５弱以上未入電) matches any threshold.
+     *
+     * @param list<string> $cityCodes 気象・地震・火山情報／市町村等 codes, e.g. registered addresses
+     */
+    public function citiesAtLeast(SeismicIntensity $threshold, array $cityCodes): CityMatches
+    {
+        if ($this->isCancelled()) {
+            return new CityMatches([], []);
+        }
+
+        $areaSource = $this->cities !== [] ? $this->newerShindoSokuhoAreas : $this->areas;
+        $matches = [];
+        $unknown = [];
+
+        foreach ($cityCodes as $cityCode) {
+            $city = $this->cities[$cityCode] ?? null;
+
+            if ($city !== null && $city->mayBeAtLeast($threshold)) {
+                $matches[] = new CityMatch($cityCode, $city->maxIntensity, $city->notYetReceived, MatchBasis::City);
+
+                continue;
+            }
+
+            if ($areaSource === []) {
+                continue;
+            }
+
+            $areaCode = EarthquakeCodes::city($cityCode)?->areaCode;
+
+            if ($areaCode === null) {
+                $unknown[] = $cityCode;
+
+                continue;
+            }
+
+            $area = $areaSource[$areaCode] ?? null;
+
+            if ($area !== null && $area->mayBeAtLeast($threshold)) {
+                $matches[] = new CityMatch($cityCode, $area->maxIntensity, $area->notYetReceived, MatchBasis::Area);
+            }
+        }
+
+        return new CityMatches($matches, $unknown);
+    }
+
+    /**
+     * Whether another earthquake may be the same shaking: detected within the window and shaking at least one common
+     * area with intensity 3 or more. Events are never merged; deciding what to do is up to the caller.
+     */
+    public function isPossiblyRelatedTo(self $other, int $windowSeconds = 300): bool
+    {
+        if ($this->status !== $other->status || $this->eventId === $other->eventId || $this->isCancelled() || $other->isCancelled()) {
+            return false;
+        }
+
+        if ($this->detectedAt === null || $other->detectedAt === null || abs($this->detectedAt->getTimestamp() - $other->detectedAt->getTimestamp()) > $windowSeconds) {
+            return false;
+        }
+
+        return array_intersect($this->shakenAreaCodes(), $other->shakenAreaCodes()) !== [];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function shakenAreaCodes(): array
+    {
+        $codes = [];
+
+        foreach ([...array_values($this->areas), ...array_values($this->newerShindoSokuhoAreas)] as $reading) {
+            if ($reading->mayBeAtLeast(SeismicIntensity::Three)) {
+                $codes[] = $reading->code;
+            }
+        }
+
+        return $codes;
     }
 
     private static function isNewer(Report $candidate, Report $current): bool
