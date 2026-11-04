@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": "^8.3",
-        "jmaxml/core": "^0.1.0",
+        "jmaxml/core": "^0.1.1",
         "psr/clock": "^1.0",
         "psr/http-client": "^1.0",
         "psr/http-factory": "^1.1",
