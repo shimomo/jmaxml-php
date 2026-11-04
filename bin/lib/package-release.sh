@@ -48,7 +48,17 @@ package_release_publish() {
   repository="shimomo/jmaxml-php-$package"
   remote=$(package_release_remote "$package")
 
+  # tmp_tag はあくまでローカル作業用の名前。リモートには
+  # ステップ5で "refs/tags/${version}" という別名で push する。
+  tmp_tag="pkg-${package}-${version}"
+
   echo "==> ${package}"
+
+  # --- 0. 前回の失敗で残った一時タグと作業ブランチを消す --------------
+  # 成功すればステップ6で消えるが、途中で失敗すると残り、
+  # やり直したときに tag -s や subtree split が失敗する。どちらもローカルだけのもの。
+  git tag -d "$tmp_tag" > /dev/null 2>&1 || true
+  git branch -D "split-$package" > /dev/null 2>&1 || true
 
   # --- 1. 直前のLatestリリースタグを記録 -----------------------------
   # 新タグをpushする前に取得すること。pushした後に取ると
@@ -66,9 +76,6 @@ package_release_publish() {
     --branch="split-$package")
 
   # --- 3. 切り出したコミットに署名付き一時タグを打つ -------------------
-  # tmp_tag はあくまでローカル作業用の名前。リモートには
-  # ステップ5で "refs/tags/${version}" という別名で push する。
-  tmp_tag="pkg-${package}-${version}"
   git tag -s "$tmp_tag" "$commit" -m "Release $version"
 
   # --- 4. 独立リポジトリの main を force push ------------------------

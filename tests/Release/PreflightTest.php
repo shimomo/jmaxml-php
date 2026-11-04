@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JmaXml\Release\Tests;
 
+use JmaXml\Release\Tests\Support\Sandbox;
 use JmaXml\Release\Tests\Support\Shell;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -12,37 +13,16 @@ use PHPUnit\Framework\TestCase;
 /**
  * The checks bin/release.sh runs before it changes or pushes anything (bin/lib/preflight.sh).
  *
- * Each test builds a sandbox: repo/ (branch main, pushed to origin.git) and the bare split repositories
- * jmaxml-php-core.git and jmaxml-php-feed.git next to it.
+ * Each test builds a fresh Sandbox.
  *
  * @author shimomo
  */
 final class PreflightTest extends TestCase
 {
-    private const string SANDBOX = <<<'SH'
-        set -e
-        git init -q --bare origin.git
-        git init -q --bare jmaxml-php-core.git
-        git init -q --bare jmaxml-php-feed.git
-        git init -q -b main repo
-        cd repo
-        git config user.name test
-        git config user.email test@example.com
-        git config commit.gpgsign false
-        git config tag.gpgSign false
-        mkdir -p packages/core packages/feed
-        echo '{}' > packages/core/composer.json
-        echo '{}' > packages/feed/composer.json
-        git add .
-        git commit -q -m init
-        git remote add origin "$(cd .. && pwd)/origin.git"
-        git push -q origin main
-        SH;
-
     #[Test]
     public function passesOnACleanMainInStepWithOrigin(): void
     {
-        $sandbox = $this->sandbox();
+        $sandbox = Sandbox::create();
 
         try {
             [$exitCode, $output] = self::preflight($sandbox, '0.1.0');
@@ -57,7 +37,7 @@ final class PreflightTest extends TestCase
     #[DataProvider('brokenStates')]
     public function stopsBeforeAnythingIsPushed(string $setup, string $version, string $reason): void
     {
-        $sandbox = $this->sandbox();
+        $sandbox = Sandbox::create();
 
         try {
             [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', $setup);
@@ -83,15 +63,39 @@ final class PreflightTest extends TestCase
         yield 'tag on origin' => ['git tag 0.1.0 && git push -q origin 0.1.0 && git tag -d 0.1.0', '0.1.0', '0.1.0'];
         yield 'behind origin' => ['git commit -q --allow-empty -m x && git push -q origin main && git reset -q --hard HEAD~1', '0.1.0', 'origin/main'];
         yield 'missing split repo' => ['rm -rf ../jmaxml-php-feed.git', '0.1.0', 'jmaxml-php-feed'];
+        yield 'not newer than the latest tag' => ['git tag 0.2.0', '0.1.5', 'newer than 0.2.0'];
+        yield 'patch below the latest tag' => ['git tag 0.1.10', '0.1.9', 'newer than 0.1.10'];
     }
 
-    private function sandbox(): string
+    #[Test]
+    public function asksBeforePublishing(): void
     {
-        $sandbox = Shell::temporaryDirectory();
-        [$exitCode, $output] = Shell::run($sandbox, self::SANDBOX);
-        $this->assertSame(0, $exitCode, $output);
+        $sandbox = Sandbox::create();
 
-        return $sandbox;
+        try {
+            [, $subject] = Shell::run($sandbox . '/repo', 'git tag 0.1.0 && git log -1 --format=%s');
+
+            [$yes, $prompt] = self::confirm($sandbox, '0.1.1', 'y');
+            $this->assertSame(0, $yes, $prompt);
+            $this->assertStringContainsString('0.1.1', $prompt);
+            $this->assertStringContainsString('previous: 0.1.0', $prompt);
+            $this->assertStringContainsString(trim($subject), $prompt);
+
+            $this->assertSame(1, self::confirm($sandbox, '0.1.1', 'n')[0]);
+            $this->assertSame(1, self::confirm($sandbox, '0.1.1', '')[0]);
+        } finally {
+            Shell::remove($sandbox);
+        }
+    }
+
+    /**
+     * @return array{int, string}
+     */
+    private static function confirm(string $sandbox, string $version, string $answer): array
+    {
+        return Sandbox::run($sandbox, '. ' . escapeshellarg(Shell::library('package-release'))
+            . '; . ' . escapeshellarg(Shell::library('preflight'))
+            . '; printf %s ' . escapeshellarg($answer === '' ? '' : $answer . "\n") . ' | release_confirm ' . escapeshellarg($version));
     }
 
     /**
@@ -99,8 +103,7 @@ final class PreflightTest extends TestCase
      */
     private static function preflight(string $sandbox, string $version): array
     {
-        return Shell::run($sandbox . '/repo', 'export JMAXML_SPLIT_REMOTE_PREFIX=' . escapeshellarg($sandbox . '/jmaxml-php-')
-            . '; . ' . escapeshellarg(Shell::library('package-release'))
+        return Sandbox::run($sandbox, '. ' . escapeshellarg(Shell::library('package-release'))
             . '; . ' . escapeshellarg(Shell::library('preflight'))
             . '; release_preflight ' . escapeshellarg($version));
     }

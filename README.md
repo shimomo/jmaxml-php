@@ -38,20 +38,24 @@ bin/release.sh 0.1.1
 この 1 回の実行で、次のことを順に行います。
 
 1. 事前確認（下の「止まる条件」）
-2. `CHANGELOG.md` に版の見出しを入れる
-3. `packages/*/composer.json` の相互依存（`^<version>`）と branch-alias を更新してコミットし、main を push する
-4. 署名付きのタグを打って push する
-5. 各パッケージを `git subtree split` で分割先に push し、タグと GitHub Release を作る
+2. 公開する版、直前の版、コミット、パッケージを出して確認を求める。`y` と答えたときだけ先に進む（`n` と答えれば、事前確認だけを試せる）
+3. `CHANGELOG.md` に版の見出しを入れる（コミットは最後の手順で行う）
+4. `packages/*/composer.json` の相互依存（`^<version>`）と branch-alias を更新してコミットし、main を push する（変更が無ければコミットしない）
+5. 署名付きのタグを打って push する
+6. 各パッケージを `git subtree split` で分割先に push し、タグと GitHub Release を作る
+7. `CHANGELOG.md` を `chore: update CHANGELOG.md` としてコミットし、main を push する
 
 - **前提**：分割先の 4 リポジトリがあること、`gh` にログインしていること、`jq` と `composer` があること、タグに署名できる GPG（パスフレーズはキャッシュしておく）
 - **版番号**：コード表の更新だけならパッチ版（`0.1.1`）、公開 API が変わるときはマイナー版（`0.2.0`）を上げます
 - **CHANGELOG**：「Unreleased」に手書きの項目があれば、それをそのまま今回の版の項目にします。無ければ、直前のタグ以降のコミットの件名を使います
-- **止まる条件**：版番号の形が違う、main にいない、未コミットの変更がある、同じタグが手元か origin にある、手元の main が origin とずれている、分割先のリポジトリに届かない。どれかに当たると、何も変えずに理由をすべて出して止まります
+- **止まる条件**：版番号の形が違う、直前のタグより新しくない、main にいない、未コミットの変更がある、同じタグが手元か origin にある、手元の main が origin とずれている、分割先のリポジトリに届かない。どれかに当たると、何も変えずに理由をすべて出して止まります
 
-事前確認の後で失敗したときは、どこまで進んだかを確かめてから再開します。
+確認の後で失敗したときは、どこまで進んだかを確かめてから再開します。
 
-- main とタグがまだ push されていなければ、`git status` でリリースが加えた変更を確かめ、それを戻してからやり直します
-- main とタグが公開済み（`git ls-remote --tags origin <version>` で見える）なら、まだ公開されていないパッケージについてだけ、次を実行します
+- **タグがまだ origin に無い**（`git ls-remote --tags origin <version>` で見えない）：パッケージはまだ公開されていません（main には `chore: prepare release` のコミットだけが push されていることがあります）。`git status` で、まだコミットされていない変更（`CHANGELOG.md` と `composer.json` 群）を確かめて元に戻し、`bin/release.sh` をやり直します
+- **タグが origin にある**：公開は始まっています。`CHANGELOG.md` は元に戻さないでください（戻すと、同じ項目が次の版でもう一度公開されます）。次の順で残りを済ませます
+  1. まだ公開されていないパッケージについてだけ、下のコマンドを実行する（前回の失敗で残った一時タグと作業ブランチは、自動で消してからやり直します）
+  2. `CHANGELOG.md` を `chore: update CHANGELOG.md` としてコミットし、main を push する
 
 ```bash
 sh -c '. bin/lib/package-release.sh; package_release_publish 0.1.1 packages/feed'
