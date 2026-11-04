@@ -236,8 +236,10 @@ final class Node
     public static function toInt(string $raw, string $path, int $min = PHP_INT_MIN, int $max = PHP_INT_MAX): int
     {
         $value = trim($raw, self::XML_WHITESPACE);
+        // filter_var() rejects leading zeros and a plus sign, which xs:int allows ("+007").
+        $digits = ltrim((string) preg_replace('/^([+-]?)0+(?=\d)/', '$1', $value), '+');
         $int = preg_match(self::INT_PATTERN, $value) === 1
-            ? filter_var(ltrim($value, '+'), FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]])
+            ? filter_var($digits, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]])
             : false;
 
         if ($int === false) {

@@ -188,6 +188,18 @@ final class NodeTest extends TestCase
     }
 
     #[Test]
+    public function intsMayHaveLeadingZeros(): void
+    {
+        $this->assertSame(7, Node::toInt('007', 'p'));
+        $this->assertSame(7, Node::toInt('+007', 'p'));
+        $this->assertSame(-7, Node::toInt('-007', 'p'));
+        $this->assertSame(0, Node::toInt('00', 'p', 0, 255));
+        $this->assertSame(0, Node::toInt('-0', 'p', 0, 255));
+        $this->assertSame(255, Node::toInt('0255', 'p', 0, 255));
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toInt('0256', 'p', 0, 255))->path);
+    }
+
+    #[Test]
     public function timezoneOffsetsAreChecked(): void
     {
         $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00+09:60', 'p'))->path);
