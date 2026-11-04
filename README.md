@@ -11,6 +11,7 @@ An **unofficial** set of PHP libraries for JMA (Japan Meteorological Agency) dis
 | [`jmaxml/core`](packages/core) | 電文を公式 XML スキーマから生成した型付きオブジェクトとして読む |
 | [`jmaxml/codes`](packages/codes) | 地震関係のコード表（都道府県・細分区域・市町村・震度観測点・震央地名・津波予報区）を引く |
 | [`jmaxml/feed`](packages/feed) | 公開 Atom フィードをポーリングし、新着の電文を絞り込んで返す（抜けの検知つき） |
+| [`jmaxml/earthquake`](packages/earthquake) | 地震の電文を地震イベントにまとめ、登録した市町村が震度いくつ以上だったか、取り消されたかを判定する |
 
 使い方は各パッケージの README を参照してください。
 
