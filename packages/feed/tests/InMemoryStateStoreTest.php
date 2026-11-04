@@ -33,6 +33,22 @@ final class InMemoryStateStoreTest extends TestCase
     }
 
     #[Test]
+    public function marksManyEntriesQuickly(): void
+    {
+        $clock = new FrozenClock(new DateTimeImmutable('2026-11-03T12:00:00Z'));
+        $store = new InMemoryStateStore($clock);
+        $expiresAt = $clock->now()->modify('+8 days');
+        $started = microtime(true);
+
+        for ($i = 0; $i < 20000; $i++) {
+            $store->markSeen('https://www.data.jma.go.jp/developer/xml/data/' . $i . '.xml', $expiresAt);
+        }
+
+        $this->assertLessThan(1.0, microtime(true) - $started);
+        $this->assertTrue($store->isSeen('https://www.data.jma.go.jp/developer/xml/data/19999.xml'));
+    }
+
+    #[Test]
     public function storesFeedStatePerUrl(): void
     {
         $store = new InMemoryStateStore(new FrozenClock(new DateTimeImmutable('2026-11-03T12:00:00Z')));

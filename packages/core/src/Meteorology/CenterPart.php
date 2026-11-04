@@ -21,18 +21,19 @@ final readonly class CenterPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 中心位置: 熱帯擾乱や低気圧、高気圧の中心位置を示す */
         public array $coordinate,
         /** @var list<Circle> 予報円: 予報円の諸要素を示す */
         public array $probabilityCircle,
         /** 存在域: 台風や低気圧の存在域を示す */
         public ?string $location,
-        /** @var list<Direction> */
+        /** @var list<Direction> 移動方向: 熱帯擾乱や低気圧、高気圧の移動方向を示す */
         public array $direction,
-        /** @var list<Speed> */
+        /** @var list<Speed> 移動速度: 熱帯擾乱や低気圧、高気圧の移動速度を示す */
         public array $speed,
+        /** 中心気圧: 熱帯擾乱や低気圧、高気圧の中心気圧を示す */
         public ?Pressure $pressure,
-        /** @var list<Radius> */
+        /** @var list<Radius> 予報円半径: 熱帯擾乱や低気圧の予報円半径を示す */
         public array $radius,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

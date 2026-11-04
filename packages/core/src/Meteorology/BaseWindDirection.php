@@ -18,7 +18,7 @@ final readonly class BaseWindDirection
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<WindDirection> */
+        /** @var list<WindDirection> 風向: 風向を示す */
         public array $windDirection,
         /** @var list<LocalWindDirection> 地域: 領域の一部の区域の内容を示す */
         public array $local,

@@ -18,7 +18,7 @@ final readonly class BaseSnowfallDepth
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<SnowfallDepth> */
+        /** @var list<SnowfallDepth> 降雪量: 降雪量を示す */
         public array $snowfallDepth,
         /** @var list<LocalSnowfallDepth> 地域: 領域の一部の区域の内容を示す */
         public array $local,

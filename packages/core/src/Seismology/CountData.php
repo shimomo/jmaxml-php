@@ -36,8 +36,8 @@ final readonly class CountData
         return new self(
             startTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'StartTime', $path)), $path . '/StartTime'),
             endTime: Node::toDateTime(Node::text(Node::one($element, self::NS, 'EndTime', $path)), $path . '/EndTime'),
-            number: Node::toInt(Node::text(Node::one($element, self::NS, 'Number', $path)), $path . '/Number'),
-            feltNumber: Node::toInt(Node::text(Node::one($element, self::NS, 'FeltNumber', $path)), $path . '/FeltNumber'),
+            number: Node::toInt(Node::text(Node::one($element, self::NS, 'Number', $path)), $path . '/Number', -2147483648, 2147483647),
+            feltNumber: Node::toInt(Node::text(Node::one($element, self::NS, 'FeltNumber', $path)), $path . '/FeltNumber', -2147483648, 2147483647),
             condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
         );

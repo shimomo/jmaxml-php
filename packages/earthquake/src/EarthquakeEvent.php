@@ -35,6 +35,10 @@ final readonly class EarthquakeEvent
      * @param array<array-key, IntensityReading> $areas 地震情報／細分区域: from the detailed report if it has intensities, else from 震度速報
      * @param array<array-key, IntensityReading> $cities 市町村等: from the detailed report (empty without one)
      * @param array<array-key, IntensityReading> $newerShindoSokuhoAreas areas of a 震度速報 newer than the detailed report (empty otherwise)
+     * @param array<array-key, IntensityReading> $prefectures 地震情報／都道府県等, from the same report as $areas
+     * @param array<array-key, IntensityReading> $newerShindoSokuhoPrefectures prefectures of a 震度速報 newer than the detailed report
+     * @param array<array-key, IntensityReading> $stations 震度観測点 of the detailed report (empty without one)
+     * @param list<string> $cancelledKinds Control/Title of every kind of report whose latest telegram is a cancellation
      */
     public function __construct(
         public string $status,
@@ -48,6 +52,10 @@ final readonly class EarthquakeEvent
         public array $areas,
         public array $cities,
         public array $newerShindoSokuhoAreas,
+        public array $prefectures = [],
+        public array $newerShindoSokuhoPrefectures = [],
+        public array $stations = [],
+        public array $cancelledKinds = [],
     ) {
         //
     }
@@ -94,8 +102,13 @@ final readonly class EarthquakeEvent
         $first = $reports[0];
         $valid = array_filter($latest, static fn(Report $report): bool => $report->head->infoType !== self::CANCELLATION);
 
+        $cancelledKinds = array_values(array_filter(
+            [self::SHINDO_SOKUHO, self::HYPOCENTER, self::HYPOCENTER_AND_INTENSITY],
+            static fn(string $kind): bool => isset($latest[$kind]) && !isset($valid[$kind]),
+        ));
+
         if ($valid === []) {
-            return new self($first->control->status, $first->head->eventID, EventStage::Cancelled, null, null, null, null, $lastReportedAt, [], [], []);
+            return new self($first->control->status, $first->head->eventID, EventStage::Cancelled, null, null, null, null, $lastReportedAt, [], [], [], [], [], [], $cancelledKinds);
         }
 
         $shindo = $valid[self::SHINDO_SOKUHO] ?? null;
@@ -138,12 +151,72 @@ final readonly class EarthquakeEvent
             self::areaReadings($observation),
             $detailedObservation === null ? [] : self::cityReadings($detailedObservation),
             self::areaReadings($newerShindo),
+            self::prefectureReadings($observation),
+            self::prefectureReadings($newerShindo),
+            $detailedObservation === null ? [] : self::stationReadings($detailedObservation),
+            $cancelledKinds,
         );
     }
 
     public function isCancelled(): bool
     {
         return $this->stage === EventStage::Cancelled;
+    }
+
+    /**
+     * The region tables are keyed by code, but PHP turns codes such as '211' or '1310100' into integer keys.
+     * These lookups take the code as a string and always work.
+     */
+    public function city(string $code): ?IntensityReading
+    {
+        return $this->cities[$code] ?? null;
+    }
+
+    /**
+     * The area's reading, merged with a 震度速報 newer than the detailed report: the stronger intensity counts, and the
+     * area counts as not yet received if either reading says so.
+     */
+    public function area(string $code): ?IntensityReading
+    {
+        return self::stronger($this->areas[$code] ?? null, $this->newerShindoSokuhoAreas[$code] ?? null);
+    }
+
+    /**
+     * The prefecture's reading, merged with a newer 震度速報 like area().
+     */
+    public function prefecture(string $code): ?IntensityReading
+    {
+        return self::stronger($this->prefectures[$code] ?? null, $this->newerShindoSokuhoPrefectures[$code] ?? null);
+    }
+
+    public function station(string $code): ?IntensityReading
+    {
+        return $this->stations[$code] ?? null;
+    }
+
+    /**
+     * Whether the shaking may have reached the threshold anywhere: the strongest confirmed intensity reaches it, or some
+     * region has not reported yet (which can be any strength). Use it rather than $maxIntensity to pre-filter events.
+     */
+    public function mayBeAtLeast(SeismicIntensity $threshold): bool
+    {
+        if ($this->isCancelled()) {
+            return false;
+        }
+
+        if ($this->maxIntensity?->isAtLeast($threshold) ?? false) {
+            return true;
+        }
+
+        foreach ([$this->prefectures, $this->areas, $this->cities, $this->stations, $this->newerShindoSokuhoAreas, $this->newerShindoSokuhoPrefectures] as $readings) {
+            foreach ($readings as $reading) {
+                if ($reading->mayBeAtLeast($threshold)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -226,6 +299,17 @@ final readonly class EarthquakeEvent
         return $codes;
     }
 
+    private static function stronger(?IntensityReading $reading, ?IntensityReading $newer): ?IntensityReading
+    {
+        if ($reading === null || $newer === null) {
+            return $reading ?? $newer;
+        }
+
+        $intensity = ($newer->maxIntensity?->rank() ?? 0) > ($reading->maxIntensity?->rank() ?? 0) ? $newer->maxIntensity : $reading->maxIntensity;
+
+        return new IntensityReading($reading->code, $reading->name, $intensity, $reading->notYetReceived || $newer->notYetReceived);
+    }
+
     private static function isNewer(Report $candidate, Report $current): bool
     {
         return [$candidate->head->reportDateTime, $candidate->control->dateTime] > [$current->head->reportDateTime, $current->control->dateTime];
@@ -259,6 +343,58 @@ final readonly class EarthquakeEvent
         $magnitude = $earthquake->magnitude[0] ?? null;
 
         return new Hypocenter($area->name, $area->code->value, $point, $magnitude?->value, $magnitude?->description);
+    }
+
+    /**
+     * Prefecture readings; a prefecture counts as not yet received when any of its areas, cities or points does.
+     *
+     * @return array<array-key, IntensityReading>
+     */
+    private static function prefectureReadings(?Seismology\IntensityDetail $observation): array
+    {
+        $readings = [];
+
+        foreach ($observation?->pref ?? [] as $pref) {
+            $pending = self::isNotYetReceived($pref->condition);
+
+            foreach ($pref->area as $area) {
+                $pending = $pending || self::isNotYetReceived($area->condition);
+
+                foreach ($area->city as $city) {
+                    $pending = $pending || self::cityIsNotYetReceived($city);
+                }
+            }
+
+            $readings[$pref->code] = new IntensityReading($pref->code, $pref->name, SeismicIntensity::fromValue($pref->maxInt), $pending);
+        }
+
+        return $readings;
+    }
+
+    /**
+     * Observation point readings of 震源・震度に関する情報 (points listed under a city or directly under an area).
+     *
+     * @return array<array-key, IntensityReading>
+     */
+    private static function stationReadings(Seismology\IntensityDetail $observation): array
+    {
+        $readings = [];
+
+        foreach ($observation->pref as $pref) {
+            foreach ($pref->area as $area) {
+                $stations = $area->intensityStation;
+
+                foreach ($area->city as $city) {
+                    $stations = [...$stations, ...$city->intensityStation];
+                }
+
+                foreach ($stations as $station) {
+                    $readings[$station->code] = new IntensityReading($station->code, $station->name, SeismicIntensity::fromValue($station->int), self::isNotYetReceived($station->int));
+                }
+            }
+        }
+
+        return $readings;
     }
 
     /**

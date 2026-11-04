@@ -17,8 +17,11 @@ final readonly class WindAboveCraterElements
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/volcanology1/';
 
     public function __construct(
+        /** 火口直上の風の海抜高度: 火口直上の風の海抜高度を示す。 */
         public PlumeHeight $windHeightAboveSeaLevel,
+        /** 火口直上の風の風向: 火口直上の風の風向を示す。 */
         public WindDegree $windDegree,
+        /** 火口直上の風の風速: 火口直上の風の風速を示す。 */
         public WindSpeed $windSpeed,
         /** 代表高度: 代表高度を示す。 */
         public ?string $heightProperty,

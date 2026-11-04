@@ -23,13 +23,13 @@ final readonly class LocalWind
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<WindDirection> */
+        /** @var list<WindDirection> 風向: 風向を示す */
         public array $windDirection,
-        /** @var list<WindDegree> */
+        /** @var list<WindDegree> 風向（数値）: 風向の数値表現を示す */
         public array $windDegree,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
-        /** @var list<WindScale> */
+        /** @var list<WindScale> 風力: 風力を示す */
         public array $windScale,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

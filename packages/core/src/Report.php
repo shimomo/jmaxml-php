@@ -19,6 +19,7 @@ final readonly class Report
     public function __construct(
         /** 伝送情報 */
         public Control $control,
+        /** ヘッダー部 */
         public Head $head,
         public Body $body,
     ) {

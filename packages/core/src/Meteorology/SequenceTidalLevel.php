@@ -21,9 +21,9 @@ final readonly class SequenceTidalLevel
         public ?Sentence $sentence,
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<TidalLevel> */
+        /** @var list<TidalLevel> 潮位: 潮位を示す */
         public array $tidalLevel,
-        /** @var list<TidalPeriod> */
+        /** @var list<TidalPeriod> 周期: 潮位変動の周期を示す */
         public array $tidalPeriod,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
@@ -44,7 +44,7 @@ final readonly class SequenceTidalLevel
             tidalPeriod: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'TidalPeriod'), $path . '/TidalPeriod', static fn(DOMElement $e, string $p): TidalPeriod => TidalPeriod::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
-            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

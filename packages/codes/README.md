@@ -83,7 +83,9 @@ $cities = EarthquakeCodes::citiesInArea('350');
 
 気象庁のコード表は、観測点の移設や市町村の変更に合わせて月に 1 回ほど更新されます。このパッケージは、それに合わせて core とは別にリリースします。
 
-開発者向け：`resources/jmaxml/codes/地震火山関連コード表.xlsx` を新しい版に差し替えて `composer generate` を実行すると、`src/Data/` が再生成されます。コードの形式や階層に矛盾があれば、生成は止まります。
+開発者向け：`resources/jmaxml/codes/地震火山関連コード表.xlsx` を新しい版に差し替えて `composer generate` を実行すると、`src/Data/` が再生成されます。見出しの並び、コードの形式、階層に矛盾があれば、生成は止まります。
+
+件数を確かめるテスト（`tools/codegen/tests/Codes/EarthquakeCodeTablesTest.php` と `packages/codes/tests/EarthquakeCodesTest.php`）は、意図した確認点です。毎月の更新で観測点などの件数が変わったら、新しい版の件数に合わせて直してください。
 
 ## 注意
 
@@ -91,7 +93,9 @@ $cities = EarthquakeCodes::citiesInArea('350');
 
 ## 出典
 
-出典：[気象庁ホームページ「気象庁防災情報XMLフォーマット」](https://xml.kishou.go.jp/)個別コード表
+出典：[気象庁ホームページ「気象庁防災情報XMLフォーマット」](https://xml.kishou.go.jp/)の個別コード表を加工して作成
+
+収録しているデータは、気象庁ホームページの利用規約（政府標準利用規約（第2.0版）準拠）に従います。
 
 ## ライセンス
 

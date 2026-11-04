@@ -18,7 +18,7 @@ final readonly class BaseWeather
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<Weather> */
+        /** @var list<Weather> 天気: 天気を示す */
         public array $weather,
         /** @var list<LocalWeather> 地域: 領域の一部の区域の内容を示す */
         public array $local,

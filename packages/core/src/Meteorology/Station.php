@@ -23,7 +23,7 @@ final readonly class Station
         public ?string $location,
         /** 観測場所の状況: 観測場所の状況について補足が必要な場合その内容を示す */
         public ?string $status,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 観測官署の座標: 観測官署の座標を示す */
         public array $coordinate,
     ) {
         //

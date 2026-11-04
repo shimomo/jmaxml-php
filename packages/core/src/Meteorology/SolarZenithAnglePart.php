@@ -15,7 +15,7 @@ final readonly class SolarZenithAnglePart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<SolarZenithAngle> */
+        /** @var list<SolarZenithAngle> 太陽天頂角: 太陽天頂角 */
         public array $solarZenithAngle,
     ) {
         //

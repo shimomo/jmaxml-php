@@ -15,6 +15,7 @@ final readonly class WindAboveCrater
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/volcanology1/';
 
     public function __construct(
+        /** 火口直上の風の日本時間での予想時刻: 火口直上の風の日本時間での予想時刻を示す。 */
         public DateTime $dateTime,
         /** @var list<WindAboveCraterElements> 火口直上の風の要素: 火口直上の風の要素を示す。 */
         public array $windAboveCraterElements,

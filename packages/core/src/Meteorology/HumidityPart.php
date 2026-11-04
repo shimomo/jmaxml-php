@@ -26,7 +26,7 @@ final readonly class HumidityPart
         public array $becoming,
         /** @var list<SubAreaHumidity> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<Humidity> */
+        /** @var list<Humidity> 湿度: 湿度を示す */
         public array $humidity,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

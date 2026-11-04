@@ -27,6 +27,7 @@ final readonly class MaxHeight
         public ?TsunamiHeight $tsunamiHeightFrom,
         /** 高さの予測値(大きな方): 最大波等の高さの予測値を示す */
         public ?TsunamiHeight $tsunamiHeightTo,
+        /** 高さの値: 最大波等の高さの予測値、観測値を示す */
         public ?TsunamiHeight $tsunamiHeight,
         /** 修正情報: 修正が発生した場合に記載する */
         public ?string $revise,

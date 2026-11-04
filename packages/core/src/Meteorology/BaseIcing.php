@@ -18,7 +18,7 @@ final readonly class BaseIcing
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<Icing> */
+        /** @var list<Icing> 着氷: 着氷を示す */
         public array $icing,
         /** @var list<LocalIcing> 地域: 領域の一部の区域の内容を示す */
         public array $local,

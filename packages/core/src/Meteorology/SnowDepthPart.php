@@ -20,7 +20,7 @@ final readonly class SnowDepthPart
         public ?Sentence $sentence,
         /** 卓越もしくは変化前: 卓越する内容、もしくは変化前の内容を示す */
         public ?BaseSnowDepth $base,
-        /** @var list<SnowDepth> */
+        /** @var list<SnowDepth> 積雪深: 積雪深を示す */
         public array $snowDepth,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

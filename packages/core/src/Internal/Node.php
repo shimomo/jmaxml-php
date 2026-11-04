@@ -23,7 +23,7 @@ final class Node
 
     private const string XML_WHITESPACE = " \t\n\r";
 
-    private const string DATE_TIME_PATTERN = '/^(-?\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$/';
+    private const string DATE_TIME_PATTERN = '/^(-?\d{4,}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-](?:0\d|1[0-4]):[0-5]\d)$/';
 
     private const string DURATION_PATTERN = '/^(-)?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)(?:\.(\d+))?S)?)?$/';
 
@@ -233,20 +233,25 @@ final class Node
         return trim($raw, self::XML_WHITESPACE) === '' ? null : self::toFloat($raw, $path);
     }
 
-    public static function toInt(string $raw, string $path): int
+    public static function toInt(string $raw, string $path, int $min = PHP_INT_MIN, int $max = PHP_INT_MAX): int
     {
         $value = trim($raw, self::XML_WHITESPACE);
+        // filter_var() rejects leading zeros and a plus sign, which xs:int allows ("+007").
+        $digits = ltrim((string) preg_replace('/^([+-]?)0+(?=\d)/', '$1', $value), '+');
+        $int = preg_match(self::INT_PATTERN, $value) === 1
+            ? filter_var($digits, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]])
+            : false;
 
-        if (preg_match(self::INT_PATTERN, $value) !== 1) {
-            throw new ParseException('Invalid integer "' . $raw . '"', $path);
+        if ($int === false) {
+            throw new ParseException('Invalid integer "' . $raw . '" (expected ' . $min . ' to ' . $max . ')', $path);
         }
 
-        return (int) $value;
+        return $int;
     }
 
-    public static function toNullableInt(string $raw, string $path): ?int
+    public static function toNullableInt(string $raw, string $path, int $min = PHP_INT_MIN, int $max = PHP_INT_MAX): ?int
     {
-        return trim($raw, self::XML_WHITESPACE) === '' ? null : self::toInt($raw, $path);
+        return trim($raw, self::XML_WHITESPACE) === '' ? null : self::toInt($raw, $path, $min, $max);
     }
 
     public static function toBool(string $raw, string $path): bool

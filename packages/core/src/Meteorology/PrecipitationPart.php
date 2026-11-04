@@ -26,7 +26,7 @@ final readonly class PrecipitationPart
         public array $becoming,
         /** @var list<SubAreaPrecipitation> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<Precipitation> */
+        /** @var list<Precipitation> 降水量: 降水量を示す */
         public array $precipitation,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
@@ -49,7 +49,7 @@ final readonly class PrecipitationPart
             precipitation: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'Precipitation'), $path . '/Precipitation', static fn(DOMElement $e, string $p): Precipitation => Precipitation::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
-            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

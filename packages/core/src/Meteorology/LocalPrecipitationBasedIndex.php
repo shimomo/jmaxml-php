@@ -20,7 +20,7 @@ final readonly class LocalPrecipitationBasedIndex
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<PrecipitationBasedIndex> */
+        /** @var list<PrecipitationBasedIndex> 雨量関連指数: 雨量関連指数を示す */
         public array $precipitationBasedIndex,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

@@ -57,6 +57,75 @@ final class EarthquakeCodeTablesTest extends TestCase
     }
 
     #[Test]
+    public function checksTheHeaderLabels(): void
+    {
+        $expected = ['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな'];
+
+        $this->assertSame(
+            [['A' => '100', 'B' => '石狩地方北部', 'C' => 'いしかりちほうほくぶ']],
+            EarthquakeCodeTables::dataRows([['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな'], ['A' => '100', 'B' => '石狩地方北部', 'C' => 'いしかりちほうほくぶ']], '24', $expected),
+        );
+
+        $this->expectException(LogicException::class);
+
+        EarthquakeCodeTables::dataRows([['A' => 'Code', 'B' => 'ふりがな', 'C' => 'Name']], '24', $expected);
+    }
+
+    #[Test]
+    public function simpleTablesReadAndValidateRows(): void
+    {
+        $this->assertSame(
+            ['891' => ['沖縄県地方', 'おきなわけんちほう', '領域表現']],
+            EarthquakeCodeTables::simpleTable([['A' => '891', 'B' => '沖縄県地方', 'C' => 'おきなわけんちほう', 'D' => '領域表現']], '31', '/^\d{3}$/', ['B', 'C', 'D']),
+        );
+
+        $rejected = 0;
+
+        foreach ([[['A' => '11', 'B' => '北海道地方']], [['A' => '011', 'B' => 'x'], ['A' => '011', 'B' => 'y']], [['A' => '011']]] as $rows) {
+            try {
+                EarthquakeCodeTables::simpleTable($rows, '41', '/^\d{3}$/', ['B']);
+            } catch (LogicException) {
+                $rejected++;
+            }
+        }
+
+        $this->assertSame(3, $rejected);
+    }
+
+    #[Test]
+    public function requiresCompleteTables(): void
+    {
+        $rejected = 0;
+
+        try {
+            EarthquakeCodeTables::hierarchyFrom([]);
+        } catch (LogicException) {
+            $rejected++;
+        }
+
+        [$areas, $cities, $stations] = EarthquakeCodeTables::hierarchyFrom([self::row()]);
+
+        try {
+            EarthquakeCodeTables::fromParts('2026-10-19', ['01' => ['北海道'], '02' => ['青森県']], $areas, $cities, $stations, ['011' => ['北海道地方']], ['100' => ['北海道太平洋沿岸東部', '', '']]);
+        } catch (LogicException $exception) {
+            $this->assertStringContainsString('02', $exception->getMessage());
+            $rejected++;
+        }
+
+        $this->assertSame(2, $rejected);
+        $this->assertSame('2026-10-19', EarthquakeCodeTables::fromParts('2026-10-19', ['01' => ['北海道']], $areas, $cities, $stations, ['011' => ['北海道地方']], ['100' => ['北海道太平洋沿岸東部', '', '']])->version);
+    }
+
+    #[Test]
+    public function duplicateStationMessageNamesTheStation(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessageMatches('/station/');
+
+        EarthquakeCodeTables::hierarchyFrom([self::row(), self::row()]);
+    }
+
+    #[Test]
     public function convertsJapaneseEraDates(): void
     {
         $this->assertSame(

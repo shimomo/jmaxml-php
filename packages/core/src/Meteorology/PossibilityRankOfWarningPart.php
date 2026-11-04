@@ -15,7 +15,7 @@ final readonly class PossibilityRankOfWarningPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<PossibilityRankOfWarning> */
+        /** @var list<PossibilityRankOfWarning> 警報級の可能性: 警報級の可能性を示す */
         public array $possibilityRankOfWarning,
     ) {
         //

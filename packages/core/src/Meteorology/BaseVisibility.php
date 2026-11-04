@@ -18,7 +18,7 @@ final readonly class BaseVisibility
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<Visibility> */
+        /** @var list<Visibility> 視程: 視程を示す */
         public array $visibility,
         /** @var list<LocalVisibility> 地域: 領域の一部の区域の内容を示す */
         public array $local,

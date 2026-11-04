@@ -35,7 +35,7 @@ final readonly class Accuracy
             epicenter: AccuracyEpicenter::fromElement(Node::one($element, self::NS, 'Epicenter', $path), $path . '/Epicenter'),
             depth: AccuracyDepth::fromElement(Node::one($element, self::NS, 'Depth', $path), $path . '/Depth'),
             magnitudeCalculation: AccuracyMagnitude::fromElement(Node::one($element, self::NS, 'MagnitudeCalculation', $path), $path . '/MagnitudeCalculation'),
-            numberOfMagnitudeCalculation: Node::toInt(Node::text(Node::one($element, self::NS, 'NumberOfMagnitudeCalculation', $path)), $path . '/NumberOfMagnitudeCalculation'),
+            numberOfMagnitudeCalculation: Node::toInt(Node::text(Node::one($element, self::NS, 'NumberOfMagnitudeCalculation', $path)), $path . '/NumberOfMagnitudeCalculation', -2147483648, 2147483647),
         );
     }
 }

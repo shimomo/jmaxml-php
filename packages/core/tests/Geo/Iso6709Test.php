@@ -68,6 +68,22 @@ final class Iso6709Test extends TestCase
     }
 
     #[Test]
+    public function rejectsOutOfRangeValues(): void
+    {
+        $rejected = 0;
+
+        foreach ([['+91.0+135.0/', null], ['+35.0+181.0/', null], ['+3560.0+13500.0/', '位置（度分）'], ['+353060+1394500/', '位置（度分秒）']] as [$value, $type]) {
+            try {
+                Iso6709::parse($value, $type);
+            } catch (InvalidArgumentException) {
+                $rejected++;
+            }
+        }
+
+        $this->assertSame(4, $rejected);
+    }
+
+    #[Test]
     public function rejectsMalformedSegment(): void
     {
         $this->expectException(InvalidArgumentException::class);

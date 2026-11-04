@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.xlsx binary
+*.zip binary
+*.png binary
+
+# JMA materials are kept byte for byte as distributed (some samples use CRLF).
+resources/jmaxml/** -text

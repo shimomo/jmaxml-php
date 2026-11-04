@@ -16,8 +16,9 @@ final readonly class WarningAreaPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 警戒領域の風速（強風域は15メートル、30ノット、暴風域は25メートル、50ノット） */
         public array $windSpeed,
+        /** 円: 警戒領域（円）の諸要素を示す */
         public Circle $circle,
         /** 分類: 警戒領域部分の分類を示す */
         public string $type,

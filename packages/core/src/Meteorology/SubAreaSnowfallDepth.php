@@ -28,7 +28,7 @@ final readonly class SubAreaSnowfallDepth
         public array $becoming,
         /** @var list<LocalSnowfallDepth> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<SnowfallDepth> */
+        /** @var list<SnowfallDepth> 降雪量: 降雪量を示す */
         public array $snowfallDepth,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

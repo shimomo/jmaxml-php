@@ -26,15 +26,20 @@ final class Document
             throw new ParseException('Empty document', '/');
         }
 
+        // Errors the caller had already collected are left alone: only the ones raised while loading are looked at,
+        // and the buffer is cleared afterwards only if the caller was not collecting errors itself.
         $previous = libxml_use_internal_errors(true);
-        libxml_clear_errors();
+        $alreadyPending = count(libxml_get_errors());
 
         try {
             $document = new DOMDocument();
             $loaded = $document->loadXML($xml, LIBXML_NONET);
-            $error = self::firstError(libxml_get_errors());
+            $error = self::firstError(array_slice(libxml_get_errors(), $alreadyPending));
         } finally {
-            libxml_clear_errors();
+            if (!$previous) {
+                libxml_clear_errors();
+            }
+
             libxml_use_internal_errors($previous);
         }
 
@@ -57,7 +62,13 @@ final class Document
 
     public static function fromFile(string $path): DOMElement
     {
-        $xml = is_file($path) && is_readable($path) ? file_get_contents($path) : false;
+        set_error_handler(static fn(): bool => true);
+
+        try {
+            $xml = is_file($path) && is_readable($path) ? file_get_contents($path) : false;
+        } finally {
+            restore_error_handler();
+        }
 
         if ($xml === false) {
             throw new ParseException('Cannot read file ' . $path, '/');

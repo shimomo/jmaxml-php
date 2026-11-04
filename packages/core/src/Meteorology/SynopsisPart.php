@@ -16,7 +16,7 @@ final readonly class SynopsisPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Synopsis> */
+        /** @var list<Synopsis> 気象要因: 気象要因を示す */
         public array $synopsis,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

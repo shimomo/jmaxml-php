@@ -21,6 +21,7 @@ enum ScalarKind
     case Float;
     case NullableFloat;
     case Int;
+    case UnsignedByte;
     case NullableInt;
     case Bool;
     case StringList;
@@ -42,12 +43,13 @@ enum ScalarKind
         }
 
         return match ($base->localName) {
-            'string', 'anyURI', 'normalizedString', 'gMonthDay' => self::String,
+            'string', 'anyURI', 'gMonthDay' => self::String,
             'token' => self::Token,
             'dateTime' => self::DateTime,
             'duration' => self::Duration,
-            'float', 'double', 'decimal' => self::Float,
-            'int', 'integer', 'unsignedByte', 'byte', 'short', 'unsignedShort', 'long', 'unsignedInt', 'nonNegativeInteger', 'positiveInteger' => self::Int,
+            'float' => self::Float,
+            'int' => self::Int,
+            'unsignedByte' => self::UnsignedByte,
             'boolean' => self::Bool,
             'list' => self::StringList,
             default => throw new LogicException('Unsupported simple type ' . $base->key()),
@@ -64,7 +66,7 @@ enum ScalarKind
             self::DateTime => 'DateTimeImmutable',
             self::Duration => 'DateInterval',
             self::Float, self::NullableFloat => '?float',
-            self::Int => 'int',
+            self::Int, self::UnsignedByte => 'int',
             self::NullableInt => '?int',
             self::Bool => 'bool',
             self::StringList => 'array',
@@ -84,11 +86,6 @@ enum ScalarKind
         };
     }
 
-    public function isNullable(): bool
-    {
-        return in_array($this, [self::Float, self::NullableFloat, self::NullableInt], true);
-    }
-
     /**
      * A PHP expression converting the raw string expression $raw; $path is the PHP expression of the node path.
      */
@@ -101,7 +98,8 @@ enum ScalarKind
             self::Duration => 'Node::toDuration(' . $raw . ', ' . $path . ')',
             self::Float => 'Node::toFloat(' . $raw . ', ' . $path . ')',
             self::NullableFloat => 'Node::toNullableFloat(' . $raw . ', ' . $path . ')',
-            self::Int => 'Node::toInt(' . $raw . ', ' . $path . ')',
+            self::Int => 'Node::toInt(' . $raw . ', ' . $path . ', -2147483648, 2147483647)',
+            self::UnsignedByte => 'Node::toInt(' . $raw . ', ' . $path . ', 0, 255)',
             self::NullableInt => 'Node::toNullableInt(' . $raw . ', ' . $path . ')',
             self::Bool => 'Node::toBool(' . $raw . ', ' . $path . ')',
             self::StringList => 'Node::toList(' . $raw . ')',

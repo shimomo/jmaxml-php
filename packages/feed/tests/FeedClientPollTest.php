@@ -166,19 +166,106 @@ final class FeedClientPollTest extends TestCase
     }
 
     #[Test]
-    public function unreadableTelegramIsReportedAndNotRetried(): void
+    public function unreadableTelegramIsRetriedForTenMinutes(): void
+    {
+        [$client, $http, $store, $clock] = $this->client();
+        $broken = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+        $factory = new Psr17Factory();
+        $http->queue(self::FEED, self::feed([$broken]), $factory->createResponse(304), $factory->createResponse(304));
+        $http->queue($broken, self::notXml(), self::notXml(), self::notXml());
+
+        $first = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+        $this->assertCount(1, $first->failures);
+        $this->assertTrue($first->failures[0]->willRetry);
+        $this->assertInstanceOf(ParseException::class, $first->failures[0]->previous);
+        $this->assertFalse($store->isSeen($broken));
+        $this->assertSame([$broken], $store->load(self::FEED)?->retryUrls);
+        $this->assertEquals([$broken => new DateTimeImmutable('2026-11-03T12:00:00Z')], $store->load(self::FEED)?->failingSince);
+
+        $clock->advance('+9 minutes');
+        $second = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+        $this->assertTrue($second->failures[0]->willRetry);
+        $this->assertFalse($store->isSeen($broken));
+
+        $clock->advance('+1 minute');
+        $third = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+        $this->assertCount(1, $third->failures);
+        $this->assertFalse($third->failures[0]->willRetry);
+        $this->assertInstanceOf(ParseException::class, $third->failures[0]->previous);
+        $this->assertTrue($store->isSeen($broken));
+        $this->assertSame([], $store->load(self::FEED)?->retryUrls);
+        $this->assertSame([], $store->load(self::FEED)?->failingSince);
+    }
+
+    #[Test]
+    public function missingTelegramIsRetriedUntilItAppears(): void
+    {
+        $factory = new Psr17Factory();
+
+        // The window counts from the first failure, not from the telegram's age: an old telegram downloaded while
+        // catching up after a gap gets the same chance.
+        foreach ([[403, '20261103115930'], [404, '20261103115930'], [403, '20261103090000']] as [$status, $createdAt]) {
+            [$client, $http, $store, $clock] = $this->client();
+            $url = AtomFixture::url($createdAt . '_0_VXSE51_270000.xml');
+            $http->queue(self::FEED, self::feed([$url]), $factory->createResponse(304));
+            $http->queue($url, $factory->createResponse($status), self::telegram(self::SHINDO));
+
+            $first = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+            $this->assertTrue($first->failures[0]->willRetry, 'HTTP ' . $status);
+            $this->assertFalse($store->isSeen($url), 'HTTP ' . $status);
+
+            $clock->advance('+1 minute');
+            $second = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+            $this->assertCount(1, $second->telegrams, 'HTTP ' . $status);
+            $this->assertSame([], $second->failures, 'HTTP ' . $status);
+            $this->assertTrue($store->isSeen($url), 'HTTP ' . $status);
+            $this->assertSame([], $store->load(self::FEED)?->failingSince, 'HTTP ' . $status);
+        }
+    }
+
+    #[Test]
+    public function missingTelegramIsGivenUpAfterTenMinutes(): void
+    {
+        $factory = new Psr17Factory();
+
+        foreach ([403 => false, 404 => false, 410 => false, 408 => true, 429 => true, 503 => true] as $status => $stillRetried) {
+            [$client, $http, $store, $clock] = $this->client();
+            $url = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+            $http->queue(self::FEED, self::feed([$url]), $factory->createResponse(304));
+            $http->queue($url, $factory->createResponse($status), $factory->createResponse($status));
+
+            $this->assertTrue($client->poll(new Subscription(FeedType::EarthquakeVolcano))->failures[0]->willRetry, 'HTTP ' . $status);
+
+            $clock->advance('+10 minutes');
+            $result = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+            $this->assertSame($stillRetried, $result->failures[0]->willRetry, 'HTTP ' . $status);
+            $this->assertSame(!$stillRetried, $store->isSeen($url), 'HTTP ' . $status);
+            $this->assertSame($stillRetried ? [$url] : [], $store->load(self::FEED)?->retryUrls, 'HTTP ' . $status);
+            $this->assertSame([], $store->load(self::FEED)?->failingSince, 'HTTP ' . $status);
+        }
+    }
+
+    #[Test]
+    public function identityAndDownloadUseTheLink(): void
     {
         [$client, $http, $store] = $this->client();
-        $broken = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
-        $http->queue(self::FEED, self::feed([$broken]));
-        $http->queue($broken, (new Psr17Factory())->createResponse(200)->withBody((new Psr17Factory())->createStream('not xml')));
+        $url = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+        $factory = new Psr17Factory();
+        $xml = AtomFixture::feed('2026-11-03T11:59:58Z', [['url' => $url, 'id' => 'tag:jma,2026:abc']]);
+        $http->queue(self::FEED, $factory->createResponse(200)->withBody($factory->createStream($xml)));
+        $http->queue($url, self::telegram(self::SHINDO));
 
         $result = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
 
-        $this->assertCount(1, $result->failures);
-        $this->assertFalse($result->failures[0]->willRetry);
-        $this->assertInstanceOf(ParseException::class, $result->failures[0]->previous);
-        $this->assertTrue($store->isSeen($broken));
+        $this->assertCount(1, $result->telegrams);
+        $this->assertTrue($store->isSeen($url));
+        $this->assertFalse($store->isSeen('tag:jma,2026:abc'));
     }
 
     #[Test]
@@ -243,5 +330,12 @@ final class FeedClientPollTest extends TestCase
         $factory = new Psr17Factory();
 
         return $factory->createResponse(200)->withBody($factory->createStream((string) file_get_contents(Fixtures::sample($sample))));
+    }
+
+    private static function notXml(): ResponseInterface
+    {
+        $factory = new Psr17Factory();
+
+        return $factory->createResponse(200)->withBody($factory->createStream('not xml'));
     }
 }

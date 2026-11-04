@@ -16,9 +16,9 @@ final readonly class HydrometricStationCriteria
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<WaterLevel> */
+        /** @var list<WaterLevel> 水位基準: 水位基準を示す */
         public array $waterLevel,
-        /** @var list<Discharge> */
+        /** @var list<Discharge> 流量基準: 流量基準を示す */
         public array $discharge,
     ) {
         //

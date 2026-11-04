@@ -24,7 +24,7 @@ final readonly class Item
     {
         return new self(
             code: Node::toText(Node::text(Node::one($element, self::NS, 'Code', $path))),
-            score: Node::toInt(Node::text(Node::one($element, self::NS, 'Score', $path)), $path . '/Score'),
+            score: Node::toInt(Node::text(Node::one($element, self::NS, 'Score', $path)), $path . '/Score', -2147483648, 2147483647),
         );
     }
 }

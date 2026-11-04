@@ -20,7 +20,7 @@ final readonly class LocalTemperature
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<Temperature> */
+        /** @var list<Temperature> 気温: 気温を示す */
         public array $temperature,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

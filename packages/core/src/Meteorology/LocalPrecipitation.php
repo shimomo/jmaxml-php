@@ -20,7 +20,7 @@ final readonly class LocalPrecipitation
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<Precipitation> */
+        /** @var list<Precipitation> 降水量: 降水量を示す */
         public array $precipitation,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

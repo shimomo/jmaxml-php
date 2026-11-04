@@ -43,6 +43,14 @@ final class GeneratedCodeIsUpToDateTest extends TestCase
         $this->assertSame(array_keys($files), self::markedFiles($sourceDir));
     }
 
+    #[Test]
+    public function referencedElementsCarryTheirDictionaryDescription(): void
+    {
+        $earthquake = (string) file_get_contents(dirname(__DIR__, 3) . '/packages/core/src/Seismology/Earthquake.php');
+
+        $this->assertStringContainsString('@var list<Magnitude> マグニチュード', $earthquake);
+    }
+
     /**
      * @return list<string> paths relative to $dir of files carrying the generated-code marker, sorted
      */

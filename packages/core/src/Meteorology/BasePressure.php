@@ -18,7 +18,7 @@ final readonly class BasePressure
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<Pressure> */
+        /** @var list<Pressure> 気圧: 気圧を示す */
         public array $pressure,
         /** @var list<LocalPressure> 地域: 領域の一部の区域の内容を示す */
         public array $local,

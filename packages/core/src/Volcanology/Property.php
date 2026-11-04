@@ -18,8 +18,9 @@ final readonly class Property
     public function __construct(
         /** 現象の量や大きさ: 発生する現象の量や大きさを示す。 */
         public ?Size $size,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 多角形: 等値線の座標を示す（閉じている場合）。 */
         public array $polygon,
+        /** 影響範囲の方向: 影響範囲の方向を示す。 */
         public PlumeDirection $plumeDirection,
         /** 影響範囲の距離: 影響範囲の火口からの距離を示す。 */
         public Distance $distance,

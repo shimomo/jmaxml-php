@@ -193,6 +193,11 @@ final class ClassRenderer
 
         $closure = 'static fn(DOMElement $e, string $p): ' . $single . ' => ' . $value('$e', '$p');
         $description = $this->dictionary->forElement($type->prefix, $type->name, $element->name);
+
+        // The dictionary lists referenced elements with their prefix, e.g. "jmx_eb:Magnitude".
+        if ($description === null && $element->namespace !== $type->namespace) {
+            $description = $this->dictionary->forElement($type->prefix, $type->name, $this->schemas->prefixFor($element->namespace) . ':' . $element->name);
+        }
         $property = Naming::propertyName($element->name);
 
         if ($element->maxOccurs === 1) {

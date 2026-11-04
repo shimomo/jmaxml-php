@@ -26,7 +26,7 @@ final readonly class WindSpeedPart
         public array $becoming,
         /** @var list<SubAreaWindSpeed> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
         /** @var list<WindSpeedLevel> 風速レベル: 府県天気予報の3時間内代表風で利用する風速レベルを示す */
         public array $windSpeedLevel,

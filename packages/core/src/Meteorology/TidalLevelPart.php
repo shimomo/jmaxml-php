@@ -27,9 +27,9 @@ final readonly class TidalLevelPart
         public array $becoming,
         /** @var list<SubAreaTidalLevel> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<TidalLevel> */
+        /** @var list<TidalLevel> 潮位: 潮位を示す */
         public array $tidalLevel,
-        /** @var list<TidalPeriod> */
+        /** @var list<TidalPeriod> 周期: 潮位変動の周期を示す */
         public array $tidalPeriod,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

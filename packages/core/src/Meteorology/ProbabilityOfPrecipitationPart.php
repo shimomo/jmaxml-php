@@ -15,7 +15,7 @@ final readonly class ProbabilityOfPrecipitationPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<ProbabilityOfPrecipitation> */
+        /** @var list<ProbabilityOfPrecipitation> 降水確率: 降水確率を示す */
         public array $probabilityOfPrecipitation,
     ) {
         //

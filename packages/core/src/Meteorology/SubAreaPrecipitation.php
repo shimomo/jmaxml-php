@@ -28,7 +28,7 @@ final readonly class SubAreaPrecipitation
         public array $becoming,
         /** @var list<LocalPrecipitation> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<Precipitation> */
+        /** @var list<Precipitation> 降水量: 降水量を示す */
         public array $precipitation,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

@@ -168,6 +168,20 @@ final class ReportTest extends TestCase
     }
 
     #[Test]
+    public function ignoresUnknownElementsInsideTheBodyAndForeignNamespaces(): void
+    {
+        $xml = str_replace(
+            '<Intensity>',
+            '<Future>x</Future><x:Other xmlns:x="urn:x">y</x:Other><Intensity>',
+            self::shindoSokuho(),
+        );
+
+        $body = Report::fromString($xml)->body;
+        $this->assertInstanceOf(Seismology\Body::class, $body);
+        $this->assertSame('4', $body->intensity?->observation?->maxInt);
+    }
+
+    #[Test]
     public function nilTargetDateTimeBecomesNull(): void
     {
         $xml = (string) preg_replace(

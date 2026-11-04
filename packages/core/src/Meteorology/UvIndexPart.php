@@ -15,7 +15,7 @@ final readonly class UvIndexPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<UvIndex> */
+        /** @var list<UvIndex> ＵＶインデックス: UVインデックス */
         public array $uvIndex,
         /** 汎用で利用するテキスト形式: テキスト形式で内容を示す。汎用で利用する。 */
         public ?string $text,

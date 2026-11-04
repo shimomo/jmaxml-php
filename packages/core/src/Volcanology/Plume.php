@@ -16,8 +16,11 @@ final readonly class Plume
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/volcanology1/';
 
     public function __construct(
+        /** 火口縁上噴煙高度: 火口縁上噴煙高度を示す。 */
         public PlumeHeight $plumeHeightAboveCrater,
+        /** 海抜噴煙高度: 海抜噴煙高度を示す。 */
         public ?PlumeHeight $plumeHeightAboveSeaLevel,
+        /** 噴煙の流向: 噴煙の流向を示す。 */
         public PlumeDirection $plumeDirection,
         /** 噴煙についての付加文: 噴煙についての付加文を示す。 */
         public ?string $plumeComment,

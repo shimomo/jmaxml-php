@@ -20,7 +20,7 @@ final readonly class LocalWindSpeed
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

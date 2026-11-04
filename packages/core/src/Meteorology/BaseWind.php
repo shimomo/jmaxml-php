@@ -21,13 +21,13 @@ final readonly class BaseWind
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<WindDirection> */
+        /** @var list<WindDirection> 風向: 風向を示す */
         public array $windDirection,
-        /** @var list<WindDegree> */
+        /** @var list<WindDegree> 風向（数値）: 風向の数値表現を示す */
         public array $windDegree,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
-        /** @var list<WindScale> */
+        /** @var list<WindScale> 風力: 風力を示す */
         public array $windScale,
         /** @var list<LocalWind> 地域: 領域の一部の区域の内容を示す */
         public array $local,

@@ -22,7 +22,7 @@ final readonly class HypoArea
         public string $name,
         /** 震央地名コード: 震央地名のコードを示す */
         public HypoAreaCode $code,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 震源要素: 震源の緯度、経度、深さの位置を示す */
         public array $coordinate,
         /** 短縮用震央地名: 短縮用震源位置の地名を示す */
         public ?string $reduceName,

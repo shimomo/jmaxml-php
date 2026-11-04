@@ -16,7 +16,7 @@ final readonly class BaseSunshine
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Sunshine> */
+        /** @var list<Sunshine> 日照: 日照を示す */
         public array $sunshine,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

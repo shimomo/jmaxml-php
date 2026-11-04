@@ -28,7 +28,7 @@ final readonly class SubAreaTemperature
         public array $becoming,
         /** @var list<LocalTemperature> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<Temperature> */
+        /** @var list<Temperature> 気温: 気温を示す */
         public array $temperature,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

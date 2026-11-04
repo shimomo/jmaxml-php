@@ -40,9 +40,16 @@ final class Iso6709
 
             $notation = self::notation($type, $matches[1]);
 
+            $latitude = self::toDegrees($matches[1], $notation);
+            $longitude = self::toDegrees($matches[2], $notation);
+
+            if (abs($latitude) > 90.0 || abs($longitude) > 180.0) {
+                throw new InvalidArgumentException('ISO 6709 point out of range "' . $segment . '"');
+            }
+
             $points[] = new Point(
-                self::toDegrees($matches[1], $notation),
-                self::toDegrees($matches[2], $notation),
+                $latitude,
+                $longitude,
                 isset($matches[3]) ? (float) $matches[3] : null,
             );
         }
@@ -98,8 +105,13 @@ final class Iso6709
     private static function fromDegreeMinutes(float $value): float
     {
         $degrees = floor($value / 100.0);
+        $minutes = $value - $degrees * 100.0;
 
-        return $degrees + ($value - $degrees * 100.0) / 60.0;
+        if ($minutes >= 60.0) {
+            throw new InvalidArgumentException('ISO 6709 minutes out of range in "' . (string) $value . '"');
+        }
+
+        return $degrees + $minutes / 60.0;
     }
 
     private static function fromDegreeMinuteSeconds(float $value): float
@@ -107,7 +119,12 @@ final class Iso6709
         $degrees = floor($value / 10000.0);
         $rest = $value - $degrees * 10000.0;
         $minutes = floor($rest / 100.0);
+        $seconds = $rest - $minutes * 100.0;
 
-        return $degrees + $minutes / 60.0 + ($rest - $minutes * 100.0) / 3600.0;
+        if ($minutes >= 60.0 || $seconds >= 60.0) {
+            throw new InvalidArgumentException('ISO 6709 minutes or seconds out of range in "' . (string) $value . '"');
+        }
+
+        return $degrees + $minutes / 60.0 + $seconds / 3600.0;
     }
 }

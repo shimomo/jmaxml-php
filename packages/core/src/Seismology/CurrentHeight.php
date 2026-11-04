@@ -25,6 +25,7 @@ final readonly class CurrentHeight
         public ?DateTimeImmutable $endTime,
         /** 観測状況: 現在波の状況を示す */
         public ?string $condition,
+        /** 高さの値: 現在波の高さの値を示す */
         public ?TsunamiHeight $tsunamiHeight,
     ) {
         //

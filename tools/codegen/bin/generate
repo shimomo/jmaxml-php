@@ -14,25 +14,28 @@ $root = dirname(__DIR__, 3);
 
 require $root . '/vendor/autoload.php';
 
+// Everything is read and validated before any file is written, so a failure leaves the tree untouched.
 $core = new Generator(
     SchemaSet::load($root . '/resources/jmaxml/xsd/jmx.xsd'),
     Dictionary::fromXlsx($root . '/resources/jmaxml/dictionary.xlsx'),
     Generator::defaultNamespaceMap(),
 );
-$written = $core->writeTo($root . '/packages/core/src');
 
 // The generator's own test fixture, committed so that its tests are type-checked.
 $mini = new Generator(
     SchemaSet::load($root . '/tools/codegen/tests/Fixtures/mini/mini.xsd'),
     Dictionary::empty(),
     ['urn:mini' => 'JmaXml\\Codegen\\Tests\\Generated\\Mini'],
-    'JmaXml\\Codegen\\Tests',
+    'JmaXml\\Codegen\\Tests\\Generated',
 );
-$mini->writeTo($root . '/tools/codegen/tests');
+
+$coreFiles = $core->generate();
+$miniFiles = $mini->generate();
+$codeFiles = (new CodesGenerator(EarthquakeCodeTables::fromXlsx($root . '/resources/jmaxml/codes/地震火山関連コード表.xlsx')))->generate();
+
+$written = GeneratedFiles::write($root . '/packages/core/src', $coreFiles);
+GeneratedFiles::write($root . '/tools/codegen/tests/Generated', $miniFiles);
+$writtenCodes = GeneratedFiles::write($root . '/packages/codes/src', $codeFiles);
 
 fwrite(STDOUT, sprintf("Generated %d files.\n", count($written)));
-
-$codes = new CodesGenerator(EarthquakeCodeTables::fromXlsx($root . '/resources/jmaxml/codes/地震火山関連コード表.xlsx'));
-$writtenCodes = GeneratedFiles::write($root . '/packages/codes/src', $codes->generate());
-
 fwrite(STDOUT, sprintf("Generated %d code table files.\n", count($writtenCodes)));
