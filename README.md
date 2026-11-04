@@ -31,7 +31,7 @@ composer generate   # resources/jmaxml から packages/core/src の型と packag
 
 このリポジトリには、気象庁が公開している技術資料（XML スキーマ、辞書、サンプル電文）を `resources/jmaxml/` に同梱しています。
 
-出典：気象庁ホームページ（https://xml.kishou.go.jp/）
+出典：[気象庁ホームページ](https://xml.kishou.go.jp/)
 
 ## 注意
 
