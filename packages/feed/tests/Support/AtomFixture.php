@@ -16,7 +16,7 @@ final class AtomFixture
     public const string DATA_URL = 'https://www.data.jma.go.jp/developer/xml/data/';
 
     /**
-     * @param list<array{url: string, title?: string, updated?: string}> $entries
+     * @param list<array{url: string, id?: string, title?: string, updated?: string}> $entries
      */
     public static function feed(string $updated, array $entries): string
     {
@@ -29,10 +29,11 @@ final class AtomFixture
         foreach ($entries as $entry) {
             $entryUpdated = $entry['updated'] ?? (TelegramFileName::fromUrl($entry['url'])?->createdAt->format('Y-m-d\TH:i:s\Z') ?? $updated);
             $url = htmlspecialchars($entry['url'], ENT_XML1);
+            $id = htmlspecialchars($entry['id'] ?? $entry['url'], ENT_XML1);
 
             $xml .= '<entry>'
                 . '<title>' . htmlspecialchars($entry['title'] ?? '震度速報', ENT_XML1) . '</title>'
-                . '<id>' . $url . '</id>'
+                . '<id>' . $id . '</id>'
                 . '<updated>' . $entryUpdated . '</updated>'
                 . '<author><name>気象庁</name></author>'
                 . '<link type="application/xml" href="' . $url . '"/>'

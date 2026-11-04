@@ -166,19 +166,70 @@ final class FeedClientPollTest extends TestCase
     }
 
     #[Test]
-    public function unreadableTelegramIsReportedAndNotRetried(): void
+    public function unreadableTelegramIsRetriedOnce(): void
+    {
+        [$client, $http, $store, $clock] = $this->client();
+        $broken = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+        $factory = new Psr17Factory();
+        $http->queue(self::FEED, self::feed([$broken]), $factory->createResponse(304));
+        $http->queue(
+            $broken,
+            $factory->createResponse(200)->withBody($factory->createStream('not xml')),
+            $factory->createResponse(200)->withBody($factory->createStream('not xml')),
+        );
+
+        $first = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+        $this->assertCount(1, $first->failures);
+        $this->assertTrue($first->failures[0]->willRetry);
+        $this->assertInstanceOf(ParseException::class, $first->failures[0]->previous);
+        $this->assertFalse($store->isSeen($broken));
+        $this->assertSame([$broken], $store->load(self::FEED)?->retryUrls);
+
+        $clock->advance('+1 minute');
+        $second = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+        $this->assertCount(1, $second->failures);
+        $this->assertFalse($second->failures[0]->willRetry);
+        $this->assertTrue($store->isSeen($broken));
+        $this->assertSame([], $store->load(self::FEED)?->retryUrls);
+        $this->assertSame([], $store->load(self::FEED)?->parseFailedUrls);
+    }
+
+    #[Test]
+    public function missingTelegramIsNotRetriedForever(): void
+    {
+        $factory = new Psr17Factory();
+
+        foreach ([403 => false, 404 => false, 408 => true, 429 => true] as $status => $willRetry) {
+            [$client, $http, $store] = $this->client();
+            $url = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+            $http->queue(self::FEED, self::feed([$url]));
+            $http->queue($url, $factory->createResponse($status));
+
+            $result = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
+
+            $this->assertSame($willRetry, $result->failures[0]->willRetry, 'HTTP ' . $status);
+            $this->assertSame(!$willRetry, $store->isSeen($url), 'HTTP ' . $status);
+            $this->assertSame($willRetry ? [$url] : [], $store->load(self::FEED)?->retryUrls, 'HTTP ' . $status);
+        }
+    }
+
+    #[Test]
+    public function identityAndDownloadUseTheLink(): void
     {
         [$client, $http, $store] = $this->client();
-        $broken = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
-        $http->queue(self::FEED, self::feed([$broken]));
-        $http->queue($broken, (new Psr17Factory())->createResponse(200)->withBody((new Psr17Factory())->createStream('not xml')));
+        $url = AtomFixture::url('20261103115930_0_VXSE51_270000.xml');
+        $factory = new Psr17Factory();
+        $xml = AtomFixture::feed('2026-11-03T11:59:58Z', [['url' => $url, 'id' => 'tag:jma,2026:abc']]);
+        $http->queue(self::FEED, $factory->createResponse(200)->withBody($factory->createStream($xml)));
+        $http->queue($url, self::telegram(self::SHINDO));
 
         $result = $client->poll(new Subscription(FeedType::EarthquakeVolcano));
 
-        $this->assertCount(1, $result->failures);
-        $this->assertFalse($result->failures[0]->willRetry);
-        $this->assertInstanceOf(ParseException::class, $result->failures[0]->previous);
-        $this->assertTrue($store->isSeen($broken));
+        $this->assertCount(1, $result->telegrams);
+        $this->assertTrue($store->isSeen($url));
+        $this->assertFalse($store->isSeen('tag:jma,2026:abc'));
     }
 
     #[Test]

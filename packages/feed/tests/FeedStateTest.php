@@ -26,6 +26,7 @@ final class FeedStateTest extends TestCase
             new DateTimeImmutable('2026-11-03T11:20:00Z'),
             ['https://www.data.jma.go.jp/developer/xml/data/a.xml', 'https://www.data.jma.go.jp/developer/xml/data/b.xml'],
             '["eqvol",["VXSE51"],["通常"]]',
+            ['https://www.data.jma.go.jp/developer/xml/data/c.xml'],
         );
         $empty = new FeedState(null, null, null, new DateTimeImmutable('2026-11-03T12:00:00Z'));
 
@@ -33,6 +34,7 @@ final class FeedStateTest extends TestCase
         $this->assertEquals($empty, FeedState::fromArray($empty->toArray()));
         $this->assertSame('2026-11-03T12:00:00+00:00', $full->toArray()['fetchedAt']);
         $this->assertSame([], $empty->toArray()['retryUrls']);
+        $this->assertSame(['https://www.data.jma.go.jp/developer/xml/data/c.xml'], $full->toArray()['parseFailedUrls']);
     }
 
     #[Test]

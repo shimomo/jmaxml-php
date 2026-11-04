@@ -21,6 +21,7 @@ final readonly class FeedState
      * @param DateTimeImmutable|null $gapSince start of a gap not yet covered (high-frequency feed only)
      * @param list<string> $retryUrls telegrams to download again after a transient failure (high-frequency feed only)
      * @param string|null $subscription fingerprint of the Subscription that uses this state (high-frequency feed only)
+     * @param list<string> $parseFailedUrls telegrams that could not be read once and get one more try (high-frequency feed only)
      */
     public function __construct(
         public ?string $etag,
@@ -30,12 +31,13 @@ final readonly class FeedState
         public ?DateTimeImmutable $gapSince = null,
         public array $retryUrls = [],
         public ?string $subscription = null,
+        public array $parseFailedUrls = [],
     ) {
         //
     }
 
     /**
-     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>, subscription: ?string}
+     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>, subscription: ?string, parseFailedUrls: list<string>}
      */
     public function toArray(): array
     {
@@ -47,6 +49,7 @@ final readonly class FeedState
             'gapSince' => $this->gapSince?->format(DATE_ATOM),
             'retryUrls' => $this->retryUrls,
             'subscription' => $this->subscription,
+            'parseFailedUrls' => $this->parseFailedUrls,
         ];
     }
 
@@ -55,31 +58,42 @@ final readonly class FeedState
      */
     public static function fromArray(array $data): self
     {
-        $retryUrls = $data['retryUrls'] ?? [];
-
-        if (!is_array($retryUrls) || !array_is_list($retryUrls)) {
-            throw new InvalidArgumentException('retryUrls must be a list of strings');
-        }
-
-        $urls = [];
-
-        foreach ($retryUrls as $url) {
-            if (!is_string($url)) {
-                throw new InvalidArgumentException('retryUrls must be a list of strings');
-            }
-
-            $urls[] = $url;
-        }
-
         return new self(
             self::optionalString($data, 'etag'),
             self::optionalString($data, 'lastModified'),
             self::optionalDateTime($data, 'feedUpdatedAt'),
             self::optionalDateTime($data, 'fetchedAt') ?? throw new InvalidArgumentException('fetchedAt is required'),
             self::optionalDateTime($data, 'gapSince'),
-            $urls,
+            self::stringList($data, 'retryUrls'),
             self::optionalString($data, 'subscription'),
+            self::stringList($data, 'parseFailedUrls'),
         );
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     *
+     * @return list<string>
+     */
+    private static function stringList(array $data, string $key): array
+    {
+        $values = $data[$key] ?? [];
+
+        if (!is_array($values) || !array_is_list($values)) {
+            throw new InvalidArgumentException($key . ' must be a list of strings');
+        }
+
+        $strings = [];
+
+        foreach ($values as $value) {
+            if (!is_string($value)) {
+                throw new InvalidArgumentException($key . ' must be a list of strings');
+            }
+
+            $strings[] = $value;
+        }
+
+        return $strings;
     }
 
     /**

@@ -25,6 +25,8 @@ final class InMemoryStateStore implements StateStore
      */
     private array $states = [];
 
+    private int $marksSinceSweep = 0;
+
     public function __construct(private readonly ClockInterface $clock)
     {
         //
@@ -39,8 +41,13 @@ final class InMemoryStateStore implements StateStore
     #[Override]
     public function markSeen(string $entryId, DateTimeImmutable $expiresAt): void
     {
-        $now = $this->clock->now();
-        $this->seen = array_filter($this->seen, static fn(DateTimeImmutable $expiry): bool => $expiry > $now);
+        // Expired entries are swept once every 1,000 marks, so that priming a big feed stays linear.
+        if (++$this->marksSinceSweep >= 1000) {
+            $now = $this->clock->now();
+            $this->seen = array_filter($this->seen, static fn(DateTimeImmutable $expiry): bool => $expiry > $now);
+            $this->marksSinceSweep = 0;
+        }
+
         $this->seen[$entryId] = $expiresAt;
     }
 
