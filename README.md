@@ -29,7 +29,7 @@ composer generate   # resources/jmaxml から packages/core/src の型と packag
 
 ## 出典
 
-このリポジトリには、気象庁が公開している技術資料（XML スキーマ、辞書、サンプル電文）を `resources/jmaxml/` に同梱しています。
+このリポジトリには、気象庁が公開している技術資料（XML スキーマ、辞書、サンプル電文、個別コード表）を `resources/jmaxml/` に同梱しています。`jmaxml/codes` のデータは、個別コード表を加工して作成したものです。
 
 出典：[気象庁ホームページ](https://xml.kishou.go.jp/)
 

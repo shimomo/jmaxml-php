@@ -27,12 +27,12 @@ final readonly class EarthquakeCodeTables
     private const string CITY_CODE = '/^\d{7}$/';
 
     /**
-     * @param array<array-key, array{string}> $prefectures code => [name]
+     * @param array<array-key, list<string>> $prefectures code => [name]
      * @param array<array-key, array{string, string, string}> $areas code => [name, kana, prefecture code]
      * @param array<array-key, array{string, string, string}> $cities code => [name, kana, area code]
      * @param array<array-key, array{string, string, string}> $stations code => [name, kana, city code]
-     * @param array<array-key, array{string}> $epicenters code => [name]
-     * @param array<array-key, array{string, string, string}> $tsunamiAreas code => [name, kana, note]
+     * @param array<array-key, list<string>> $epicenters code => [name]
+     * @param array<array-key, list<string>> $tsunamiAreas code => [name, kana, note]
      */
     public function __construct(
         public string $version,
@@ -49,59 +49,118 @@ final readonly class EarthquakeCodeTables
     public static function fromXlsx(string $path): self
     {
         $reader = XlsxReader::open($path);
+        $codeName = ['A' => 'Code', 'B' => 'Name'];
+        $codeNameKana = ['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな'];
 
-        $prefectures = [];
+        [$areas, $cities, $stations] = self::hierarchyFrom(self::dataRows($reader->rows('24'), '24', [
+            ...$codeNameKana,
+            'D' => 'Code', 'E' => 'Name', 'F' => 'ふりがな',
+            'G' => 'Code', 'H' => 'Name', 'I' => 'ふりがな',
+        ]));
 
-        foreach (self::dataRows($reader->rows('23'), '23') as $row) {
-            $code = self::code($row, 'A', self::PREFECTURE_CODE, '23');
-            self::assertNew($prefectures, $code, '23');
-            $prefectures[$code] = [self::name($row, 'B', '23', $code)];
+        return self::fromParts(
+            self::versionFrom($reader->rows('更新履歴')),
+            self::simpleTable(self::dataRows($reader->rows('23'), '23', $codeName), '23', self::PREFECTURE_CODE, ['B']),
+            $areas,
+            $cities,
+            $stations,
+            self::simpleTable(self::dataRows($reader->rows('41'), '41', $codeName), '41', self::AREA_CODE, ['B']),
+            self::simpleTable(self::dataRows($reader->rows('31'), '31', $codeNameKana), '31', self::AREA_CODE, ['B', 'C', 'D']),
+        );
+    }
+
+    /**
+     * Builds the tables after checking that they are complete and consistent with each other.
+     *
+     * @param array<array-key, list<string>> $prefectures
+     * @param array<array-key, array{string, string, string}> $areas
+     * @param array<array-key, array{string, string, string}> $cities
+     * @param array<array-key, array{string, string, string}> $stations
+     * @param array<array-key, list<string>> $epicenters
+     * @param array<array-key, list<string>> $tsunamiAreas
+     */
+    public static function fromParts(
+        string $version,
+        array $prefectures,
+        array $areas,
+        array $cities,
+        array $stations,
+        array $epicenters,
+        array $tsunamiAreas,
+    ): self {
+        foreach (['prefectures' => $prefectures, 'areas' => $areas, 'cities' => $cities, 'stations' => $stations, 'epicenters' => $epicenters, 'tsunami areas' => $tsunamiAreas] as $name => $table) {
+            if ($table === []) {
+                throw new LogicException('The ' . $name . ' table is empty');
+            }
         }
 
-        [$areas, $cities, $stations] = self::hierarchyFrom(self::dataRows($reader->rows('24'), '24'));
+        /** @var array<array-key, true> $prefecturesWithAreas */
+        $prefecturesWithAreas = [];
 
         foreach ($areas as $code => [, , $prefecture]) {
             if (!isset($prefectures[$prefecture])) {
                 throw new LogicException('Sheet 24: area ' . $code . ' belongs to unknown prefecture ' . $prefecture);
             }
+
+            $prefecturesWithAreas[$prefecture] = true;
         }
 
-        $epicenters = [];
-
-        foreach (self::dataRows($reader->rows('41'), '41') as $row) {
-            $code = self::code($row, 'A', self::AREA_CODE, '41');
-            self::assertNew($epicenters, $code, '41');
-            $epicenters[$code] = [self::name($row, 'B', '41', $code)];
+        foreach (array_keys($prefectures) as $code) {
+            if (!array_key_exists($code, $prefecturesWithAreas)) {
+                throw new LogicException('Sheet 23: prefecture ' . (string) $code . ' has no area in sheet 24');
+            }
         }
 
-        $tsunamiAreas = [];
-
-        foreach (self::dataRows($reader->rows('31'), '31') as $row) {
-            $code = self::code($row, 'A', self::AREA_CODE, '31');
-            self::assertNew($tsunamiAreas, $code, '31');
-            $tsunamiAreas[$code] = [self::name($row, 'B', '31', $code), self::clean($row['C'] ?? ''), self::clean($row['D'] ?? '')];
-        }
-
-        return new self(
-            self::versionFrom($reader->rows('更新履歴')),
-            self::sorted($prefectures),
-            $areas,
-            $cities,
-            $stations,
-            self::sorted($epicenters),
-            self::sorted($tsunamiAreas),
-        );
+        return new self($version, self::sorted($prefectures), $areas, $cities, $stations, self::sorted($epicenters), self::sorted($tsunamiAreas));
     }
 
     /**
+     * Reads a code table with one row per code: the code in column A and values in $columns (the first must not be empty).
+     *
+     * @param list<array<string, string>> $rows data rows
+     * @param non-empty-string $pattern
+     * @param non-empty-list<string> $columns
+     *
+     * @return array<array-key, list<string>> sorted by code
+     */
+    public static function simpleTable(array $rows, string $sheet, string $pattern, array $columns): array
+    {
+        $table = [];
+
+        foreach ($rows as $row) {
+            $code = self::code($row, 'A', $pattern, $sheet);
+            self::assertNew($table, $code, $sheet, 'code');
+            $values = [self::name($row, $columns[0], $sheet, $code)];
+
+            foreach (array_slice($columns, 1) as $column) {
+                $values[] = self::clean($row[$column] ?? '');
+            }
+
+            $table[$code] = $values;
+        }
+
+        return self::sorted($table);
+    }
+
+    /**
+     * Returns the rows below the header row (the first row whose column A is "Code"). When $expectedHeader is given,
+     * the header labels must match it, so that a change of layout stops the generator.
+     *
      * @param list<array<string, string>> $rows
+     * @param array<string, string> $expectedHeader column => label
      *
      * @return list<array<string, string>>
      */
-    public static function dataRows(array $rows, string $sheet): array
+    public static function dataRows(array $rows, string $sheet, array $expectedHeader = []): array
     {
         foreach ($rows as $index => $row) {
             if (self::clean($row['A'] ?? '') === 'Code') {
+                foreach ($expectedHeader as $column => $label) {
+                    if (self::clean($row[$column] ?? '') !== $label) {
+                        throw new LogicException('Sheet ' . $sheet . ': expected header "' . $label . '" in column ' . $column . ', found "' . ($row[$column] ?? '') . '"');
+                    }
+                }
+
                 return array_slice($rows, $index + 1);
             }
         }
@@ -159,6 +218,10 @@ final readonly class EarthquakeCodeTables
      */
     public static function hierarchyFrom(array $rows): array
     {
+        if ($rows === []) {
+            throw new LogicException('Sheet 24 has no data rows');
+        }
+
         $areas = [];
         $cities = [];
         $stations = [];
@@ -167,14 +230,15 @@ final readonly class EarthquakeCodeTables
             $area = self::code($row, 'A', self::AREA_CODE, '24');
             $city = self::code($row, 'D', self::CITY_CODE, '24');
             $station = self::code($row, 'G', self::CITY_CODE, '24');
-            $prefecture = substr($city, 0, 2);
+            $areaEntry = [self::name($row, 'B', '24', $area), self::clean($row['C'] ?? ''), substr($city, 0, 2)];
+            $cityEntry = [self::name($row, 'E', '24', $city), self::clean($row['F'] ?? ''), $area];
 
-            self::assertSame($areas, $area, [self::name($row, 'B', '24', $area), self::clean($row['C'] ?? ''), $prefecture], 'area');
-            self::assertSame($cities, $city, [self::name($row, 'E', '24', $city), self::clean($row['F'] ?? ''), $area], 'city');
-            self::assertNew($stations, $station, '24');
+            self::assertSame($areas, $area, $areaEntry, 'area');
+            self::assertSame($cities, $city, $cityEntry, 'city');
+            self::assertNew($stations, $station, '24', 'station code');
 
-            $areas[$area] = [self::name($row, 'B', '24', $area), self::clean($row['C'] ?? ''), $prefecture];
-            $cities[$city] = [self::name($row, 'E', '24', $city), self::clean($row['F'] ?? ''), $area];
+            $areas[$area] = $areaEntry;
+            $cities[$city] = $cityEntry;
             $stations[$station] = [self::name($row, 'H', '24', $station), self::clean($row['I'] ?? ''), $city];
         }
 
@@ -213,10 +277,10 @@ final readonly class EarthquakeCodeTables
     /**
      * @param array<array-key, mixed> $table
      */
-    private static function assertNew(array $table, string $code, string $sheet): void
+    private static function assertNew(array $table, string $code, string $sheet, string $what): void
     {
         if (array_key_exists($code, $table)) {
-            throw new LogicException('Sheet ' . $sheet . ': duplicate code ' . $code);
+            throw new LogicException('Sheet ' . $sheet . ': duplicate ' . $what . ' ' . $code);
         }
     }
 

@@ -23,6 +23,11 @@ use JmaXml\Codes\Data\TsunamiAreaData;
  */
 final class EarthquakeCodes
 {
+    private function __construct()
+    {
+        //
+    }
+
     /**
      * The date of the bundled code tables (the latest entry of their update history), e.g. "2026-10-19".
      */
