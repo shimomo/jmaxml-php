@@ -29,7 +29,8 @@
 
 - 3 種類の電文の管理部の `Title` は、`震度速報`（VXSE51）、`震源に関する情報`（VXSE52）、`震源・震度に関する情報`（VXSE53）。同じ地震は同じ `Head/EventID` を持つが、**編集官署（`Control/EditorialOffice`）は電文の種類で違うことがある**（VXSE51 は大阪管区気象台、VXSE53 は気象庁本庁など）。そこでイベントのキーは「`Control/Status` + `Head/EventID`」、情報の単位は「イベント + `Control/Title`」とする
 - core の型（`JmaXml\Seismology\`）：`Body::$earthquake`（list）、`Body::$intensity?->observation`（`IntensityDetail`：`maxInt`、`pref`）、`IntensityPref`（`name`・`code`・`maxInt`・`condition`・`area`）、`IntensityArea`（同じく `city`）、`IntensityCity`（`name`・`code`・`maxInt`・`condition`）。`Earthquake`（`originTime`・`arrivalTime`・`hypocenter?->area`（`name`・`code->value`・`coordinate[0]->points()`）・`magnitude[0]`（`value`・`description`））。`MaxInt` は文字列（core が 1 行の値を trim 済み）
-- 「未入電」は `IntensityCity::$condition === '震度５弱以上未入電'` で表れ、そのとき `maxInt` は null（`32-35_06_04_240613_VXSE53.xml` の金ケ崎町 `0338100`（細分区域 213）と大蔵村 `0636500`（241））
+- 「未入電」は `IntensityCity::$condition === '震度５弱以上未入電'` で表れる（`32-35_06_04_240613_VXSE53.xml` の金ケ崎町 `0338100`（細分区域 213、`maxInt` は null）と大蔵村 `0636500`（241、`maxInt` は 4））
+- **（最終レビューで訂正）** 気象庁は、市町村の確定した震度が 5 弱以上のときは市町村に Condition を付けず、観測点の `IntensityStation/Int` を `震度５弱以上未入電` にする（`32-35_06_04` の宮城加美町 `0444500`：市町村は 5-、観測点 中新田が未入電で、次の電文で 5+ になる）。実装では観測点の未入電も市町村の `notYetReceived` に含めた
 - 公式サンプルの流れ（ファイル名、括弧は Head/ReportDateTime）：
   - `32-35_08_*`：EventID が 2 つ。地震 A `20100705065511` は VXSE51 だけ（01 06:57 最大 3、03 06:58 最大 4、05 06:59 最大 4）。地震 B `20100705065610` は VXSE51（02、04）→ VXSE52（06、震源 岩手県沖 `286`、M6.3、`Ｍ６．３`）→ VXSE53（07 07:02、08 07:08、最大 4）。A の VXSE51 の `TargetDateTime` は 06:55、B の VXSE51 は 06:56。どちらも細分区域 211・212 などが震度 4
   - 地震 A の最終（05）の細分区域：211・212・220・222 が 4、200・202・203・210・213・221・230・231・233・240・242・250 が 3

@@ -112,10 +112,35 @@ final class EarthquakeEventTest extends TestCase
     #[Test]
     public function keepsDrillsApartFromRealEvents(): void
     {
-        $events = EarthquakeEvents::group(Samples::reports('32-35_01_02_240613_VXSE52.xml', '32-35_01_03_240613_VXSE53.xml'));
+        $drills = Samples::reports('32-35_01_02_240613_VXSE52.xml', '32-35_01_03_240613_VXSE53.xml');
+        $events = EarthquakeEvents::group($drills, ['通常', '訓練']);
 
         $this->assertCount(1, $events);
         $this->assertSame('訓練', $events[0]->status);
+        $this->assertSame('訓練', EarthquakeEvent::fromReports($drills)->status);
+    }
+
+    #[Test]
+    public function groupLeavesDrillsOutUnlessAsked(): void
+    {
+        $drill = Report::fromString(str_replace(
+            '<Status>通常</Status>',
+            '<Status>訓練</Status>',
+            (string) file_get_contents(Fixtures::sample('32-35_08_08_240613_VXSE53.xml')),
+        ));
+        $reports = [...Samples::earthquakeB(), $drill];
+
+        $this->assertSame(['通常'], array_map(static fn(EarthquakeEvent $event): string => $event->status, EarthquakeEvents::group($reports)));
+        $this->assertCount(2, EarthquakeEvents::group($reports, ['通常', '訓練']));
+    }
+
+    #[Test]
+    public function acceptsReportsThatAreNotAList(): void
+    {
+        $reports = Samples::earthquakeA();
+        $filtered = array_filter($reports, static fn(Report $report): bool => $report !== $reports[0]);
+
+        $this->assertSame(SeismicIntensity::Four, EarthquakeEvent::fromReports($filtered)->maxIntensity);
     }
 
     #[Test]

@@ -12,7 +12,10 @@ namespace JmaXml\Earthquake;
 final readonly class CityMatch
 {
     /**
-     * @param SeismicIntensity|null $intensity the city's intensity, or its area's strongest one; null when not yet received
+     * @param SeismicIntensity|null $intensity the confirmed intensity of the city, or the strongest of its area; null when
+     *                                         nothing is confirmed yet
+     * @param bool $notYetReceived some observations of the city (or area) have not arrived and 5-lower or more is estimated:
+     *                             the shaking may be stronger than $intensity, so check this flag rather than $intensity
      */
     public function __construct(
         public string $cityCode,

@@ -16,15 +16,16 @@ final class EarthquakeEvents
 {
     /**
      * @param iterable<Report> $reports any telegrams; only the three kinds of earthquake report are used
+     * @param list<string> $statuses Control/Status values to keep; drills (訓練) and tests (試験) only when listed
      *
      * @return list<EarthquakeEvent> one event per Control/Status and Head/EventID, oldest detection first (unknown last)
      */
-    public static function group(iterable $reports): array
+    public static function group(iterable $reports, array $statuses = ['通常']): array
     {
         $groups = [];
 
         foreach ($reports as $report) {
-            if (self::isEarthquakeReport($report)) {
+            if (self::isEarthquakeReport($report) && in_array($report->control->status, $statuses, true)) {
                 $groups[$report->control->status . "\0" . $report->head->eventID][] = $report;
             }
         }

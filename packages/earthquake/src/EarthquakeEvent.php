@@ -53,10 +53,12 @@ final readonly class EarthquakeEvent
     }
 
     /**
-     * @param list<Report> $reports telegrams about one earthquake, in any order
+     * @param array<array-key, Report> $reports telegrams about one earthquake, in any order
      */
     public static function fromReports(array $reports): self
     {
+        $reports = array_values($reports);
+
         if ($reports === []) {
             throw new InvalidArgumentException('An earthquake event needs at least one report');
         }
@@ -172,10 +174,7 @@ final readonly class EarthquakeEvent
                 continue;
             }
 
-            if ($areaSource === []) {
-                continue;
-            }
-
+            // A code the tables do not know can be checked neither by city nor by area: report it whatever the stage.
             $areaCode = EarthquakeCodes::city($cityCode)?->areaCode;
 
             if ($areaCode === null) {
@@ -263,6 +262,8 @@ final readonly class EarthquakeEvent
     }
 
     /**
+     * Area readings. In 震源・震度に関する情報 an area also counts as not yet received when one of its cities is.
+     *
      * @return array<array-key, IntensityReading>
      */
     private static function areaReadings(?Seismology\IntensityDetail $observation): array
@@ -271,7 +272,13 @@ final readonly class EarthquakeEvent
 
         foreach ($observation?->pref ?? [] as $pref) {
             foreach ($pref->area as $area) {
-                $readings[$area->code] = IntensityReading::from($area->code, $area->name, $area->maxInt, $area->condition);
+                $pending = self::isNotYetReceived($area->condition);
+
+                foreach ($area->city as $city) {
+                    $pending = $pending || self::cityIsNotYetReceived($city);
+                }
+
+                $readings[$area->code] = new IntensityReading($area->code, $area->name, SeismicIntensity::fromValue($area->maxInt), $pending);
             }
         }
 
@@ -279,6 +286,9 @@ final readonly class EarthquakeEvent
     }
 
     /**
+     * City readings. JMA marks a city with Condition 震度５弱以上未入電 only while its confirmed intensity is below 5-lower;
+     * a city already confirmed at 5-lower or more can still have points whose Int is 震度５弱以上未入電, so those count too.
+     *
      * @return array<array-key, IntensityReading>
      */
     private static function cityReadings(Seismology\IntensityDetail $observation): array
@@ -288,11 +298,31 @@ final readonly class EarthquakeEvent
         foreach ($observation->pref as $pref) {
             foreach ($pref->area as $area) {
                 foreach ($area->city as $city) {
-                    $readings[$city->code] = IntensityReading::from($city->code, $city->name, $city->maxInt, $city->condition);
+                    $readings[$city->code] = new IntensityReading($city->code, $city->name, SeismicIntensity::fromValue($city->maxInt), self::cityIsNotYetReceived($city));
                 }
             }
         }
 
         return $readings;
+    }
+
+    private static function cityIsNotYetReceived(Seismology\IntensityCity $city): bool
+    {
+        if (self::isNotYetReceived($city->condition)) {
+            return true;
+        }
+
+        foreach ($city->intensityStation as $station) {
+            if (self::isNotYetReceived($station->int)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isNotYetReceived(?string $value): bool
+    {
+        return $value !== null && str_contains($value, '未入電');
     }
 }
