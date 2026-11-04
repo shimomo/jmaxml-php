@@ -48,10 +48,16 @@ script_dir=$(cd "$(dirname "$0")" && pwd)
 # ---------------------------------------------------------------------------
 # 1. CHANGELOG.md に今回バージョンのセクションを書き込む
 # ---------------------------------------------------------------------------
-# 直前のタグ以降のコミットだけを対象にする。
+# "Unreleased" に手書きの項目があれば、それをそのまま今回の版の項目にする。
+# 無ければ直前のタグ以降のコミットの件名を使う。
 # タグが一つも無い場合（プロジェクト初回リリース）は全コミットを対象にする。
-last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
-commits=$(changelog_collect_commits "$last_tag")
+commits=''
+
+if changelog_unreleased_is_empty; then
+  last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
+  commits=$(changelog_collect_commits "$last_tag")
+fi
+
 changelog_stamp_release "$version" "$commits"
 
 # ---------------------------------------------------------------------------

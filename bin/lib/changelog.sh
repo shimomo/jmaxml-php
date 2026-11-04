@@ -27,11 +27,26 @@ changelog_collect_commits() {
   fi
 }
 
+# changelog_unreleased_is_empty
+#
+# "## Unreleased" から次の "## " 見出し（またはファイルの終わり）までに
+# 空行しか無ければ終了コード 0、手書きの項目があれば 1 を返す。
+# 見出しが無いときも 0 を返す。
+changelog_unreleased_is_empty() {
+  awk '
+    /^## / { inside = ($0 == "## Unreleased"); next }
+    inside && NF > 0 { found = 1 }
+    END { exit found ? 1 : 0 }
+  ' CHANGELOG.md
+}
+
 # changelog_stamp_release VERSION COMMITS
 #
 # CHANGELOG.md の "## Unreleased" 見出しの直後に
 # "## [VERSION] - YYYY-MM-DD" ブロックを挿入し、
 # その下に COMMITS（changelog_collect_commits の出力）を書き込む。
+# COMMITS が空なら見出しだけを入れるので、"Unreleased" に手書きした項目が
+# そのまま今回の版の項目になる。見出しの後の空行は 1 行にそろえる。
 #
 # 例: Unreleased の直後がこうなる
 #   ## Unreleased
@@ -41,23 +56,32 @@ changelog_collect_commits() {
 #   - feat: foo
 #   - fix: bar
 #
+# 日付は date で取る（strftime は gawk にしか無い）。
+#
 # 注意: "## Unreleased" 見出しが存在しない場合は何も変化しない
 #       （= リリースバージョンが追記されない）ので、
 #       事前に見出しの存在を保証しておくこと。
 changelog_stamp_release() {
   version="$1"
   commits="$2"
+  today=$(date +%Y-%m-%d)
 
-  awk -v commits="$commits" -v version="$version" '
+  awk -v commits="$commits" -v version="$version" -v today="$today" '
     /^## Unreleased$/ {
       print
       print ""
-      print "## [" version "] - " strftime("%Y-%m-%d")
-      print ""
-      print commits
-      print ""
+      print "## [" version "] - " today
+
+      if (commits != "") {
+        print ""
+        print commits
+      }
+
+      skipping = 1
       next
     }
+    skipping && NF == 0 { next }
+    skipping { print ""; skipping = 0 }
     { print }
   ' CHANGELOG.md > CHANGELOG_NEW.md
 
