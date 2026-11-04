@@ -45,6 +45,13 @@ final class FeedClient
     private const int LONG_TERM_WINDOW_SECONDS = 604800;
 
     /**
+     * How long a telegram that looks missing (a 4xx other than 408 and 429) or unreadable keeps being retried, counted
+     * from its first such failure. Behind CloudFront a new object can answer 403 or 404 for a while, a WAF block or
+     * rate limit also answers 403, and a broken body can stay cached for a minute.
+     */
+    private const int GIVE_UP_AFTER_SECONDS = 600;
+
+    /**
      * @param int $gapThresholdSeconds how far the feed may have moved on since the last successful poll before telegrams
      *                                 may have been missed; below the 10-minute window of the high-frequency feed
      * @param int $catchUpLimitSeconds after a longer pause the state is rebuilt instead of catching up; below the 7 days
@@ -133,7 +140,7 @@ final class FeedClient
         }
 
         // Phase 2: decide. Downloads happen here; their failures become Failure objects, never exceptions.
-        [$telegrams, $failures, $retryUrls, $seen, $parseFailedUrls] = $this->process($subscription, $entries, $state->retryUrls, $state->parseFailedUrls, $now);
+        [$telegrams, $failures, $retryUrls, $seen, $failingSince] = $this->process($subscription, $entries, $state->retryUrls, $state->failingSince, $now);
 
         // Phase 3: commit.
         $expiresAt = $now->modify('+' . $this->seenRetentionSeconds . ' seconds');
@@ -154,7 +161,7 @@ final class FeedClient
             $gap !== null && !$gap->covered ? $gap->since : null,
             $retryUrls,
             $subscription->fingerprint(),
-            $parseFailedUrls,
+            $failingSince,
         ));
 
         return new PollResult($telegrams, $failures, $feed === null, false, $gap, $warnings);
@@ -231,12 +238,12 @@ final class FeedClient
      *
      * @param list<Entry> $entries
      * @param list<string> $retryUrls
-     * @param list<string> $parseFailedUrls telegrams that already failed to parse once
+     * @param array<string, DateTimeImmutable> $failingSince when each telegram that looks missing or unreadable first failed
      *
-     * @return array{list<Telegram>, list<Failure>, list<string>, list<string>, list<string>}
-     *     telegrams, failures, URLs to retry, URLs to mark seen, URLs that failed to parse for the first time
+     * @return array{list<Telegram>, list<Failure>, list<string>, list<string>, array<string, DateTimeImmutable>}
+     *     telegrams, failures, URLs to retry, URLs to mark seen, telegrams that still look missing or unreadable
      */
-    private function process(Subscription $subscription, array $entries, array $retryUrls, array $parseFailedUrls, DateTimeImmutable $now): array
+    private function process(Subscription $subscription, array $entries, array $retryUrls, array $failingSince, DateTimeImmutable $now): array
     {
         $candidates = [];
 
@@ -255,7 +262,7 @@ final class FeedClient
         $failures = [];
         $retry = [];
         $seen = [];
-        $newParseFailures = [];
+        $stillFailing = [];
 
         foreach ($pending as $entry) {
             if ($subscription->dataTypeCodes !== [] && $entry->file === null) {
@@ -278,50 +285,46 @@ final class FeedClient
                 continue;
             }
 
-            $download = $this->download($entry);
+            $downloaded = self::read($entry, $this->download($entry));
 
-            if ($download instanceof Failure) {
-                $failures[] = $download;
-
-                if ($download->willRetry) {
-                    $retry[] = $entry->url;
-                } else {
-                    $seen[] = $entry->url;
+            if ($downloaded instanceof Telegram) {
+                if ($subscription->wantsStatus($downloaded->envelope->control->status)) {
+                    $telegrams[] = $downloaded;
                 }
+
+                $seen[] = $entry->url;
 
                 continue;
             }
 
-            try {
-                $envelope = Envelope::fromString($download);
-            } catch (ParseException $exception) {
-                // A truncated body or an error page served with 200 gets one more try before it is given up.
-                $firstTime = !in_array($entry->url, $parseFailedUrls, true);
-                $failures[] = new Failure($entry, 'Cannot read telegram: ' . $exception->getMessage(), $firstTime, $exception);
-
-                if ($firstTime) {
-                    $retry[] = $entry->url;
-                    $newParseFailures[] = $entry->url;
-                } else {
-                    $seen[] = $entry->url;
-                }
+            if ($downloaded->willRetry) {
+                $failures[] = $downloaded;
+                $retry[] = $entry->url;
 
                 continue;
             }
 
-            if ($subscription->wantsStatus($envelope->control->status)) {
-                $telegrams[] = new Telegram($entry, $download, $envelope);
-            }
+            // The telegram looks missing or unreadable, which may still pass: give up only once it has failed this way
+            // for GIVE_UP_AFTER_SECONDS.
+            $since = $failingSince[$entry->url] ?? $now;
 
-            $seen[] = $entry->url;
+            if ($now->getTimestamp() - $since->getTimestamp() < self::GIVE_UP_AFTER_SECONDS) {
+                $failures[] = new Failure($entry, $downloaded->reason, true, $downloaded->previous);
+                $retry[] = $entry->url;
+                $stillFailing[$entry->url] = $since;
+            } else {
+                $failures[] = $downloaded;
+                $seen[] = $entry->url;
+            }
         }
 
-        return [$telegrams, $failures, $retry, $seen, $newParseFailures];
+        return [$telegrams, $failures, $retry, $seen, $stillFailing];
     }
 
     /**
      * @return string|Failure the telegram XML, or a failure: retryable for 5xx, 408, 429 and transport errors (including a
-     *                        body that cannot be read), permanent for other 4xx such as 403/404 for a missing object
+     *                        body that cannot be read); for other 4xx (403/404 for a missing object) willRetry is false,
+     *                        and process() decides how long to keep trying
      */
     private function download(Entry $entry): string|Failure
     {
@@ -340,6 +343,23 @@ final class FeedClient
             return (string) $response->getBody();
         } catch (ClientExceptionInterface|RuntimeException $exception) {
             return new Failure($entry, 'Cannot download telegram: ' . $exception->getMessage(), true, $exception);
+        }
+    }
+
+    /**
+     * @param string|Failure $download the telegram XML, or the failure to download it
+     */
+    private static function read(Entry $entry, string|Failure $download): Telegram|Failure
+    {
+        if ($download instanceof Failure) {
+            return $download;
+        }
+
+        try {
+            return new Telegram($entry, $download, Envelope::fromString($download));
+        } catch (ParseException $exception) {
+            // A truncated body or an error page served with 200.
+            return new Failure($entry, 'Cannot read telegram: ' . $exception->getMessage(), false, $exception);
         }
     }
 

@@ -21,7 +21,8 @@ final readonly class FeedState
      * @param DateTimeImmutable|null $gapSince start of a gap not yet covered (high-frequency feed only)
      * @param list<string> $retryUrls telegrams to download again after a transient failure (high-frequency feed only)
      * @param string|null $subscription fingerprint of the Subscription that uses this state (high-frequency feed only)
-     * @param list<string> $parseFailedUrls telegrams that could not be read once and get one more try (high-frequency feed only)
+     * @param array<string, DateTimeImmutable> $failingSince telegrams that look missing or unreadable, with the time of their
+     *                                                   first such failure; they are retried for a while (high-frequency feed only)
      */
     public function __construct(
         public ?string $etag,
@@ -31,13 +32,13 @@ final readonly class FeedState
         public ?DateTimeImmutable $gapSince = null,
         public array $retryUrls = [],
         public ?string $subscription = null,
-        public array $parseFailedUrls = [],
+        public array $failingSince = [],
     ) {
         //
     }
 
     /**
-     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>, subscription: ?string, parseFailedUrls: list<string>}
+     * @return array{etag: ?string, lastModified: ?string, feedUpdatedAt: ?string, fetchedAt: string, gapSince: ?string, retryUrls: list<string>, subscription: ?string, failingSince: array<string, string>}
      */
     public function toArray(): array
     {
@@ -49,7 +50,7 @@ final readonly class FeedState
             'gapSince' => $this->gapSince?->format(DATE_ATOM),
             'retryUrls' => $this->retryUrls,
             'subscription' => $this->subscription,
-            'parseFailedUrls' => $this->parseFailedUrls,
+            'failingSince' => array_map(static fn(DateTimeImmutable $since): string => $since->format(DATE_ATOM), $this->failingSince),
         ];
     }
 
@@ -66,7 +67,7 @@ final readonly class FeedState
             self::optionalDateTime($data, 'gapSince'),
             self::stringList($data, 'retryUrls'),
             self::optionalString($data, 'subscription'),
-            self::stringList($data, 'parseFailedUrls'),
+            self::dateTimeMap($data, 'failingSince'),
         );
     }
 
@@ -94,6 +95,32 @@ final readonly class FeedState
         }
 
         return $strings;
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     *
+     * @return array<string, DateTimeImmutable>
+     */
+    private static function dateTimeMap(array $data, string $key): array
+    {
+        $values = $data[$key] ?? [];
+
+        if (!is_array($values)) {
+            throw new InvalidArgumentException($key . ' must map URLs to date-times');
+        }
+
+        $map = [];
+
+        foreach ($values as $url => $value) {
+            if (!is_string($url) || !is_string($value)) {
+                throw new InvalidArgumentException($key . ' must map URLs to date-times');
+            }
+
+            $map[$url] = W3cDateTime::parse($value) ?? throw new InvalidArgumentException($key . ' has a value that is not a date-time: ' . $value);
+        }
+
+        return $map;
     }
 
     /**
