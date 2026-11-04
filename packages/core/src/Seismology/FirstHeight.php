@@ -29,6 +29,7 @@ final readonly class FirstHeight
         public ?string $condition,
         /** 極性: 第1波の極性を示す */
         public ?string $initial,
+        /** 高さの値: 第1波の高さの値を示す */
         public ?TsunamiHeight $tsunamiHeight,
         /** 修正情報: 修正が発生した場合に記載する */
         public ?string $revise,

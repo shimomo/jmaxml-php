@@ -28,7 +28,7 @@ final readonly class SubAreaVisibility
         public array $becoming,
         /** @var list<LocalVisibility> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<Visibility> */
+        /** @var list<Visibility> 視程: 視程を示す */
         public array $visibility,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

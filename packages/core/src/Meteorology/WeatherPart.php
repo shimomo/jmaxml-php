@@ -26,7 +26,7 @@ final readonly class WeatherPart
         public array $becoming,
         /** @var list<SubAreaWeather> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<Weather> */
+        /** @var list<Weather> 天気: 天気を示す */
         public array $weather,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

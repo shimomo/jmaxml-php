@@ -20,7 +20,7 @@ final readonly class LocalWeather
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<Weather> */
+        /** @var list<Weather> 天気: 天気を示す */
         public array $weather,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

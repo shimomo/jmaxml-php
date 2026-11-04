@@ -18,7 +18,7 @@ final readonly class BaseWaveHeight
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<WaveHeight> */
+        /** @var list<WaveHeight> 波高: 波高を示す */
         public array $waveHeight,
         /** @var list<LocalWaveHeight> 地域: 領域の一部の区域の内容を示す */
         public array $local,

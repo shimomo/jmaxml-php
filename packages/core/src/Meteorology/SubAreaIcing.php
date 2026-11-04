@@ -28,7 +28,7 @@ final readonly class SubAreaIcing
         public array $becoming,
         /** @var list<LocalIcing> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<Icing> */
+        /** @var list<Icing> 着氷: 着氷を示す */
         public array $icing,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

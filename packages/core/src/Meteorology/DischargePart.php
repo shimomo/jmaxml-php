@@ -15,7 +15,7 @@ final readonly class DischargePart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Discharge> */
+        /** @var list<Discharge> 流量: 流量を示す */
         public array $discharge,
     ) {
         //

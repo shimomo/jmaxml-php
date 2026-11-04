@@ -15,7 +15,7 @@ final readonly class WaterLevelPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<WaterLevel> */
+        /** @var list<WaterLevel> 水位: 水位を示す */
         public array $waterLevel,
     ) {
         //

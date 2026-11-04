@@ -28,7 +28,7 @@ final readonly class SubAreaWindDirection
         public array $becoming,
         /** @var list<LocalWindDirection> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<WindDirection> */
+        /** @var list<WindDirection> 風向: 風向を示す */
         public array $windDirection,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

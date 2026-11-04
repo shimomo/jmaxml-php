@@ -28,7 +28,7 @@ final readonly class SubAreaWindSpeed
         public array $becoming,
         /** @var list<LocalWindSpeed> 地域: 領域の一部の区域の内容を示す */
         public array $local,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

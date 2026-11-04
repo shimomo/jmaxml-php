@@ -26,7 +26,7 @@ final readonly class WaveHeightForecastPart
         public array $becoming,
         /** @var list<SubAreaWaveHeight> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<WaveHeight> */
+        /** @var list<WaveHeight> 波高: 波高を示す */
         public array $waveHeight,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
@@ -49,7 +49,7 @@ final readonly class WaveHeightForecastPart
             waveHeight: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WaveHeight'), $path . '/WaveHeight', static fn(DOMElement $e, string $p): WaveHeight => WaveHeight::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
-            refID: Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

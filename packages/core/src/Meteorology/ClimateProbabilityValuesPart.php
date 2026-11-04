@@ -18,7 +18,7 @@ final readonly class ClimateProbabilityValuesPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<ClimateProbabilityValues> */
+        /** @var list<ClimateProbabilityValues> 気温、降水量、日照時間等の確率 */
         public array $climateProbabilityValues,
     ) {
         //

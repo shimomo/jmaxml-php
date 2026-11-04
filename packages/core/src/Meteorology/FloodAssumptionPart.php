@@ -20,7 +20,7 @@ final readonly class FloodAssumptionPart
         public ?string $floodAssumptionArea,
         /** 氾濫水到達時刻: 氾濫水到達時刻を示す。 */
         public ?DateTime $attainmentTime,
-        /** @var list<FloodDepth> */
+        /** @var list<FloodDepth> 浸水深: 浸水深を示す。 */
         public array $floodDepth,
         /** 氾濫水最深時刻: 氾濫水最深時刻を示す。 */
         public ?DateTime $attainmentDeepestTime,

@@ -20,7 +20,7 @@ final readonly class PrecipitationBasedIndexPart
         public ?Sentence $sentence,
         /** 卓越もしくは変化前: 卓越する内容、もしくは変化前の内容を示す */
         public ?BasePrecipitationBasedIndex $base,
-        /** @var list<PrecipitationBasedIndex> */
+        /** @var list<PrecipitationBasedIndex> 雨量関連指数: 雨量関連指数を示す */
         public array $precipitationBasedIndex,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
@@ -40,7 +40,7 @@ final readonly class PrecipitationBasedIndexPart
             precipitationBasedIndex: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'PrecipitationBasedIndex'), $path . '/PrecipitationBasedIndex', static fn(DOMElement $e, string $p): PrecipitationBasedIndex => PrecipitationBasedIndex::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
-            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

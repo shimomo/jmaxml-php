@@ -13,6 +13,7 @@ use JmaXml\Codegen\Schema\SchemaSet;
 use JmaXml\Codegen\Tests\Generated\Mini\Item;
 use JmaXml\Codegen\Tests\Generated\Mini\Root;
 use JmaXml\Exception\ParseException;
+use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
@@ -44,7 +45,7 @@ final class GeneratorTest extends TestCase
     public function committedMiniCodeMatchesGenerator(): void
     {
         foreach (self::miniGenerator()->generate() as $path => $contents) {
-            $this->assertStringEqualsFile(__DIR__ . '/' . $path, $contents, $path);
+            $this->assertStringEqualsFile(__DIR__ . '/Generated/' . $path, $contents, $path);
         }
     }
 
@@ -80,13 +81,21 @@ final class GeneratorTest extends TestCase
         try {
             $written = self::miniGenerator()->writeTo($dir);
 
-            $this->assertSame(['Generated/Mini/Item.php', 'Generated/Mini/Root.php', 'Generated/Mini/Size.php'], $written);
+            $this->assertSame(['Mini/Item.php', 'Mini/Root.php', 'Mini/Size.php'], $written);
             $this->assertFileDoesNotExist($dir . '/Stale.php');
             $this->assertFileExists($dir . '/Handwritten.php');
-            $this->assertFileExists($dir . '/Generated/Mini/Root.php');
+            $this->assertFileExists($dir . '/Mini/Root.php');
         } finally {
             self::removeDirectory($dir);
         }
+    }
+
+    #[Test]
+    public function rejectsClassNamesThatDifferOnlyInCase(): void
+    {
+        $this->expectException(LogicException::class);
+
+        (new Generator(SchemaSet::load(__DIR__ . '/Fixtures/case/case.xsd'), Dictionary::empty(), ['urn:case' => 'JmaXml\\Codegen\\Tests\\Generated\\CaseFixture'], 'JmaXml\\Codegen\\Tests'))->generate();
     }
 
     public static function miniGenerator(): Generator
@@ -95,7 +104,7 @@ final class GeneratorTest extends TestCase
             SchemaSet::load(__DIR__ . '/Fixtures/mini/mini.xsd'),
             Dictionary::empty(),
             ['urn:mini' => 'JmaXml\Codegen\Tests\Generated\Mini'],
-            'JmaXml\Codegen\Tests',
+            'JmaXml\Codegen\Tests\Generated',
         );
     }
 

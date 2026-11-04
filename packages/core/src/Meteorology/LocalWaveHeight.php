@@ -20,7 +20,7 @@ final readonly class LocalWaveHeight
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<WaveHeight> */
+        /** @var list<WaveHeight> 波高: 波高を示す */
         public array $waveHeight,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

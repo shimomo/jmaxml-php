@@ -20,7 +20,7 @@ final readonly class LocalSnowfallDepth
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<SnowfallDepth> */
+        /** @var list<SnowfallDepth> 降雪量: 降雪量を示す */
         public array $snowfallDepth,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

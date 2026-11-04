@@ -20,7 +20,7 @@ final readonly class LocalVisibility
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<Visibility> */
+        /** @var list<Visibility> 視程: 視程を示す */
         public array $visibility,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

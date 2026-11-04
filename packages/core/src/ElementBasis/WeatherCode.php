@@ -35,7 +35,7 @@ final readonly class WeatherCode
         return new self(
             value: Node::toNullableInt(Node::text($element), $path),
             type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
-            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
             condition: Node::attribute($element, 'condition') === null ? null : Node::toText(Node::requiredAttribute($element, 'condition', $path)),
             description: Node::attribute($element, 'description') === null ? null : Node::toText(Node::requiredAttribute($element, 'description', $path)),
         );

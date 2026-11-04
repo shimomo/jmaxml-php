@@ -18,7 +18,7 @@ final readonly class SunshinePart
     public function __construct(
         /** 卓越もしくは変化前: 卓越する内容、もしくは変化前の内容を示す */
         public ?BaseSunshine $base,
-        /** @var list<Sunshine> */
+        /** @var list<Sunshine> 日照: 日照を示す */
         public array $sunshine,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

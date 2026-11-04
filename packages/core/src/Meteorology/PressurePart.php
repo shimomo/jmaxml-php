@@ -26,7 +26,7 @@ final readonly class PressurePart
         public array $becoming,
         /** @var list<SubAreaPressure> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<Pressure> */
+        /** @var list<Pressure> 気圧: 気圧を示す */
         public array $pressure,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

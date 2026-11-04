@@ -26,7 +26,7 @@ final readonly class WaveHeightPart
         public array $becoming,
         /** @var list<SubAreaWaveHeight> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<WaveHeight> */
+        /** @var list<WaveHeight> 波高: 波高を示す */
         public array $waveHeight,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

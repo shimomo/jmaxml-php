@@ -179,6 +179,24 @@ final class NodeTest extends TestCase
     }
 
     #[Test]
+    public function intsAreRangeChecked(): void
+    {
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toInt('99999999999999999999', 'p'))->path);
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toInt('256', 'p', 0, 255))->path);
+        $this->assertSame(255, Node::toInt('255', 'p', 0, 255));
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toNullableInt('-1', 'p', 0, 255))->path);
+    }
+
+    #[Test]
+    public function timezoneOffsetsAreChecked(): void
+    {
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00+09:60', 'p'))->path);
+        $this->assertSame('p', $this->catchParseException(fn() => Node::toDateTime('2026-11-03T12:00:00+99:00', 'p'))->path);
+        $this->assertSame('+14:00', Node::toDateTime('2026-11-03T12:00:00+14:00', 'p')->getTimezone()->getName());
+        $this->assertSame('-12:00', Node::toDateTime('2026-11-03T12:00:00-12:00', 'p')->getTimezone()->getName());
+    }
+
+    #[Test]
     public function splitsLists(): void
     {
         $this->assertSame(['気象庁', '大阪管区気象台'], Node::toList(" 気象庁  大阪管区気象台\n"));

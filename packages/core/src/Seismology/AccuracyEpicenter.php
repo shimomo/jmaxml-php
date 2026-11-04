@@ -32,8 +32,8 @@ final readonly class AccuracyEpicenter
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            rank: Node::toInt(Node::requiredAttribute($element, 'rank', $path), $path . '/@rank'),
-            rank2: Node::toInt(Node::requiredAttribute($element, 'rank2', $path), $path . '/@rank2'),
+            rank: Node::toInt(Node::requiredAttribute($element, 'rank', $path), $path . '/@rank', -2147483648, 2147483647),
+            rank2: Node::toInt(Node::requiredAttribute($element, 'rank2', $path), $path . '/@rank2', -2147483648, 2147483647),
         );
     }
 }

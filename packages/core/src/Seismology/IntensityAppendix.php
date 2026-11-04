@@ -32,10 +32,10 @@ final readonly class IntensityAppendix
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            maxIntChange: Node::toInt(Node::text(Node::one($element, self::NS, 'MaxIntChange', $path)), $path . '/MaxIntChange'),
-            maxLgIntChange: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgIntChange'), $path . '/MaxLgIntChange', static fn(DOMElement $e, string $p): int => Node::toInt(Node::text($e), $p)),
-            maxIntChangeReason: Node::toInt(Node::text(Node::one($element, self::NS, 'MaxIntChangeReason', $path)), $path . '/MaxIntChangeReason'),
-            maxLgIntChangeReason: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgIntChangeReason'), $path . '/MaxLgIntChangeReason', static fn(DOMElement $e, string $p): int => Node::toInt(Node::text($e), $p)),
+            maxIntChange: Node::toInt(Node::text(Node::one($element, self::NS, 'MaxIntChange', $path)), $path . '/MaxIntChange', -2147483648, 2147483647),
+            maxLgIntChange: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgIntChange'), $path . '/MaxLgIntChange', static fn(DOMElement $e, string $p): int => Node::toInt(Node::text($e), $p, -2147483648, 2147483647)),
+            maxIntChangeReason: Node::toInt(Node::text(Node::one($element, self::NS, 'MaxIntChangeReason', $path)), $path . '/MaxIntChangeReason', -2147483648, 2147483647),
+            maxLgIntChangeReason: Node::mapOptional(Node::optional($element, self::NS, 'MaxLgIntChangeReason'), $path . '/MaxLgIntChangeReason', static fn(DOMElement $e, string $p): int => Node::toInt(Node::text($e), $p, -2147483648, 2147483647)),
         );
     }
 }

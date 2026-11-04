@@ -16,8 +16,11 @@ final readonly class IsobarPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
+        /** 気圧: 等圧線の気圧を示す */
         public Pressure $pressure,
+        /** 線: 等圧線の座標を示す（閉じていない場合） */
         public ?Coordinate $line,
+        /** 多角形: 等圧線の座標を示す（閉じている場合） */
         public ?Coordinate $polygon,
     ) {
         //

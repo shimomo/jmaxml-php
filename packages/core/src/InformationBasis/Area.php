@@ -20,13 +20,13 @@ final readonly class Area
         public string $name,
         /** 対象地域・地点コード: 対象地域・地点コードを示す（コード辞書参照）。 */
         public ?string $code,
-        /** @var list<Circle> */
+        /** @var list<Circle> 対象地域（円）: 台風と低気圧の対象地域（円）を示す。 */
         public array $circle,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（点）の座標: 対象地域（点）の座標を示す */
         public array $coordinate,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域(線)の座標: 対象地域（線）の座標を示す。 */
         public array $line,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（多角形）の座標: 対象地域（多角形）の座標を示す。 */
         public array $polygon,
     ) {
         //

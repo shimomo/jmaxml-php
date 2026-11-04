@@ -26,7 +26,7 @@ final readonly class VisibilityPart
         public array $becoming,
         /** @var list<SubAreaVisibility> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<Visibility> */
+        /** @var list<Visibility> 視程: 視程を示す */
         public array $visibility,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

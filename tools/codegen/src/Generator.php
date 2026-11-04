@@ -55,13 +55,17 @@ final class Generator
     public function generate(): array
     {
         $files = [];
+        $lowerPaths = [];
 
         foreach ($this->schemas->complexTypes() as $type) {
             $path = $this->directoryFor($this->renderer->phpNamespace($type->namespace)) . Naming::className($type->name) . '.php';
 
-            if (isset($files[$path])) {
-                throw new LogicException('Two types would be written to ' . $path);
+            // PHP class names are case-insensitive, so FooBar and Foobar would collide.
+            if (isset($lowerPaths[strtolower($path)])) {
+                throw new LogicException('Two types would be written to ' . $path . ' (class names differ only in case)');
             }
+
+            $lowerPaths[strtolower($path)] = true;
 
             $files[$path] = $this->renderer->render($type);
         }

@@ -29,7 +29,7 @@ final readonly class HypoAreaDistance
     public static function fromElement(DOMElement $element, string $path): self
     {
         return new self(
-            value: Node::toInt(Node::text($element), $path),
+            value: Node::toInt(Node::text($element), $path, -2147483648, 2147483647),
             unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
         );
     }

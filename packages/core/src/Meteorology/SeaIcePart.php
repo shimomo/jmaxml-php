@@ -26,7 +26,7 @@ final readonly class SeaIcePart
         public array $becoming,
         /** @var list<SubAreaSeaIce> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<SeaIce> */
+        /** @var list<SeaIce> 海氷: 海氷を示す */
         public array $seaIce,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

@@ -16,11 +16,11 @@ final readonly class CoordinatePart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（点）の座標: 対象地域（点）の座標を示す */
         public array $coordinate,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（線）の座標: 対象地域（線）の座標を示す */
         public array $line,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（多角形）の座標: 対象地域（多角形）の座標を示す */
         public array $polygon,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

@@ -20,17 +20,17 @@ final readonly class ClimateValuesPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<Temperature> */
+        /** @var list<Temperature> 気温の値: 平均気温、最高気温又は最低気温 */
         public array $temperature,
-        /** @var list<Precipitation> */
+        /** @var list<Precipitation> 降水量: 降水量 */
         public array $precipitation,
-        /** @var list<Sunshine> */
+        /** @var list<Sunshine> 日照時間: 日照時間 */
         public array $sunshine,
-        /** @var list<SnowfallDepth> */
+        /** @var list<SnowfallDepth> 降雪量: 降雪量 */
         public array $snowfallDepth,
-        /** @var list<SnowDepth> */
+        /** @var list<SnowDepth> 積雪の深さ: 積雪の深さ */
         public array $snowDepth,
-        /** @var list<Comparison> */
+        /** @var list<Comparison> 平年や前年等との差（比）: 平年や前年等との差（比） */
         public array $comparison,
         /** 注意事項・付加事項: 注意事項・付加事項を示す */
         public ?string $remark,

@@ -27,9 +27,9 @@ final readonly class WindForecastPart
         public array $becoming,
         /** @var list<SubAreaWind> 地域: 領域全体と同じ予報表現を行う一部領域の内容を示す */
         public array $subArea,
-        /** @var list<WindDirection> */
+        /** @var list<WindDirection> 風向: 風向を示す */
         public array $windDirection,
-        /** @var list<WindSpeed> */
+        /** @var list<WindSpeed> 風速: 風速を示す */
         public array $windSpeed,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
@@ -53,7 +53,7 @@ final readonly class WindForecastPart
             windSpeed: Node::mapMany(Node::many($element, 'http://xml.kishou.go.jp/jmaxml1/elementBasis1/', 'WindSpeed'), $path . '/WindSpeed', static fn(DOMElement $e, string $p): WindSpeed => WindSpeed::fromElement($e, $p)),
             time: Node::mapOptional(Node::optional($element, self::NS, 'Time'), $path . '/Time', static fn(DOMElement $e, string $p): DateTimeImmutable => Node::toDateTime(Node::text($e), $p)),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
-            refID: Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

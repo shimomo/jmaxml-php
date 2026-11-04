@@ -27,7 +27,7 @@ final readonly class Earthquake
         public ?string $condition,
         /** 震源要素: 震源要素を示す */
         public ?Hypocenter $hypocenter,
-        /** @var list<Magnitude> */
+        /** @var list<Magnitude> マグニチュード: マグニチュードの諸要素を示す */
         public array $magnitude,
     ) {
         //

@@ -16,7 +16,7 @@ final readonly class BaseSnowDepth
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<SnowDepth> */
+        /** @var list<SnowDepth> 積雪深: 積雪深を示す */
         public array $snowDepth,
         /** @var list<LocalSnowDepth> 地域: 領域の一部の区域の内容を示す */
         public array $local,

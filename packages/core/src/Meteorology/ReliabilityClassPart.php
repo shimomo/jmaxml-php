@@ -15,7 +15,7 @@ final readonly class ReliabilityClassPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<ReliabilityClass> */
+        /** @var list<ReliabilityClass> 信頼度階級: 信頼度の階級を示す */
         public array $reliabilityClass,
     ) {
         //

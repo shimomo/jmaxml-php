@@ -41,7 +41,7 @@ final readonly class Significancy
             condition: Node::mapOptional(Node::optional($element, self::NS, 'Condition'), $path . '/Condition', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             remark: Node::mapOptional(Node::optional($element, self::NS, 'Remark'), $path . '/Remark', static fn(DOMElement $e, string $p): string => Node::toText(Node::text($e))),
             type: Node::toText(Node::requiredAttribute($element, 'type', $path)),
-            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID'),
+            refID: Node::attribute($element, 'refID') === null ? null : Node::toInt(Node::requiredAttribute($element, 'refID', $path), $path . '/@refID', 0, 255),
         );
     }
 }

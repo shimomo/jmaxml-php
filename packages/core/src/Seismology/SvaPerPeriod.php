@@ -37,7 +37,7 @@ final readonly class SvaPerPeriod
         return new self(
             value: Node::toFloat(Node::text($element), $path),
             unit: Node::toText(Node::requiredAttribute($element, 'unit', $path)),
-            periodicBand: Node::attribute($element, 'PeriodicBand') === null ? null : Node::toInt(Node::requiredAttribute($element, 'PeriodicBand', $path), $path . '/@PeriodicBand'),
+            periodicBand: Node::attribute($element, 'PeriodicBand') === null ? null : Node::toInt(Node::requiredAttribute($element, 'PeriodicBand', $path), $path . '/@PeriodicBand', -2147483648, 2147483647),
             period: Node::attribute($element, 'Period') === null ? null : Node::toFloat(Node::requiredAttribute($element, 'Period', $path), $path . '/@Period'),
             periodUnit: Node::attribute($element, 'PeriodUnit') === null ? null : Node::toText(Node::requiredAttribute($element, 'PeriodUnit', $path)),
         );

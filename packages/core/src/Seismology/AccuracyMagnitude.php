@@ -30,7 +30,7 @@ final readonly class AccuracyMagnitude
     {
         return new self(
             value: Node::toFloat(Node::text($element), $path),
-            rank: Node::toInt(Node::requiredAttribute($element, 'rank', $path), $path . '/@rank'),
+            rank: Node::toInt(Node::requiredAttribute($element, 'rank', $path), $path . '/@rank', -2147483648, 2147483647),
         );
     }
 }

@@ -54,13 +54,13 @@ final readonly class Area
         public ?array $subCityCodeList,
         /** @var list<string>|null 対象地域・地点コードのリスト: 対象地域・地点名が複数の対象地域・地点コードにより示される場合にxs:list型で記述 */
         public ?array $codeList,
-        /** @var list<Circle> */
+        /** @var list<Circle> 対象地域（円）: 台風と低気圧の対象地域（円）を示す。 */
         public array $circle,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（点）の座標: 対象地域（点）の座標を示す */
         public array $coordinate,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域(線)の座標: 対象地域（線）の座標を示す。 */
         public array $line,
-        /** @var list<Coordinate> */
+        /** @var list<Coordinate> 対象地域（多角形）の座標: 対象地域（多角形）の座標を示す。 */
         public array $polygon,
         /** 領域の存在域: 領域の存在域を示す */
         public ?string $location,

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="urn:case" targetNamespace="urn:case" elementFormDefault="qualified">
+  <xs:complexType name="type.FooBar">
+    <xs:sequence>
+      <xs:element maxOccurs="1" minOccurs="1" name="A" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="type.Foobar">
+    <xs:sequence>
+      <xs:element maxOccurs="1" minOccurs="1" name="B" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

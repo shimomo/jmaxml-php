@@ -18,7 +18,7 @@ final readonly class BasePrecipitationBasedIndex
     public function __construct(
         /** 変化を表す時要素: 変化を表す時間表現を示す */
         public ?string $timeModifier,
-        /** @var list<PrecipitationBasedIndex> */
+        /** @var list<PrecipitationBasedIndex> 雨量関連指数: 雨量関連指数を示す */
         public array $precipitationBasedIndex,
         /** @var list<LocalPrecipitationBasedIndex> 地域: 領域の一部の区域の内容を示す */
         public array $local,

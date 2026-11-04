@@ -15,7 +15,7 @@ final readonly class WeatherCodePart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
-        /** @var list<WeatherCode> */
+        /** @var list<WeatherCode> テロップ用天気予報用語番号: テロップ用天気予報用語番号を示す */
         public array $weatherCode,
     ) {
         //

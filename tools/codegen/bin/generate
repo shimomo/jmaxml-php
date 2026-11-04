@@ -26,9 +26,9 @@ $mini = new Generator(
     SchemaSet::load($root . '/tools/codegen/tests/Fixtures/mini/mini.xsd'),
     Dictionary::empty(),
     ['urn:mini' => 'JmaXml\\Codegen\\Tests\\Generated\\Mini'],
-    'JmaXml\\Codegen\\Tests',
+    'JmaXml\\Codegen\\Tests\\Generated',
 );
-$mini->writeTo($root . '/tools/codegen/tests');
+$mini->writeTo($root . '/tools/codegen/tests/Generated');
 
 fwrite(STDOUT, sprintf("Generated %d files.\n", count($written)));
 

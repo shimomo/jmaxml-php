@@ -18,8 +18,11 @@ final readonly class ClassPart
     public const string NS = 'http://xml.kishou.go.jp/jmaxml1/body/meteorology1/';
 
     public function __construct(
+        /** 熱帯擾乱種類: 熱帯擾乱の種類を示す */
         public ?TyphoonClass $typhoonClass,
+        /** 大きさ階級: 台風の大きさ階級を示す */
         public ?AreaClass $areaClass,
+        /** 強さ階級: 台風の強さ階級を示す */
         public ?IntensityClass $intensityClass,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,

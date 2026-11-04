@@ -21,6 +21,7 @@ final readonly class AftershockItem
         public DateTimeImmutable $startTime,
         /** 終了時刻: 余震確率の予想終了時刻を示す */
         public DateTimeImmutable $endTime,
+        /** 余震確率: 余震確率を示す */
         public ProbabilityOfAftershock $probabilityOfAftershock,
         /** 対象マグニチュード: 余震確率の対象となるマグニチュードを示す */
         public Magnitude $targetMagnitude,

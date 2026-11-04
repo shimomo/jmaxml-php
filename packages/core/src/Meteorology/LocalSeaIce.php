@@ -20,7 +20,7 @@ final readonly class LocalSeaIce
         public ?string $areaName,
         /** 文章形式の表現: 領域の一部の区域の内容を文章形式で示す */
         public ?Sentence $sentence,
-        /** @var list<SeaIce> */
+        /** @var list<SeaIce> 海氷: 海氷を示す */
         public array $seaIce,
         /** 起時: 発生時刻を示す */
         public ?DateTimeImmutable $time,
