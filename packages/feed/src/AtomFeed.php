@@ -72,15 +72,20 @@ final readonly class AtomFeed
             throw new FeedException('Empty feed', $url);
         }
 
+        // Errors the caller had already collected are left alone: only the ones raised while loading are looked at,
+        // and the buffer is cleared afterwards only if the caller was not collecting errors itself.
         $previous = libxml_use_internal_errors(true);
-        libxml_clear_errors();
+        $alreadyPending = count(libxml_get_errors());
 
         try {
             $document = new DOMDocument();
             $loaded = $document->loadXML($xml, LIBXML_NONET);
-            $error = self::firstError(libxml_get_errors());
+            $error = self::firstError(array_slice(libxml_get_errors(), $alreadyPending));
         } finally {
-            libxml_clear_errors();
+            if (!$previous) {
+                libxml_clear_errors();
+            }
+
             libxml_use_internal_errors($previous);
         }
 

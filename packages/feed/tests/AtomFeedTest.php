@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JmaXml\Feed\Tests;
 
+use DOMDocument;
 use JmaXml\Feed\AtomFeed;
 use JmaXml\Feed\Exception\FeedException;
 use JmaXml\Feed\FeedType;
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class AtomFeedTest extends TestCase
 {
+    private const string MISMATCHED_FEED = '<feed xmlns="http://www.w3.org/2005/Atom"><id>x</feed>';
+
     #[Test]
     public function readsTheRealEqvolFeed(): void
     {
@@ -85,5 +88,70 @@ final class AtomFeedTest extends TestCase
         $this->assertSame('VXSE51', $feed->entries[0]->file?->dataTypeCode);
         $this->assertCount(1, $feed->warnings);
         $this->assertStringContainsString('entry 1', $feed->warnings[0]);
+    }
+
+    #[Test]
+    public function keepsLibxmlErrorsTheCallerAlreadyHad(): void
+    {
+        $xml = file_get_contents(__DIR__ . '/Fixtures/eqvol.xml');
+        $this->assertIsString($xml);
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
+        try {
+            (new DOMDocument())->loadXML('<broken');
+            $before = count(libxml_get_errors());
+            $this->assertGreaterThan(0, $before);
+
+            AtomFeed::fromString($xml, FeedType::EarthquakeVolcano->highFrequencyUrl());
+
+            $this->assertCount($before, libxml_get_errors());
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    #[Test]
+    public function reportsTheFeedsOwnErrorWhenTheCallerHasErrorsPending(): void
+    {
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
+        try {
+            (new DOMDocument())->loadXML('<broken');
+
+            try {
+                AtomFeed::fromString(self::MISMATCHED_FEED, FeedType::EarthquakeVolcano->highFrequencyUrl());
+                $this->fail('FeedException was not thrown');
+            } catch (FeedException $exception) {
+                $this->assertStringContainsString('Opening and ending tag mismatch', $exception->getMessage());
+                $this->assertStringNotContainsString('broken', $exception->getMessage());
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    #[Test]
+    public function leavesNoLibxmlErrorsForCallersThatDoNotCollectThem(): void
+    {
+        $previous = libxml_use_internal_errors(false);
+
+        try {
+            try {
+                AtomFeed::fromString(self::MISMATCHED_FEED, FeedType::EarthquakeVolcano->highFrequencyUrl());
+                $this->fail('FeedException was not thrown');
+            } catch (FeedException) {
+                // expected
+            }
+
+            $this->assertFalse(libxml_use_internal_errors(null));
+            $this->assertSame([], libxml_get_errors());
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
     }
 }
