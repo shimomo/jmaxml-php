@@ -23,6 +23,26 @@ final class Samples
     }
 
     /**
+     * Reads a sample after applying string replacements (each search string must occur in the file).
+     *
+     * @param array<string, string> $replacements
+     */
+    public static function edited(string $fileName, array $replacements): Report
+    {
+        $xml = (string) file_get_contents(Fixtures::sample($fileName));
+
+        foreach ($replacements as $search => $replace) {
+            if (!str_contains($xml, $search)) {
+                throw new \LogicException('Not in ' . $fileName . ': ' . $search);
+            }
+
+            $xml = str_replace($search, $replace, $xml);
+        }
+
+        return Report::fromString($xml);
+    }
+
+    /**
      * Earthquake A of the 32-35_08 sequence: three 震度速報 only.
      *
      * @return list<Report>

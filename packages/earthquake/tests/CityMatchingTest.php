@@ -6,6 +6,7 @@ namespace JmaXml\Earthquake\Tests;
 
 use JmaXml\Earthquake\CityMatch;
 use JmaXml\Earthquake\EarthquakeEvent;
+use JmaXml\Earthquake\EventStage;
 use JmaXml\Earthquake\MatchBasis;
 use JmaXml\Earthquake\SeismicIntensity;
 use JmaXml\Earthquake\Tests\Support\Samples;
@@ -109,6 +110,71 @@ final class CityMatchingTest extends TestCase
 
         $this->assertSame([], $matches->matches);
         $this->assertSame([], $matches->unknownCityCodes);
+    }
+
+    #[Test]
+    public function cancellingOnlyTheDetailedReportFallsBackToShindoSokuho(): void
+    {
+        $cancelled = Samples::edited('32-35_04_04_240613_VXSE53.xml', [
+            '<InfoType>発表</InfoType>' => '<InfoType>取消</InfoType>',
+            '<ReportDateTime>2010-01-25T16:19:00+09:00</ReportDateTime>' => '<ReportDateTime>2010-01-25T16:21:00+09:00</ReportDateTime>',
+        ]);
+        $event = EarthquakeEvent::fromReports([
+            ...Samples::reports('32-35_04_02_100831_VXSE51.xml', '32-35_04_03_240613_VXSE52.xml', '32-35_04_04_240613_VXSE53.xml'),
+            $cancelled,
+        ]);
+
+        $this->assertSame(EventStage::WithHypocenter, $event->stage);
+        $this->assertSame(['震源・震度に関する情報'], $event->cancelledKinds);
+        $this->assertEquals(
+            [new CityMatch('4520100', SeismicIntensity::Three, false, MatchBasis::Area)],
+            $event->citiesAtLeast(SeismicIntensity::Three, ['4520100'])->matches,
+        );
+    }
+
+    #[Test]
+    public function detailedReportWithoutIntensityFallsBackToShindoSokuho(): void
+    {
+        $xml = (string) file_get_contents(\JmaXml\Tests\Support\Fixtures::sample('32-35_08_07_240613_VXSE53.xml'));
+        $withoutIntensity = \JmaXml\Report::fromString((string) preg_replace('#<Intensity>.*</Intensity>#s', '', $xml));
+        $event = EarthquakeEvent::fromReports([...Samples::reports('32-35_08_02_100915_VXSE51.xml', '32-35_08_04_100915_VXSE51.xml'), $withoutIntensity]);
+
+        $this->assertEquals(
+            [new CityMatch('0321000', SeismicIntensity::Four, false, MatchBasis::Area)],
+            $event->citiesAtLeast(SeismicIntensity::Four, ['0321000'])->matches,
+        );
+    }
+
+    #[Test]
+    public function relatesTheTwoEarthquakesOfTheSecondSequence(): void
+    {
+        $first = EarthquakeEvent::fromReports(Samples::reports('32-35_04_01_100831_VXSE51.xml'));
+        $second = EarthquakeEvent::fromReports(Samples::reports(
+            '32-35_04_02_100831_VXSE51.xml',
+            '32-35_04_03_240613_VXSE52.xml',
+            '32-35_04_04_240613_VXSE53.xml',
+            '32-35_04_05_100831_VXSE51.xml',
+            '32-35_04_06_240613_VXSE53.xml',
+        ));
+
+        $this->assertTrue($first->isPossiblyRelatedTo($second));
+    }
+
+    #[Test]
+    public function relationNeedsTheSameStatusAndLiveEvents(): void
+    {
+        $a = EarthquakeEvent::fromReports(Samples::earthquakeA());
+        $drill = EarthquakeEvent::fromReports([Samples::edited('32-35_08_08_240613_VXSE53.xml', ['<Status>通常</Status>' => '<Status>訓練</Status>'])]);
+        $cancelled = EarthquakeEvent::fromReports([
+            ...Samples::reports('32-35_08_04_100915_VXSE51.xml'),
+            Samples::edited('32-35_08_04_100915_VXSE51.xml', [
+                '<InfoType>発表</InfoType>' => '<InfoType>取消</InfoType>',
+                '<ReportDateTime>2010-07-05T06:58:00+09:00</ReportDateTime>' => '<ReportDateTime>2010-07-05T07:00:00+09:00</ReportDateTime>',
+            ]),
+        ]);
+
+        $this->assertFalse($a->isPossiblyRelatedTo($drill));
+        $this->assertFalse($a->isPossiblyRelatedTo($cancelled));
     }
 
     #[Test]

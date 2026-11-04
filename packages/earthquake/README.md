@@ -56,11 +56,26 @@ $event->citiesAtLeast(SeismicIntensity::Four, ['0320100', '0110100'])->matches;
 // [CityMatch('0320100', Four, false, MatchBasis::Area)]  盛岡市は細分区域「岩手県内陸北部」が震度 4
 ```
 
+### 地域ごとの震度と取消の状況
+
+```php
+$event->city('1310100')?->maxIntensity;      // 市町村の震度（震源・震度に関する情報）
+$event->area('350');                          // 細分区域
+$event->prefecture('13');                     // 都道府県
+$event->station('1310100');                   // 震度観測点
+$event->cancelledKinds;                       // 例：['震源・震度に関する情報']（取り消された種類。一部だけ取り消されることもある）
+$event->mayBeAtLeast(SeismicIntensity::FiveUpper);   // どこかが基準以上、または未入電の地域がある
+```
+
+- `areas`・`cities` などの配列のキーは、`'211'` や `'1310100'` のようなコードが PHP によって整数に変わることがあります。キーを `===` で比べず、`city()`・`area()`・`prefecture()`・`station()` で引くか、各読み取りの `code` を使ってください
+- `maxIntensity` は確定した震度だけを見ます。未入電の地域があると、実際の揺れはもっと強いかもしれません。地震を基準の震度で先に絞り込むときは `mayBeAtLeast()` を使ってください
+
 ## 振る舞い
 
 | 項目 | 振る舞い |
 |---|---|
 | 地震のまとめ方 | `Control/Status`（通常・訓練など）と `Head/EventID` が同じ電文を 1 つの地震にします。訓練の電文は別の地震になります |
+| 情報の単位 | 「運用種別 + EventID + 電文の種類（`Control/Title`）」です。気象庁の仕様の単位には編集官署（`Control/EditorialOffice`）も入りますが、同じ地震でも電文の種類によって官署が違う（震度速報は大阪管区気象台、震源・震度に関する情報は気象庁本庁など）ため、地震のまとめには使いません。同じ種類の電文は同じ官署から出る前提です |
 | 最新の決め方 | 電文の種類（`Control/Title`）ごとに、`Head/ReportDateTime`、同じなら `Control/DateTime` が最も新しいものを使います。`Serial` は使いません。「訂正」は最新を置き換えるだけです |
 | 取消 | 最新が「取消」の種類は使いません。すべての種類が取り消されたら `EventStage::Cancelled` で、どの市町村も一致しません |
 | 段階 | `IntensityOnly`（震度速報だけ）、`WithHypocenter`（震源あり）、`WithHypocenterAndIntensity`（震源・震度あり）、`Cancelled` |
