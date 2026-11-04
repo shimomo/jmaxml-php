@@ -197,6 +197,9 @@ final readonly class EarthquakeEvent
     /**
      * Whether the shaking may have reached the threshold anywhere: the strongest confirmed intensity reaches it, or some
      * region has not reported yet (which can be any strength). Use it rather than $maxIntensity to pre-filter events.
+     *
+     * An event without any intensity data (only 震源に関する情報, or a distant earthquake) gives false; check
+     * $maxIntensity === null to tell it apart.
      */
     public function mayBeAtLeast(SeismicIntensity $threshold): bool
     {
