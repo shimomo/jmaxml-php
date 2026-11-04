@@ -57,6 +57,7 @@
             "JmaXml\\Codes\\Tests\\": "packages/codes/tests/",
             "JmaXml\\Earthquake\\Tests\\": "packages/earthquake/tests/",
             "JmaXml\\Feed\\Tests\\": "packages/feed/tests/",
+            "JmaXml\\Release\\Tests\\": "tests/Release/",
             "JmaXml\\Tests\\": "packages/core/tests/"
         }
     },
