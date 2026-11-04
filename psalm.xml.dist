@@ -13,5 +13,6 @@
         <directory name="packages/*/tests"/>
         <directory name="tools/codegen/src"/>
         <directory name="tools/codegen/tests"/>
+        <directory name="tests/Release"/>
     </projectFiles>
 </psalm>

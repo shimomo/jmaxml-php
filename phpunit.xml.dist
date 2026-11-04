@@ -9,6 +9,7 @@
         <testsuite name="JmaXml">
             <directory suffix="Test.php">packages/*/tests/</directory>
             <directory suffix="Test.php">tools/codegen/tests/</directory>
+            <directory suffix="Test.php">tests/Release/</directory>
         </testsuite>
     </testsuites>
 
