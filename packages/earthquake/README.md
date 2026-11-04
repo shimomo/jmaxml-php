@@ -78,7 +78,7 @@ $event->citiesAtLeast(SeismicIntensity::Four, ['0320100', '0110100'])->matches;
 
 ## 出典
 
-出典：気象庁ホームページ「気象庁防災情報XMLフォーマット」（https://xml.kishou.go.jp/）
+出典：[気象庁ホームページ「気象庁防災情報XMLフォーマット」](https://xml.kishou.go.jp/)
 
 ## ライセンス
 

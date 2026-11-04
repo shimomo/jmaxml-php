@@ -136,7 +136,7 @@ interface StateStore
 
 ## 出典
 
-出典：気象庁ホームページ「気象庁防災情報XMLフォーマット」（https://xml.kishou.go.jp/）
+出典：[気象庁ホームページ「気象庁防災情報XMLフォーマット」](https://xml.kishou.go.jp/)
 
 ## ライセンス
 

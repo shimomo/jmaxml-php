@@ -91,7 +91,7 @@ $cities = EarthquakeCodes::citiesInArea('350');
 
 ## 出典
 
-出典：気象庁ホームページ「気象庁防災情報XMLフォーマット」個別コード表（https://xml.kishou.go.jp/）
+出典：[気象庁ホームページ「気象庁防災情報XMLフォーマット」](https://xml.kishou.go.jp/)個別コード表
 
 ## ライセンス
 
