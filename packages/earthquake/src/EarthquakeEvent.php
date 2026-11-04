@@ -36,6 +36,7 @@ final readonly class EarthquakeEvent
      * @param array<array-key, IntensityReading> $cities 市町村等: from the detailed report (empty without one)
      * @param array<array-key, IntensityReading> $newerShindoSokuhoAreas areas of a 震度速報 newer than the detailed report (empty otherwise)
      * @param array<array-key, IntensityReading> $prefectures 地震情報／都道府県等, from the same report as $areas
+     * @param array<array-key, IntensityReading> $newerShindoSokuhoPrefectures prefectures of a 震度速報 newer than the detailed report
      * @param array<array-key, IntensityReading> $stations 震度観測点 of the detailed report (empty without one)
      * @param list<string> $cancelledKinds Control/Title of every kind of report whose latest telegram is a cancellation
      */
@@ -52,6 +53,7 @@ final readonly class EarthquakeEvent
         public array $cities,
         public array $newerShindoSokuhoAreas,
         public array $prefectures = [],
+        public array $newerShindoSokuhoPrefectures = [],
         public array $stations = [],
         public array $cancelledKinds = [],
     ) {
@@ -106,7 +108,7 @@ final readonly class EarthquakeEvent
         ));
 
         if ($valid === []) {
-            return new self($first->control->status, $first->head->eventID, EventStage::Cancelled, null, null, null, null, $lastReportedAt, [], [], [], [], [], $cancelledKinds);
+            return new self($first->control->status, $first->head->eventID, EventStage::Cancelled, null, null, null, null, $lastReportedAt, [], [], [], [], [], [], $cancelledKinds);
         }
 
         $shindo = $valid[self::SHINDO_SOKUHO] ?? null;
@@ -150,6 +152,7 @@ final readonly class EarthquakeEvent
             $detailedObservation === null ? [] : self::cityReadings($detailedObservation),
             self::areaReadings($newerShindo),
             self::prefectureReadings($observation),
+            self::prefectureReadings($newerShindo),
             $detailedObservation === null ? [] : self::stationReadings($detailedObservation),
             $cancelledKinds,
         );
@@ -169,14 +172,21 @@ final readonly class EarthquakeEvent
         return $this->cities[$code] ?? null;
     }
 
+    /**
+     * The area's reading, merged with a 震度速報 newer than the detailed report: the stronger intensity counts, and the
+     * area counts as not yet received if either reading says so.
+     */
     public function area(string $code): ?IntensityReading
     {
-        return $this->areas[$code] ?? $this->newerShindoSokuhoAreas[$code] ?? null;
+        return self::stronger($this->areas[$code] ?? null, $this->newerShindoSokuhoAreas[$code] ?? null);
     }
 
+    /**
+     * The prefecture's reading, merged with a newer 震度速報 like area().
+     */
     public function prefecture(string $code): ?IntensityReading
     {
-        return $this->prefectures[$code] ?? null;
+        return self::stronger($this->prefectures[$code] ?? null, $this->newerShindoSokuhoPrefectures[$code] ?? null);
     }
 
     public function station(string $code): ?IntensityReading
@@ -198,7 +208,7 @@ final readonly class EarthquakeEvent
             return true;
         }
 
-        foreach ([$this->prefectures, $this->areas, $this->cities, $this->stations, $this->newerShindoSokuhoAreas] as $readings) {
+        foreach ([$this->prefectures, $this->areas, $this->cities, $this->stations, $this->newerShindoSokuhoAreas, $this->newerShindoSokuhoPrefectures] as $readings) {
             foreach ($readings as $reading) {
                 if ($reading->mayBeAtLeast($threshold)) {
                     return true;
@@ -287,6 +297,17 @@ final readonly class EarthquakeEvent
         }
 
         return $codes;
+    }
+
+    private static function stronger(?IntensityReading $reading, ?IntensityReading $newer): ?IntensityReading
+    {
+        if ($reading === null || $newer === null) {
+            return $reading ?? $newer;
+        }
+
+        $intensity = ($newer->maxIntensity?->rank() ?? 0) > ($reading->maxIntensity?->rank() ?? 0) ? $newer->maxIntensity : $reading->maxIntensity;
+
+        return new IntensityReading($reading->code, $reading->name, $intensity, $reading->notYetReceived || $newer->notYetReceived);
     }
 
     private static function isNewer(Report $candidate, Report $current): bool

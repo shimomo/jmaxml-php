@@ -68,6 +68,7 @@ $event->mayBeAtLeast(SeismicIntensity::FiveUpper);   // どこかが基準以上
 ```
 
 - `areas`・`cities` などの配列のキーは、`'211'` や `'1310100'` のようなコードが PHP によって整数に変わることがあります。キーを `===` で比べず、`city()`・`area()`・`prefecture()`・`station()` で引くか、各読み取りの `code` を使ってください
+- 震源・震度に関する情報より新しい震度速報があるときは、`area()`・`prefecture()` は両方の震度のうち強いほうを返します。どちらかが未入電なら `notYetReceived` は `true` です
 - `maxIntensity` は確定した震度だけを見ます。未入電の地域があると、実際の揺れはもっと強いかもしれません。地震を基準の震度で先に絞り込むときは `mayBeAtLeast()` を使ってください
 
 ## 振る舞い

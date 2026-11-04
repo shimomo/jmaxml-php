@@ -204,6 +204,27 @@ final class EarthquakeEventTest extends TestCase
     }
 
     #[Test]
+    public function lookupsTakeTheStrongerReadingOfANewerShindoSokuho(): void
+    {
+        $detailed = Samples::reports('32-35_04_02_100831_VXSE51.xml', '32-35_04_03_240613_VXSE52.xml', '32-35_04_04_240613_VXSE53.xml');
+        $newer = Samples::edited('32-35_04_05_100831_VXSE51.xml', [
+            '<Code>771</Code><MaxInt>4</MaxInt>' => '<Code>771</Code><MaxInt>3</MaxInt>',
+            '<Code>770</Code><MaxInt>3</MaxInt>' => '<Code>770</Code><MaxInt>3</MaxInt><Condition>震度５弱以上未入電</Condition>',
+        ]);
+        $event = EarthquakeEvent::fromReports([...$detailed, $newer]);
+
+        // 宮崎県南部平野部 is 3 in the detailed report and 4 in the newer 震度速報.
+        $this->assertSame(SeismicIntensity::Four, $event->area('762')?->maxIntensity);
+        $this->assertSame('宮崎県南部平野部', $event->area('762')?->name);
+        $this->assertSame(SeismicIntensity::Four, $event->prefecture('45')?->maxIntensity);
+        // A weaker newer reading does not lower the detailed one, and a region stays open if either is not yet received.
+        $this->assertSame(SeismicIntensity::Four, $event->area('771')?->maxIntensity);
+        $this->assertTrue($event->area('770')?->notYetReceived);
+        $this->assertTrue($event->prefecture('46')?->notYetReceived);
+        $this->assertFalse($event->area('762')?->notYetReceived);
+    }
+
+    #[Test]
     public function exposesPartialCancellation(): void
     {
         $sequence = Samples::cancelledSequence();
