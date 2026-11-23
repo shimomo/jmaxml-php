@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace JmaXml\Codegen\Tests\Codes;
 
+use DOMDocument;
 use JmaXml\Codegen\Codes\EarthquakeCodeTables;
 use JmaXml\Tests\Support\Fixtures;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use ZipArchive;
 
 /**
  * @author shimomo
@@ -93,7 +97,7 @@ final class EarthquakeCodeTablesTest extends TestCase
     }
 
     #[Test]
-    public function tsunamiAreasNeedAKnownKindInColumnD(): void
+    public function tsunamiAreaNotesStartWithAKnownKind(): void
     {
         $row = ['A' => '891', 'B' => '沖縄県地方', 'C' => 'おきなわけんちほう', 'D' => '領域表現（構成する津波予報区800,801,802）'];
 
@@ -118,7 +122,7 @@ final class EarthquakeCodeTablesTest extends TestCase
     }
 
     #[Test]
-    public function sheet31HeaderLeavesColumnDUnlabelled(): void
+    public function sheet31CodeHeaderRowIsEmptyInColumnD(): void
     {
         try {
             EarthquakeCodeTables::dataRows([['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな', 'D' => 'English']], '31', ['A' => 'Code', 'B' => 'Name', 'C' => 'ふりがな', 'D' => '']);
@@ -126,6 +130,36 @@ final class EarthquakeCodeTablesTest extends TestCase
         } catch (LogicException $exception) {
             $this->assertStringContainsString('column D', $exception->getMessage());
         }
+    }
+
+    /**
+     * fromXlsx() must run the sheet 31 checks on the official file, not only tsunamiAreasFrom() and dataRows() alone.
+     */
+    #[Test]
+    #[DataProvider('brokenSheet31Cells')]
+    public function fromXlsxChecksSheet31(string $cell, string $value, string $reason): void
+    {
+        $path = self::officialFileWithSheet31Cell($cell, $value);
+
+        try {
+            EarthquakeCodeTables::fromXlsx($path);
+            $this->fail('LogicException was not thrown');
+        } catch (LogicException $exception) {
+            $this->assertStringContainsString($reason, $exception->getMessage());
+        } finally {
+            unlink($path);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function brokenSheet31Cells(): iterable
+    {
+        // D3 is the Code header row, which is empty in column D (備考 sits above it, in the merged cell D2:D3).
+        yield 'a label in the Code header row' => ['D3', '備考', 'column D'];
+        // D4 is the note of code 100 (津波予報区).
+        yield 'an unknown note' => ['D4', 'Okinawa', 'Sheet 31: code 100'];
     }
 
     #[Test]
@@ -242,5 +276,57 @@ final class EarthquakeCodeTablesTest extends TestCase
             'H' => '石狩市花川',
             'I' => 'いしかりしはなかわ',
         ];
+    }
+
+    /**
+     * A copy of the official 地震火山関連コード表.xlsx in which the cell $cell of sheet 31 holds $value. The caller deletes it.
+     */
+    private static function officialFileWithSheet31Cell(string $cell, string $value): string
+    {
+        $path = sys_get_temp_dir() . '/jmaxml-codes-' . bin2hex(random_bytes(4)) . '.xlsx';
+        copy(Fixtures::earthquakeCodeTablePath(), $path);
+
+        $zip = new ZipArchive();
+        $zip->open($path);
+        $sheet = self::sheetPath($zip, '31');
+        $count = 0;
+        $xml = preg_replace(
+            '#<c r="' . $cell . '"[^>]*?(?:/>|>.*?</c>)#s',
+            '<c r="' . $cell . '" t="inlineStr"><is><t>' . $value . '</t></is></c>',
+            (string) $zip->getFromName($sheet),
+            1,
+            $count,
+        );
+        self::assertSame(1, $count, 'cell ' . $cell . ' of sheet 31');
+        $zip->addFromString($sheet, (string) $xml);
+        $zip->close();
+
+        return $path;
+    }
+
+    private static function sheetPath(ZipArchive $zip, string $name): string
+    {
+        $workbook = new DOMDocument();
+        $workbook->loadXML((string) $zip->getFromName('xl/workbook.xml'));
+        $relationships = new DOMDocument();
+        $relationships->loadXML((string) $zip->getFromName('xl/_rels/workbook.xml.rels'));
+
+        foreach ($workbook->getElementsByTagName('sheet') as $sheet) {
+            if ($sheet->getAttribute('name') !== $name) {
+                continue;
+            }
+
+            $id = $sheet->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+
+            foreach ($relationships->getElementsByTagName('Relationship') as $relationship) {
+                if ($relationship->getAttribute('Id') === $id) {
+                    $target = $relationship->getAttribute('Target');
+
+                    return str_starts_with($target, '/') ? ltrim($target, '/') : 'xl/' . $target;
+                }
+            }
+        }
+
+        throw new RuntimeException('No sheet ' . $name);
     }
 }
