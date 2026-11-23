@@ -67,6 +67,7 @@ bin/release.sh publish 0.1.2   # main にタグを打ち、各パッケージを
 - **prepare をやり直す**（PR を作る前に止まった、マージ前の PR を作り直したい）：main には何も入っていません。PR があれば閉じます。`git switch -f main` で main に戻り（書き換えた `CHANGELOG.md` と `composer.json` 群は捨てる）、`git branch -D release/<version>` で手元のブランチを、`git push origin --delete release/<version>` で origin のブランチを消してから、`bin/release.sh prepare` をやり直します
 - **publish でタグがまだ origin に無い**（`git ls-remote --tags origin <version>` で見えない）：何も公開されていません。手元にだけタグがあれば `git tag -d <version>` で消してから、`bin/release.sh publish` をやり直します
 - **publish でタグが origin にある**：公開は始まっています。まだ公開されていないパッケージについてだけ、下のコマンドを実行します。手元にタグが無ければ、先に `git fetch --tags` で取ってきます。分割はタグの時点で行うので、main がその後に進んでいてもかまいません（前回の失敗で残った一時タグと作業ブランチは、自動で消してからやり直します）
+- **分割先の main への push が拒否された**（`GH013: Repository rule violations` と出る）：分割先の main はルールセットで force push を禁止しています。新しい分割が前回の main の続きになっていないということで、git のバージョンや分割の仕方を変えたときに起こりえます。本体のタグはもう公開されています。そのリポジトリの Settings → Rules → Rulesets で「main」を一時的に Disabled にし、下のコマンドでそのパッケージだけ公開し直してから、「main」を Active に戻します
 
 ```bash
 sh -c '. bin/lib/package-release.sh; package_release_publish 0.1.2 packages/feed'
