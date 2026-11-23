@@ -19,8 +19,8 @@
 #
 # publish の流れ:
 #   1. 事前確認（release_preflight publish）と、公開してよいかの確認（y と答えたときだけ進む）
-#   2. main に署名付きのバージョンタグを打って push する
-#   3. packages/* を1つずつ独立リポジトリへ subtree split し、push & GitHub Release 作成を行う
+#   2. 版の節を足したコミット（prepare の PR をマージしたコミット）に署名付きのバージョンタグを打って push する
+#   3. packages/* を1つずつ、タグの時点で独立リポジトリへ subtree split し、push & GitHub Release 作成を行う
 #
 # CHANGELOG の版の節は、版の書き換えと同じコミットに入れる。こうしておくと、
 # タグを打つコミットの CHANGELOG に、その版の節が載る。
@@ -153,7 +153,9 @@ release_publish() {
   # -------------------------------------------------------------------------
   # 2. ルートリポジトリにバージョンタグを打って push
   # -------------------------------------------------------------------------
-  git tag -s "$version" -m "release $version"
+  # タグは main の先頭ではなく、版の節を足したコミット（release_commit）に打つ。
+  # その後に main へ入ったコミットは、次の版の CHANGELOG に載る。
+  git tag -s "$version" -m "release $version" "$(release_commit "$version")"
   git push origin "refs/tags/$version"
 
   # -------------------------------------------------------------------------

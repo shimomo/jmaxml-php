@@ -81,7 +81,7 @@ final class PreflightTest extends TestCase
         yield 'patch below the latest tag' => ['prepare', 'git tag 0.1.10', '0.1.9', 'newer than 0.1.10'];
         yield 'unknown step' => ['ship', 'true', '0.1.0', 'ship'];
         yield 'section already stamped' => ['prepare', Sandbox::PREPARED, '0.1.0', 'publish'];
-        yield 'release branch on origin' => ['prepare', 'git push -q origin main:refs/heads/release/0.1.0', '0.1.0', 'release/0.1.0'];
+        yield 'release branch on origin' => ['prepare', 'git push -q origin main:refs/heads/release/0.1.0', '0.1.0', 'git push origin --delete release/0.1.0'];
         yield 'prepare not merged' => ['publish', 'true', '0.1.0', 'prepare'];
         yield 'mutual require not bumped' => [
             'publish',
@@ -97,16 +97,18 @@ final class PreflightTest extends TestCase
         $sandbox = Sandbox::create();
 
         try {
-            [, $subject] = Shell::run($sandbox . '/repo', 'git tag 0.1.0 && git log -1 --format=%s');
+            [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', 'git tag 0.0.9 && ' . Sandbox::PREPARED . ' && git commit -q --allow-empty -m later');
+            $this->assertSame(0, $setupExitCode, $setupOutput);
 
-            [$yes, $prompt] = self::confirm($sandbox, '0.1.1', 'y');
+            [$yes, $prompt] = self::confirm($sandbox, '0.1.0', 'y');
             $this->assertSame(0, $yes, $prompt);
-            $this->assertStringContainsString('0.1.1', $prompt);
-            $this->assertStringContainsString('previous: 0.1.0', $prompt);
-            $this->assertStringContainsString(trim($subject), $prompt);
+            $this->assertStringContainsString('Release 0.1.0', $prompt);
+            $this->assertStringContainsString('previous: 0.0.9', $prompt);
+            $this->assertStringContainsString('chore: prepare release 0.1.0', $prompt);
+            $this->assertStringContainsString('1 later commit', $prompt);
 
-            $this->assertSame(1, self::confirm($sandbox, '0.1.1', 'n')[0]);
-            $this->assertSame(1, self::confirm($sandbox, '0.1.1', '')[0]);
+            $this->assertSame(1, self::confirm($sandbox, '0.1.0', 'n')[0]);
+            $this->assertSame(1, self::confirm($sandbox, '0.1.0', '')[0]);
         } finally {
             Shell::remove($sandbox);
         }

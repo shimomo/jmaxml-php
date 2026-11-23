@@ -26,6 +26,15 @@ release_branch() {
   echo "release/$1"
 }
 
+# release_commit VERSION
+#
+# CHANGELOG.md に "## [VERSION] - " の節を足したコミット（prepare の PR を squash マージしたコミット）の
+# ハッシュを出力する。publish はこのコミットにタグを打つ。publish の前に main へ入ったコミットは
+# タグに入らず、次の版に回る（そうしないと、タグには入るのにどの版の CHANGELOG にも載らない）。
+release_commit() {
+  git log -1 --no-show-signature --format=%H -S"## [$1] - " HEAD -- CHANGELOG.md
+}
+
 # release_preflight STEP VERSION
 #
 # STEP は prepare か publish。どちらにも共通の確認に、段階ごとの確認を足す。
@@ -124,7 +133,7 @@ release_preflight() {
     branch_name=$(release_branch "$version")
 
     if git rev-parse --quiet --verify "refs/heads/$branch_name" > /dev/null; then
-      problems="${problems}- branch $branch_name already exists locally
+      problems="${problems}- branch $branch_name already exists locally; to redo the release, delete it (git branch -D $branch_name)
 "
     fi
 
@@ -133,7 +142,7 @@ release_preflight() {
     git ls-remote --exit-code --heads origin "refs/heads/$branch_name" > /dev/null 2>&1 || status=$?
 
     if [ "$status" -eq 0 ]; then
-      problems="${problems}- branch $branch_name already exists on origin; finish or close its pull request first
+      problems="${problems}- branch $branch_name already exists on origin; to redo the release, close its pull request and delete it (git push origin --delete $branch_name)
 "
     elif [ "$status" -ne 2 ]; then
       problems="${problems}- cannot read the branches of origin
@@ -174,13 +183,22 @@ release_preflight() {
 
 # release_confirm VERSION
 #
-# 何を公開するか（版、直前の版、コミット、パッケージ）を出して、標準入力で y を受け取ったときだけ 0 を返す。
+# 何を公開するか（版、直前の版、タグを打つコミット、その後の main のコミット数、パッケージ）を出して、
+# 標準入力で y を受け取ったときだけ 0 を返す。
 # それ以外（n、空、入力の終わり）は 1 を返す。n と答えれば、事前確認だけを試すことにもなる。
+# release_preflight publish が通った後に呼ぶ（release_commit が見つかる前提）。
 release_confirm() {
   version="$1"
+  commit=$(release_commit "$version")
+  later=$(git rev-list --count "$commit..HEAD")
 
   printf 'Release %s (previous: %s)\n' "$version" "$(release_latest_tag | grep . || echo none)"
-  printf '  commit:   %s\n' "$(git log -1 --no-show-signature --format='%h %s')"
+  printf '  commit:   %s\n' "$(git log -1 --no-show-signature --format='%h %s' "$commit")"
+
+  if [ "$later" -gt 0 ]; then
+    printf '  later:    %s later commit(s) on main are not part of %s and go to the next version\n' "$later" "$version"
+  fi
+
   printf '  packages:'
 
   for directory in packages/*; do

@@ -87,6 +87,28 @@ final class ReleaseScriptTest extends TestCase
     }
 
     #[Test]
+    public function publishTagsTheReleaseCommitAfterMainHasMovedOn(): void
+    {
+        $sandbox = Sandbox::create();
+
+        try {
+            [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', Sandbox::PREPARED);
+            $this->assertSame(0, $setupExitCode, $setupOutput);
+            $release = self::origin($sandbox, 'rev-parse refs/heads/main');
+            [$laterExitCode, $laterOutput] = Shell::run($sandbox . '/repo', 'echo later > packages/core/later.txt && git add . && git commit -q -m later && git push -q origin main');
+            $this->assertSame(0, $laterExitCode, $laterOutput);
+
+            [$exitCode, $output] = self::release($sandbox, 'publish 0.1.0', "y\n");
+
+            $this->assertSame(0, $exitCode, $output);
+            $this->assertSame($release, self::origin($sandbox, 'rev-parse refs/tags/0.1.0^{commit}'));
+            $this->assertStringNotContainsString('later.txt', Shell::run($sandbox, 'git --git-dir=jmaxml-php-core.git ls-tree -r --name-only refs/tags/0.1.0')[1]);
+        } finally {
+            Shell::remove($sandbox);
+        }
+    }
+
+    #[Test]
     public function refusesTheOldSingleStepUsage(): void
     {
         $sandbox = Sandbox::create();
