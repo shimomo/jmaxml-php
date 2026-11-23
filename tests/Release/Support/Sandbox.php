@@ -7,7 +7,8 @@ namespace JmaXml\Release\Tests\Support;
 use RuntimeException;
 
 /**
- * A throwaway release setup: repo/ (branch main with packages/core and packages/feed, pushed to origin.git), the bare
+ * A throwaway release setup: repo/ (branch main with packages/core, packages/feed and a CHANGELOG.md whose Unreleased
+ * section has one entry, pushed to origin.git), the bare
  * split repositories jmaxml-php-core.git and jmaxml-php-feed.git next to it, an SSH key that signs tags in repo/, and
  * a fake gh in fake-bin/ that logs its calls to gh.log.
  *
@@ -36,6 +37,7 @@ final class Sandbox
         mkdir -p packages/core packages/feed
         echo '{}' > packages/core/composer.json
         echo '{}' > packages/feed/composer.json
+        printf '# Changelog\n\n## Unreleased\n\n- first\n' > CHANGELOG.md
         git add .
         git commit -q -m init
         git remote add origin "$sandbox/origin.git"
