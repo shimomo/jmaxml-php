@@ -88,12 +88,33 @@ changelog_stamp_release() {
   mv CHANGELOG_NEW.md CHANGELOG.md
 }
 
+# changelog_release_notes VERSION
+#
+# CHANGELOG.md の "## [VERSION] - ..." の節の中身（見出しの次の行から次の "## " 見出しの前まで）を、
+# 前後の空行を除いて標準出力に返す。prepare が作る PR の本文に使う。
+changelog_release_notes() {
+  version="$1"
+
+  awk -v heading="## [$version] - " '
+    index($0, heading) == 1 { inside = 1; next }
+    inside && /^## / { exit }
+    inside { count++; lines[count] = $0; blank[count] = (NF == 0) }
+    END {
+      first = 1
+      while (first <= count && blank[first]) first++
+      last = count
+      while (last >= first && blank[last]) last--
+      for (i = first; i <= last; i++) print lines[i]
+    }
+  ' CHANGELOG.md
+}
+
 # changelog_ensure_unreleased_heading
 #
 # CHANGELOG.md に "## Unreleased" 見出しが無ければ、
 # "# Changelog" の直後に挿入して復元する。
-# changelog_stamp_release で消費された見出しを次回リリースに備えて
-# 再生成するために、リリース完了後に呼び出す想定。
+# changelog_stamp_release は見出しが無いと何も書かずに通ってしまうので、
+# prepare が版の節を書く前に呼ぶ（手で消してしまったときの備え）。
 changelog_ensure_unreleased_heading() {
   if grep -q '^## Unreleased$' CHANGELOG.md; then
     return 0

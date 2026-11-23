@@ -7,14 +7,21 @@ namespace JmaXml\Release\Tests\Support;
 use RuntimeException;
 
 /**
- * A throwaway release setup: repo/ (branch main with packages/core and packages/feed, pushed to origin.git), the bare
- * split repositories jmaxml-php-core.git and jmaxml-php-feed.git next to it, an SSH key that signs tags in repo/, and
- * a fake gh in fake-bin/ that logs its calls to gh.log.
+ * A throwaway release setup: repo/ (branch main with packages/core, packages/feed, a root composer.json that replaces
+ * both, and a CHANGELOG.md whose Unreleased section has one entry, pushed to origin.git), the bare split repositories
+ * jmaxml-php-core.git and jmaxml-php-feed.git next to it, an SSH key that signs tags in repo/, and in fake-bin/ a fake
+ * gh and a fake composer that log their calls to gh.log and composer.log.
  *
  * @author shimomo
  */
 final class Sandbox
 {
+    /**
+     * Run in repo/: leaves main as merging the prepare pull request for 0.1.0 would.
+     */
+    public const string PREPARED = "printf '# Changelog\\n\\n## Unreleased\\n\\n## [0.1.0] - 2026-11-23\\n\\n- first\\n' > CHANGELOG.md"
+        . " && git commit -q -am 'chore: prepare release 0.1.0' && git push -q origin main";
+
     private const string SETUP = <<<'SH'
         set -e
         sandbox=$(pwd)
@@ -24,7 +31,8 @@ final class Sandbox
         ssh-keygen -q -t ed25519 -N '' -C test -f signing-key
         mkdir fake-bin
         printf '%s\n' '#!/bin/sh' 'echo "gh $*" >> "$(dirname "$0")/../gh.log"' '[ "$1 $2" != "release view" ]' > fake-bin/gh
-        chmod +x fake-bin/gh
+        printf '%s\n' '#!/bin/sh' 'echo "composer $*" >> "$(dirname "$0")/../composer.log"' > fake-bin/composer
+        chmod +x fake-bin/gh fake-bin/composer
         git init -q -b main repo
         cd repo
         git config user.name test
@@ -36,6 +44,8 @@ final class Sandbox
         mkdir -p packages/core packages/feed
         echo '{}' > packages/core/composer.json
         echo '{}' > packages/feed/composer.json
+        printf '# Changelog\n\n## Unreleased\n\n- first\n' > CHANGELOG.md
+        printf '%s\n' '{"name": "test/test", "replace": {"jmaxml/core": "self.version", "jmaxml/feed": "self.version"}}' > composer.json
         git add .
         git commit -q -m init
         git remote add origin "$sandbox/origin.git"

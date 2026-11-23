@@ -25,11 +25,13 @@ package_release_remote() {
 #       これを取得し損ねると、GitHub側の自動推測に頼ることになり、
 #       過去に "Full Changelog: commits/x.y.z" という
 #       単一コミットへの壊れたリンクになる不具合が再発する）
-#   2. packages/<name> 配下だけの履歴を git subtree split で取り出す
+#   2. packages/<name> 配下だけの履歴を、バージョンタグの時点で git subtree split で取り出す
+#      （main の先頭ではなくタグを使う。タグの後に main へ入ったコミットを含めないため。
+#        手元にバージョンタグがあること）
 #   3. 取り出したコミットを署名付きタグで固定する（一時タグ）
 #   4. 独立リポジトリの main ブランチへ force push
 #      （force push前提の運用のため、各パッケージリポジトリの
-#        main ブランチ履歴は毎回ルートの最新状態で上書きされる）
+#        main ブランチ履歴は毎回タグの時点の状態で上書きされる）
 #   5. 一時タグを正式なバージョンタグとして独立リポジトリへ push
 #   6. ローカルの一時タグ/作業ブランチを掃除
 #   7. GitHub Release を作成。直前のリリースタグが取れていれば
@@ -70,10 +72,11 @@ package_release_publish() {
     --json tagName \
     --jq .tagName 2>/dev/null || echo '')
 
-  # --- 2. packages/<name> 配下だけの履歴を切り出す --------------------
+  # --- 2. packages/<name> 配下だけの履歴を、タグの時点で切り出す -------
   commit=$(git subtree split \
     --prefix="$directory" \
-    --branch="split-$package")
+    --branch="split-$package" \
+    "refs/tags/$version^{commit}")
 
   # --- 3. 切り出したコミットに署名付き一時タグを打つ -------------------
   git tag -s "$tmp_tag" "$commit" -m "Release $version"
