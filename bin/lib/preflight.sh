@@ -107,6 +107,13 @@ release_preflight() {
 "
   fi
 
+  # prepare は PR を作り、publish は分割先の GitHub Release を作る。どちらも gh を使うので、
+  # ログインが切れていたら、何かを push する前に止める。
+  if ! gh auth status --hostname github.com > /dev/null 2>&1; then
+    problems="${problems}- gh is not installed or not logged in to github.com; run gh auth login
+"
+  fi
+
   for directory in packages/*; do
     package=$(basename "$directory")
     remote=$(package_release_remote "$package")

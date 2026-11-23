@@ -55,6 +55,8 @@
 #       sh -c '. bin/lib/package-release.sh; package_release_publish <version> packages/<name>'
 #     手元にタグが無ければ、先に git fetch --tags で取ってくる。分割はタグの時点で行うので、
 #     main がその後に進んでいてもかまわない（前回の失敗で残った一時タグと作業ブランチは自動で消える）。
+#   - GitHub Release だけ作れなかった（publish が最後に一覧を出して、終了コード 1 で終わる）
+#     パッケージの公開は済んでいる。表示された gh release create のコマンドを実行する。
 #   - 分割先の main への push が拒否された（GH013: Repository rule violations）
 #     分割先の main はルールセットで force push を禁止している。新しい分割が前回の main の
 #     続きになっていない（git のバージョンや分割の仕方を変えたときに起こりうる）。本体のタグは
@@ -191,9 +193,17 @@ release_publish() {
   # -------------------------------------------------------------------------
   # subtree split → force push → タグpush → GitHub Release作成 を
   # パッケージごとに実行する。詳細は package_release_publish 内のコメント参照。
+  # GitHub Release を作れなかった分割先は package_release_failed に溜まる。最後にまとめて知らせる。
+  package_release_failed=''
+
   for directory in packages/*; do
     package_release_publish "$version" "$directory"
   done
+
+  if [ -n "$package_release_failed" ]; then
+    echo "==> $version is published, but the GitHub Releases of these repositories are missing: $package_release_failed (create them with the commands above)" >&2
+    exit 1
+  fi
 
   echo "==> Release $version completed"
 }

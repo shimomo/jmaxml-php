@@ -110,6 +110,31 @@ final class ReleaseScriptTest extends TestCase
     }
 
     #[Test]
+    public function publishReportsTheGitHubReleasesItCouldNotCreate(): void
+    {
+        $sandbox = Sandbox::create();
+
+        try {
+            // A gh that is logged in but cannot create releases.
+            $gh = "printf '%s\\n' '#!/bin/sh' 'echo \"gh \$*\" >> \"\$(dirname \"\$0\")/../gh.log\"'"
+                . " 'case \"\$1 \$2\" in \"release view\" | \"release create\") exit 1 ;; esac' > ../fake-bin/gh";
+            [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', $gh . ' && ' . Sandbox::PREPARED);
+            $this->assertSame(0, $setupExitCode, $setupOutput);
+
+            [$exitCode, $output] = self::release($sandbox, 'publish 0.1.0', "y\n");
+
+            $this->assertSame(1, $exitCode, $output);
+
+            foreach (['core', 'feed'] as $package) {
+                $this->assertStringContainsString('gh release create 0.1.0 --repo shimomo/jmaxml-php-' . $package . ' --generate-notes', $output);
+                $this->assertStringContainsString('refs/tags/0.1.0', Shell::run($sandbox, 'git ls-remote jmaxml-php-' . $package . '.git')[1]);
+            }
+        } finally {
+            Shell::remove($sandbox);
+        }
+    }
+
+    #[Test]
     public function refusesTheOldSingleStepUsage(): void
     {
         $sandbox = Sandbox::create();

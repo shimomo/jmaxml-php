@@ -35,7 +35,9 @@ package_release_remote() {
 #   5. 一時タグを正式なバージョンタグとして独立リポジトリへ push
 #   6. ローカルの一時タグ/作業ブランチを掃除
 #   7. GitHub Release を作成。直前のリリースタグが取れていれば
-#      --notes-start-tag で明示し、Full Changelog リンクを正しく出す
+#      --notes-start-tag で明示し、Full Changelog リンクを正しく出す。
+#      作れなかったら、作り直すコマンドを出して package_release_failed に分割先を足し、
+#      先に進む（Packagist はタグを見るので、パッケージの公開はもう済んでいる）
 #
 # 引数:
 #   VERSION   リリースするバージョン文字列（例: 0.1.0）
@@ -107,17 +109,16 @@ package_release_publish() {
   # 単一コミットへのリンクになってしまうケースがある
   # (GitHub は祖先関係にあるタグでも、Releaseとして公開されていないと
   #  自動では前回リリースとして認識できないことがある)。
+  # 初回リリースなど、比較対象となる前回タグが存在しない場合は --notes-start-tag を付けない。
+  set -- --repo "$repository" --generate-notes
+
   if [ -n "$prev_version" ]; then
-    gh release create "$version" \
-      --repo "$repository" \
-      --notes-start-tag "$prev_version" \
-      --generate-notes \
-      || true
-  else
-    # 初回リリースなど、比較対象となる前回タグが存在しない場合
-    gh release create "$version" \
-      --repo "$repository" \
-      --generate-notes \
-      || true
+    set -- "$@" --notes-start-tag "$prev_version"
+  fi
+
+  # 失敗を黙って見逃さない（以前は `|| true` で握りつぶしていた）。
+  if ! gh release create "$version" "$@"; then
+    echo "==> Could not create the GitHub Release of $version for $repository; create it with: gh release create $version $*" >&2
+    package_release_failed="${package_release_failed:-}${package_release_failed:+ }$repository"
   fi
 }
