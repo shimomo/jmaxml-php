@@ -38,7 +38,8 @@ release_commit() {
 # release_preflight STEP VERSION
 #
 # STEP は prepare か publish。どちらにも共通の確認に、段階ごとの確認を足す。
-#   prepare  CHANGELOG.md にまだ VERSION の節が無いこと（あれば prepare の PR はもうマージ済み）。
+#   prepare  CHANGELOG.md にまだ VERSION の節が無く、節を書く場所（"# Changelog" か "## Unreleased" の行）があり、
+#            いちばん上の版の節にタグがある（publish し忘れていない）こと。
 #            release/VERSION のブランチが手元にも origin にも無いこと
 #   publish  prepare の PR がマージ済みであること。つまり CHANGELOG.md に VERSION の節があり、
 #            packages/*/composer.json の jmaxml/* への依存がすべて ^VERSION であること
@@ -103,7 +104,7 @@ release_preflight() {
     problems="${problems}- cannot fetch main from origin
 "
   elif [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-    problems="${problems}- HEAD is not the same commit as origin/main; pull or push first
+    problems="${problems}- HEAD is not the same commit as origin/main; run git pull, or move the local commits to a branch (main only changes through pull requests)
 "
   fi
 
@@ -133,8 +134,30 @@ release_preflight() {
 
   if [ "$step" = prepare ]; then
     if [ "$stamped" = true ]; then
-      problems="${problems}- CHANGELOG.md already has a section for $version; its pull request is merged, so run bin/release.sh publish $version
+      problems="${problems}- CHANGELOG.md already has a section for $version; if its pull request is merged, run bin/release.sh publish $version
 "
+    fi
+
+    # changelog_stamp_release は "## Unreleased" の下に書き、見出しが無ければ "# Changelog" の下に戻す。
+    # どちらの行も無い（CRLF の行も一致しない）と、版の節を書かないまま PR ができてしまう。
+    if ! grep -Eq '^(# Changelog|## Unreleased)$' CHANGELOG.md 2> /dev/null; then
+      problems="${problems}- CHANGELOG.md needs a '# Changelog' or '## Unreleased' line, with LF line endings, to write the section for $version under
+"
+    fi
+
+    # 直前の版を publish し忘れたまま次の版を作ると、前の版の項目が次の版にも入り、
+    # 相互依存が次の版になるので前の版はもう公開できない。いちばん上の節にタグがあることを確かめる。
+    previous=$(sed -n -E 's/^## \[([0-9]+\.[0-9]+\.[0-9]+)\] - .*/\1/p' CHANGELOG.md 2> /dev/null | head -n 1)
+
+    if [ -n "$previous" ] && [ "$previous" != "$version" ]; then
+      # --exit-code: 2 = the tag does not exist. Other failures are already reported by the tag check above.
+      status=0
+      git ls-remote --exit-code --tags origin "refs/tags/$previous" > /dev/null 2>&1 || status=$?
+
+      if [ "$status" -eq 2 ]; then
+        problems="${problems}- CHANGELOG.md has a section for $previous, but tag $previous is not on origin; publish it first (bin/release.sh publish $previous)
+"
+      fi
     fi
 
     branch_name=$(release_branch "$version")

@@ -80,6 +80,12 @@ final class PreflightTest extends TestCase
         yield 'not newer than the latest tag' => ['prepare', 'git tag 0.2.0', '0.1.5', 'newer than 0.2.0'];
         yield 'patch below the latest tag' => ['prepare', 'git tag 0.1.10', '0.1.9', 'newer than 0.1.10'];
         yield 'unknown step' => ['ship', 'true', '0.1.0', 'ship'];
+        yield 'ahead of origin' => ['prepare', 'git commit -q --allow-empty -m x', '0.1.0', 'move the local commits to a branch'];
+        yield 'tag only locally' => ['prepare', 'git tag 0.1.0', '0.1.0', 'tag 0.1.0 already exists locally'];
+        yield 'release branch locally' => ['prepare', 'git branch release/0.1.0', '0.1.0', 'git branch -D release/0.1.0'];
+        yield 'previous version not published' => ['prepare', Sandbox::PREPARED, '0.1.1', 'bin/release.sh publish 0.1.0'];
+        yield 'no place for the section' => ['prepare', "printf 'Changes\\n' > CHANGELOG.md && git commit -q -am x && git push -q origin main", '0.1.0', '# Changelog'];
+        yield 'CRLF line endings' => ['prepare', "printf '# Changelog\\r\\n\\r\\n## Unreleased\\r\\n' > CHANGELOG.md && git commit -q -am x && git push -q origin main", '0.1.0', 'LF'];
         yield 'gh not logged in' => ['publish', "printf '%s\\n' '#!/bin/sh' 'exit 1' > ../fake-bin/gh", '0.1.0', 'gh auth login'];
         yield 'section already stamped' => ['prepare', Sandbox::PREPARED, '0.1.0', 'publish'];
         yield 'release branch on origin' => ['prepare', 'git push -q origin main:refs/heads/release/0.1.0', '0.1.0', 'git push origin --delete release/0.1.0'];
@@ -90,6 +96,29 @@ final class PreflightTest extends TestCase
             '0.1.0',
             'packages/feed/composer.json',
         ];
+    }
+
+    #[Test]
+    public function doesNotCallTheSectionMergedFromAnotherBranch(): void
+    {
+        $sandbox = Sandbox::create();
+
+        try {
+            // What a prepare that stopped before opening its pull request leaves: the release branch, checked out.
+            $setup = "git checkout -q -b release/0.1.0 && printf '# Changelog\\n\\n## Unreleased\\n\\n## [0.1.0] - 2026-11-23\\n\\n- first\\n' > CHANGELOG.md"
+                . " && git commit -q -am 'chore: prepare release 0.1.0'";
+            [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', $setup);
+            $this->assertSame(0, $setupExitCode, $setupOutput);
+
+            [$exitCode, $output] = self::preflight($sandbox, 'prepare', '0.1.0');
+
+            $this->assertSame(1, $exitCode, $output);
+            $this->assertStringContainsString('section for 0.1.0', $output);
+            $this->assertStringContainsString('if its pull request is merged', $output);
+            $this->assertStringNotContainsString('its pull request is merged, so', $output);
+        } finally {
+            Shell::remove($sandbox);
+        }
     }
 
     #[Test]
