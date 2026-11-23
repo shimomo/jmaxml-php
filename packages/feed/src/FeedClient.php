@@ -30,7 +30,7 @@ use RuntimeException;
  */
 final class FeedClient
 {
-    public const string DEFAULT_USER_AGENT = 'jmaxml-feed/0.1.1';
+    public const string DEFAULT_USER_AGENT = 'jmaxml-feed/0.1.2';
 
     public const string TELEGRAM_URL_PREFIX = 'https://www.data.jma.go.jp/developer/xml/data/';
 
