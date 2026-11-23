@@ -9,6 +9,9 @@
 #   bin/release.sh publish <version>   その PR をマージした後の main にタグを打ち、各パッケージを公開する
 #   例: bin/release.sh prepare 0.1.2 → PR を squash マージ → git pull → bin/release.sh publish 0.1.2
 #
+# prepare の PR をマージするまで、ほかの PR をマージしない。その変更はタグに入るのに、
+# 今回の版の CHANGELOG には載らない（マージした後なら、次の版に回るのでかまわない）。
+#
 # prepare の流れ:
 #   1. 事前確認（release_preflight prepare）。駄目なら何も変えずに止まる
 #   2. release/<version> ブランチを作って移る
@@ -36,6 +39,25 @@
 #   - 各 packages/<name> に対応する shimomo/jmaxml-php-<name> リポジトリが
 #     作成済みで、git push 権限（SSH）があること
 #   - jq, composer（normalize, update）がインストールされていること
+#
+# 途中で失敗したとき（どこまで進んだかを確かめてから再開する）:
+#   - prepare をやり直す（PR を作る前に止まった、マージ前の PR を作り直したい）
+#     main には何も入っていない。PR があれば閉じてから、次を実行してやり直す。
+#       git switch -f main                           # 書き換えた CHANGELOG.md と composer.json 群は捨てる
+#       git branch -D release/<version>
+#       git push origin --delete release/<version>   # ブランチを push した後なら
+#   - publish でタグがまだ origin に無い（git ls-remote --tags origin <version> で見えない）
+#     何も公開されていない。手元にだけタグがあれば git tag -d <version> で消してからやり直す。
+#   - publish でタグが origin にある
+#     公開は始まっている。まだ公開されていないパッケージについてだけ、次を実行する。
+#       sh -c '. bin/lib/package-release.sh; package_release_publish <version> packages/<name>'
+#     手元にタグが無ければ、先に git fetch --tags で取ってくる。分割はタグの時点で行うので、
+#     main がその後に進んでいてもかまわない（前回の失敗で残った一時タグと作業ブランチは自動で消える）。
+#   - 分割先の main への push が拒否された（GH013: Repository rule violations）
+#     分割先の main はルールセットで force push を禁止している。新しい分割が前回の main の
+#     続きになっていない（git のバージョンや分割の仕方を変えたときに起こりうる）。本体のタグは
+#     もう公開されている。そのリポジトリの Settings → Rules → Rulesets で「main」を一時的に
+#     Disabled にし、上の package_release_publish でそのパッケージだけ公開し直してから Active に戻す。
 
 set -eu
 
