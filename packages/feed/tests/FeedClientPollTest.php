@@ -37,6 +37,13 @@ final class FeedClientPollTest extends TestCase
     private const string DRILL = '32-35_01_03_240613_VXSE53.xml';
 
     #[Test]
+    public function defaultUserAgentNamesTheFullVersion(): void
+    {
+        // bin/release.sh prepare writes the version being released here (bin/lib/user-agent.sh).
+        $this->assertMatchesRegularExpression('/\Ajmaxml-feed\/\d+\.\d+\.\d+\z/', FeedClient::DEFAULT_USER_AGENT);
+    }
+
+    #[Test]
     public function returnsNewTelegramsOldestFirst(): void
     {
         [$client, $http, $store] = $this->client();
@@ -67,7 +74,7 @@ final class FeedClientPollTest extends TestCase
         $this->assertSame('Tue, 03 Nov 2026 11:58:00 GMT', $feedRequest->getHeaderLine('If-Modified-Since'));
 
         foreach ($http->requests() as $request) {
-            $this->assertSame('jmaxml-feed/0.1', $request->getHeaderLine('User-Agent'));
+            $this->assertSame(FeedClient::DEFAULT_USER_AGENT, $request->getHeaderLine('User-Agent'));
         }
 
         $state = $store->load(self::FEED);

@@ -7,10 +7,11 @@ namespace JmaXml\Release\Tests\Support;
 use RuntimeException;
 
 /**
- * A throwaway release setup: repo/ (branch main with packages/core, packages/feed, a root composer.json that replaces
- * both, and a CHANGELOG.md whose Unreleased section has one entry, pushed to origin.git), the bare split repositories
- * jmaxml-php-core.git and jmaxml-php-feed.git next to it, an SSH key that signs tags in repo/, and in fake-bin/ a fake
- * gh and a fake composer that log their calls to gh.log and composer.log.
+ * A throwaway release setup: repo/ (branch main with packages/core, packages/feed with a FeedClient.php that holds the
+ * default User-Agent, a root composer.json that replaces both, and a CHANGELOG.md whose Unreleased section has one
+ * entry, pushed to origin.git), the bare split repositories jmaxml-php-core.git and jmaxml-php-feed.git next to it, an
+ * SSH key that signs tags in repo/, and in fake-bin/ a fake gh and a fake composer that log their calls to gh.log and
+ * composer.log.
  *
  * @author shimomo
  */
@@ -44,6 +45,8 @@ final class Sandbox
         mkdir -p packages/core packages/feed
         echo '{}' > packages/core/composer.json
         echo '{}' > packages/feed/composer.json
+        mkdir packages/feed/src
+        printf '%s\n' '<?php' '' 'final class FeedClient' '{' "    public const string DEFAULT_USER_AGENT = 'jmaxml-feed/0.0.1';" '}' > packages/feed/src/FeedClient.php
         printf '# Changelog\n\n## Unreleased\n\n- first\n' > CHANGELOG.md
         printf '%s\n' '{"name": "test/test", "replace": {"jmaxml/core": "self.version", "jmaxml/feed": "self.version"}}' > composer.json
         git add .

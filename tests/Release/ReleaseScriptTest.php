@@ -35,6 +35,7 @@ final class ReleaseScriptTest extends TestCase
             $changelog = self::origin($sandbox, 'show refs/heads/release/0.1.0:CHANGELOG.md');
             $this->assertStringContainsString('## [0.1.0] - ', $changelog);
             $this->assertStringContainsString('- first', $changelog);
+            $this->assertStringContainsString("'jmaxml-feed/0.1.0'", self::origin($sandbox, 'show refs/heads/release/0.1.0:packages/feed/src/FeedClient.php'));
             $this->assertStringContainsString('gh pr create --base main --head release/0.1.0', (string) file_get_contents($sandbox . '/gh.log'));
             $this->assertSame([0, "main\n"], Shell::run($sandbox . '/repo', 'git symbolic-ref --short HEAD'));
         } finally {

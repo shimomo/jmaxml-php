@@ -16,7 +16,8 @@
 #   1. 事前確認（release_preflight prepare）。駄目なら何も変えずに止まる
 #   2. release/<version> ブランチを作って移る
 #   3. CHANGELOG.md の "Unreleased" の下に今回の版の節を書く
-#   4. packages/*/composer.json と ルート composer.json のバージョン関連フィールドを更新する
+#   4. packages/*/composer.json と ルート composer.json のバージョン関連フィールドと、
+#      jmaxml/feed の既定の User-Agent（jmaxml-feed/<version>）を更新する
 #   5. 3 と 4 を "chore: prepare release <version>" としてコミットし、ブランチを push して PR を作る
 #   6. main に戻る
 #
@@ -35,6 +36,7 @@
 #                                  ルート composer.json へマージする関数
 #   - bin/lib/composer-version.sh  composer.json のバージョン更新関数
 #   - bin/lib/package-release.sh   パッケージ単位のリリース処理関数
+#   - bin/lib/user-agent.sh        jmaxml/feed の既定の User-Agent に版番号を書く関数
 #   - GitHub CLI (gh) でログイン済みであること
 #   - 各 packages/<name> に対応する shimomo/jmaxml-php-<name> リポジトリが
 #     作成済みで、git push 権限（SSH）があること
@@ -88,6 +90,8 @@ script_dir=$(cd "$(dirname "$0")" && pwd)
 . "$script_dir/lib/package-release.sh"
 # shellcheck source=lib/preflight.sh
 . "$script_dir/lib/preflight.sh"
+# shellcheck source=lib/user-agent.sh
+. "$script_dir/lib/user-agent.sh"
 
 release_prepare() {
   # -------------------------------------------------------------------------
@@ -129,14 +133,16 @@ release_prepare() {
   #   - 各 packages/*/composer.json の branch-alias を `<major>.<minor>.x-dev` に更新
   #   - composer_version_sync_monorepo でルートへのマージ・依存関係・フォーマットを同期
   #   - ルート composer.json の `replace` は `self.version` なので触らない
+  #   - jmaxml/feed の既定の User-Agent を `jmaxml-feed/<version>` にする
   composer_version_release "$version"
+  user_agent_update "$version"
 
   # -------------------------------------------------------------------------
   # 5. コミットしてブランチを push し、PR を作る
   # -------------------------------------------------------------------------
   # CHANGELOG.md も同じコミットに入れる。マージ後の main にタグを打つので、
   # タグの時点の CHANGELOG に今回の版の節が載る。
-  git add CHANGELOG.md composer.json packages/*/composer.json
+  git add CHANGELOG.md composer.json packages/*/composer.json packages/feed/src/FeedClient.php
   git commit -m "chore: prepare release $version"
   git push -u origin "$release_branch_name"
 
