@@ -88,7 +88,7 @@ package_release_publish() {
   # この push は fast-forward で済む。
   # 分割先の main もルールセットで force push を禁止しているので、続きにならないときは
   # --force を付けていてもここで拒否される（GH013）。--force は、そのときにルールセットを
-  # 一時的に無効にして公開し直すために残している。手順は README の「リリース」を参照。
+  # 一時的に無効にして公開し直すために残している。手順は bin/release.sh の先頭のコメントを参照。
   # push 元が生の SHA なので、宛先は refs/heads/ まで書く。"main" だけだと
   # git はリモートの既存 main から補完しようとし、空のリポジトリでは失敗する。
   git push "$remote" "$commit:refs/heads/main" --force
