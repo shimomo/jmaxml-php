@@ -65,7 +65,8 @@ final readonly class EarthquakeCodeTables
             $cities,
             $stations,
             self::simpleTable(self::dataRows($reader->rows('41'), '41', $codeName), '41', self::AREA_CODE, ['B']),
-            // Column D of sheet 31 has no label in the official file; a label there means the layout changed.
+            // Sheet 31 labels column D 備考 one row above the Code header (D2:D3 is one merged cell), so the Code
+            // header row itself is empty in column D; anything there means the layout changed.
             self::tsunamiAreasFrom(self::dataRows($reader->rows('31'), '31', [...$codeNameKana, 'D' => ''])),
         );
     }
@@ -144,20 +145,21 @@ final readonly class EarthquakeCodeTables
     }
 
     /**
-     * Reads sheet 31 (津波予報区). Column D has no header label; it says what kind of code the row is (津波予報区,
-     * 領域表現…, 結合表現…), so an unknown value there means the columns have moved.
+     * Reads sheet 31 (津波予報区). Column D holds the note (備考; its label is above the Code header row). Every note
+     * starts with the kind of the code (津波予報区, 領域表現…, 結合表現…), so a note that does not means the columns
+     * have moved.
      *
      * @param list<array<string, string>> $rows data rows
      *
-     * @return array<array-key, list<string>> code => [name, kana, kind], sorted by code
+     * @return array<array-key, list<string>> code => [name, kana, note], sorted by code
      */
     public static function tsunamiAreasFrom(array $rows): array
     {
         $table = self::simpleTable($rows, '31', self::AREA_CODE, ['B', 'C', 'D']);
 
-        foreach ($table as $code => [, , $kind]) {
-            if (preg_match('/^(津波予報区|領域表現|結合表現)/u', $kind) !== 1) {
-                throw new LogicException('Sheet 31: code ' . (string) $code . ' has an unknown kind "' . $kind . '" in column D');
+        foreach ($table as $code => [, , $note]) {
+            if (preg_match('/^(津波予報区|領域表現|結合表現)/u', $note) !== 1) {
+                throw new LogicException('Sheet 31: code ' . (string) $code . ' has a note "' . $note . '" in column D that does not start with 津波予報区, 領域表現 or 結合表現');
             }
         }
 
