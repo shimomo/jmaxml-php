@@ -35,6 +35,7 @@ final class ReleaseScriptTest extends TestCase
             $changelog = self::origin($sandbox, 'show refs/heads/release/0.1.0:CHANGELOG.md');
             $this->assertStringContainsString('## [0.1.0] - ', $changelog);
             $this->assertStringContainsString('- first', $changelog);
+            $this->assertStringContainsString("'jmaxml-feed/0.1.0'", self::origin($sandbox, 'show refs/heads/release/0.1.0:packages/feed/src/FeedClient.php'));
             $this->assertStringContainsString('gh pr create --base main --head release/0.1.0', (string) file_get_contents($sandbox . '/gh.log'));
             $this->assertSame([0, "main\n"], Shell::run($sandbox . '/repo', 'git symbolic-ref --short HEAD'));
         } finally {
@@ -103,6 +104,31 @@ final class ReleaseScriptTest extends TestCase
             $this->assertSame(0, $exitCode, $output);
             $this->assertSame($release, self::origin($sandbox, 'rev-parse refs/tags/0.1.0^{commit}'));
             $this->assertStringNotContainsString('later.txt', Shell::run($sandbox, 'git --git-dir=jmaxml-php-core.git ls-tree -r --name-only refs/tags/0.1.0')[1]);
+        } finally {
+            Shell::remove($sandbox);
+        }
+    }
+
+    #[Test]
+    public function publishReportsTheGitHubReleasesItCouldNotCreate(): void
+    {
+        $sandbox = Sandbox::create();
+
+        try {
+            // A gh that is logged in but cannot create releases.
+            $gh = "printf '%s\\n' '#!/bin/sh' 'echo \"gh \$*\" >> \"\$(dirname \"\$0\")/../gh.log\"'"
+                . " 'case \"\$1 \$2\" in \"release view\" | \"release create\") exit 1 ;; esac' > ../fake-bin/gh";
+            [$setupExitCode, $setupOutput] = Shell::run($sandbox . '/repo', $gh . ' && ' . Sandbox::PREPARED);
+            $this->assertSame(0, $setupExitCode, $setupOutput);
+
+            [$exitCode, $output] = self::release($sandbox, 'publish 0.1.0', "y\n");
+
+            $this->assertSame(1, $exitCode, $output);
+
+            foreach (['core', 'feed'] as $package) {
+                $this->assertStringContainsString('gh release create 0.1.0 --repo shimomo/jmaxml-php-' . $package . ' --generate-notes', $output);
+                $this->assertStringContainsString('refs/tags/0.1.0', Shell::run($sandbox, 'git ls-remote jmaxml-php-' . $package . '.git')[1]);
+            }
         } finally {
             Shell::remove($sandbox);
         }

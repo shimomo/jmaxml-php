@@ -80,6 +80,7 @@ final class PreflightTest extends TestCase
         yield 'not newer than the latest tag' => ['prepare', 'git tag 0.2.0', '0.1.5', 'newer than 0.2.0'];
         yield 'patch below the latest tag' => ['prepare', 'git tag 0.1.10', '0.1.9', 'newer than 0.1.10'];
         yield 'unknown step' => ['ship', 'true', '0.1.0', 'ship'];
+        yield 'gh not logged in' => ['publish', "printf '%s\\n' '#!/bin/sh' 'exit 1' > ../fake-bin/gh", '0.1.0', 'gh auth login'];
         yield 'section already stamped' => ['prepare', Sandbox::PREPARED, '0.1.0', 'publish'];
         yield 'release branch on origin' => ['prepare', 'git push -q origin main:refs/heads/release/0.1.0', '0.1.0', 'git push origin --delete release/0.1.0'];
         yield 'prepare not merged' => ['publish', 'true', '0.1.0', 'prepare'];

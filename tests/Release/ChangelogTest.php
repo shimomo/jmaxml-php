@@ -56,6 +56,21 @@ final class ChangelogTest extends TestCase
     }
 
     #[Test]
+    public function backslashesInCommitSubjectsAreWrittenAsTheyAre(): void
+    {
+        $directory = Shell::temporaryDirectory();
+
+        try {
+            file_put_contents($directory . '/CHANGELOG.md', "# Changelog\n\n## Unreleased\n");
+
+            $this->assertSame(0, self::changelog($directory, 'changelog_stamp_release 0.1.1 ' . escapeshellarg('- fix: escape \\n and \\t in C:\\path'))[0]);
+            $this->assertStringContainsString("\n- fix: escape \\n and \\t in C:\\path\n", (string) file_get_contents($directory . '/CHANGELOG.md'));
+        } finally {
+            Shell::remove($directory);
+        }
+    }
+
+    #[Test]
     public function releaseNotesAreTheSectionOfTheVersion(): void
     {
         $directory = Shell::temporaryDirectory();

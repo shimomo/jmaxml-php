@@ -16,7 +16,8 @@
 #   1. 事前確認（release_preflight prepare）。駄目なら何も変えずに止まる
 #   2. release/<version> ブランチを作って移る
 #   3. CHANGELOG.md の "Unreleased" の下に今回の版の節を書く
-#   4. packages/*/composer.json と ルート composer.json のバージョン関連フィールドを更新する
+#   4. packages/*/composer.json と ルート composer.json のバージョン関連フィールドと、
+#      jmaxml/feed の既定の User-Agent（jmaxml-feed/<version>）を更新する
 #   5. 3 と 4 を "chore: prepare release <version>" としてコミットし、ブランチを push して PR を作る
 #   6. main に戻る
 #
@@ -35,6 +36,7 @@
 #                                  ルート composer.json へマージする関数
 #   - bin/lib/composer-version.sh  composer.json のバージョン更新関数
 #   - bin/lib/package-release.sh   パッケージ単位のリリース処理関数
+#   - bin/lib/user-agent.sh        jmaxml/feed の既定の User-Agent に版番号を書く関数
 #   - GitHub CLI (gh) でログイン済みであること
 #   - 各 packages/<name> に対応する shimomo/jmaxml-php-<name> リポジトリが
 #     作成済みで、git push 権限（SSH）があること
@@ -53,6 +55,8 @@
 #       sh -c '. bin/lib/package-release.sh; package_release_publish <version> packages/<name>'
 #     手元にタグが無ければ、先に git fetch --tags で取ってくる。分割はタグの時点で行うので、
 #     main がその後に進んでいてもかまわない（前回の失敗で残った一時タグと作業ブランチは自動で消える）。
+#   - GitHub Release だけ作れなかった（publish が最後に一覧を出して、終了コード 1 で終わる）
+#     パッケージの公開は済んでいる。表示された gh release create のコマンドを実行する。
 #   - 分割先の main への push が拒否された（GH013: Repository rule violations）
 #     分割先の main はルールセットで force push を禁止している。新しい分割が前回の main の
 #     続きになっていない（git のバージョンや分割の仕方を変えたときに起こりうる）。本体のタグは
@@ -88,6 +92,8 @@ script_dir=$(cd "$(dirname "$0")" && pwd)
 . "$script_dir/lib/package-release.sh"
 # shellcheck source=lib/preflight.sh
 . "$script_dir/lib/preflight.sh"
+# shellcheck source=lib/user-agent.sh
+. "$script_dir/lib/user-agent.sh"
 
 release_prepare() {
   # -------------------------------------------------------------------------
@@ -129,14 +135,16 @@ release_prepare() {
   #   - 各 packages/*/composer.json の branch-alias を `<major>.<minor>.x-dev` に更新
   #   - composer_version_sync_monorepo でルートへのマージ・依存関係・フォーマットを同期
   #   - ルート composer.json の `replace` は `self.version` なので触らない
+  #   - jmaxml/feed の既定の User-Agent を `jmaxml-feed/<version>` にする
   composer_version_release "$version"
+  user_agent_update "$version"
 
   # -------------------------------------------------------------------------
   # 5. コミットしてブランチを push し、PR を作る
   # -------------------------------------------------------------------------
   # CHANGELOG.md も同じコミットに入れる。マージ後の main にタグを打つので、
   # タグの時点の CHANGELOG に今回の版の節が載る。
-  git add CHANGELOG.md composer.json packages/*/composer.json
+  git add CHANGELOG.md composer.json packages/*/composer.json packages/feed/src/FeedClient.php
   git commit -m "chore: prepare release $version"
   git push -u origin "$release_branch_name"
 
@@ -185,9 +193,17 @@ release_publish() {
   # -------------------------------------------------------------------------
   # subtree split → force push → タグpush → GitHub Release作成 を
   # パッケージごとに実行する。詳細は package_release_publish 内のコメント参照。
+  # GitHub Release を作れなかった分割先は package_release_failed に溜まる。最後にまとめて知らせる。
+  package_release_failed=''
+
   for directory in packages/*; do
     package_release_publish "$version" "$directory"
   done
+
+  if [ -n "$package_release_failed" ]; then
+    echo "==> $version is published, but the GitHub Releases of these repositories are missing: $package_release_failed (create them with the commands above)" >&2
+    exit 1
+  fi
 
   echo "==> Release $version completed"
 }

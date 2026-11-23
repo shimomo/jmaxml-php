@@ -57,6 +57,8 @@ changelog_unreleased_is_empty() {
 #   - fix: bar
 #
 # 日付は date で取る（strftime は gawk にしか無い）。
+# COMMITS は環境変数で渡す。awk -v はバックスラッシュをエスケープとして解釈するので、
+# 件名の "\n" が改行に化ける。ENVIRON の値はそのまま読める。
 #
 # 注意: "## Unreleased" 見出しが存在しない場合は何も変化しない
 #       （= リリースバージョンが追記されない）ので、
@@ -66,15 +68,15 @@ changelog_stamp_release() {
   commits="$2"
   today=$(date +%Y-%m-%d)
 
-  awk -v commits="$commits" -v version="$version" -v today="$today" '
+  CHANGELOG_COMMITS="$commits" awk -v version="$version" -v today="$today" '
     /^## Unreleased$/ {
       print
       print ""
       print "## [" version "] - " today
 
-      if (commits != "") {
+      if (ENVIRON["CHANGELOG_COMMITS"] != "") {
         print ""
-        print commits
+        print ENVIRON["CHANGELOG_COMMITS"]
       }
 
       skipping = 1
