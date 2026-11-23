@@ -55,6 +55,21 @@ final class ChangelogTest extends TestCase
         }
     }
 
+    #[Test]
+    public function releaseNotesAreTheSectionOfTheVersion(): void
+    {
+        $directory = Shell::temporaryDirectory();
+
+        try {
+            file_put_contents($directory . '/CHANGELOG.md', "# Changelog\n\n## Unreleased\n\n## [0.1.1] - 2026-11-23\n\n- a\n- b\n\n## [0.1.0] - 2026-11-05\n\n- c\n");
+
+            $this->assertSame([0, "- a\n- b\n"], self::changelog($directory, 'changelog_release_notes 0.1.1'));
+            $this->assertSame([0, "- c\n"], self::changelog($directory, 'changelog_release_notes 0.1.0'));
+        } finally {
+            Shell::remove($directory);
+        }
+    }
+
     /**
      * @return array{int, string}
      */

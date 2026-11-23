@@ -31,34 +31,45 @@ composer generate   # resources/jmaxml から packages/core/src の型と packag
 
 4 つのパッケージは、いつも同じ版番号でまとめて公開します。各パッケージは `shimomo/jmaxml-php-<package>` に分割され、Packagist にはその分割先を登録しています。
 
+main には PR からしか入れられない（ルールセットで直接の push を止めている）ので、リリースは 2 段階で行います。どちらの段階も main には push しません。
+
 ```bash
-bin/release.sh 0.1.1
+bin/release.sh prepare 0.1.2   # 版を上げる PR を作る
+# PR の CI が通ったら squash マージする
+git pull
+bin/release.sh publish 0.1.2   # main にタグを打ち、各パッケージを公開する
 ```
 
-この 1 回の実行で、次のことを順に行います。
+`prepare` は次のことを順に行います。
+
+1. 事前確認（下の「止まる条件」）
+2. `release/<version>` ブランチを作る
+3. `CHANGELOG.md` の「Unreleased」の下に版の見出しを入れる（「Unreleased」の見出しは残る）
+4. `packages/*/composer.json` の相互依存（`^<version>`）と branch-alias を更新し、ルートの `composer.json` に反映する
+5. 3 と 4 を `chore: prepare release <version>` としてコミットし、ブランチを push して PR を作る（本文に今回の版の CHANGELOG が入る）
+6. main に戻る
+
+`publish` は次のことを順に行います。
 
 1. 事前確認（下の「止まる条件」）
 2. 公開する版、直前の版、コミット、パッケージを出して確認を求める。`y` と答えたときだけ先に進む（`n` と答えれば、事前確認だけを試せる）
-3. `CHANGELOG.md` に版の見出しを入れる（コミットは最後の手順で行う）
-4. `packages/*/composer.json` の相互依存（`^<version>`）と branch-alias を更新してコミットし、main を push する（変更が無ければコミットしない）
-5. 署名付きのタグを打って push する
-6. 各パッケージを `git subtree split` で分割先に push し、タグと GitHub Release を作る
-7. `CHANGELOG.md` を `chore: update CHANGELOG.md` としてコミットし、main を push する
+3. 署名付きのタグを打って push する
+4. 各パッケージを `git subtree split` で分割先に push し、タグと GitHub Release を作る
 
-- **前提**：分割先の 4 リポジトリがあること、`gh` にログインしていること、`jq` と `composer` があること、タグに署名できる GPG（パスフレーズはキャッシュしておく）
+- **前提**：分割先の 4 リポジトリがあること、`gh` にログインしていること、`jq` と `composer` があること、コミットとタグに署名できる GPG（パスフレーズはキャッシュしておく）
 - **版番号**：コード表の更新だけならパッチ版（`0.1.1`）、公開 API が変わるときはマイナー版（`0.2.0`）を上げます
-- **CHANGELOG**：「Unreleased」に手書きの項目があれば、それをそのまま今回の版の項目にします。無ければ、直前のタグ以降のコミットの件名を使います
-- **止まる条件**：版番号の形が違う、直前のタグより新しくない、main にいない、未コミットの変更がある、同じタグが手元か origin にある、手元の main が origin とずれている、分割先のリポジトリに届かない。どれかに当たると、何も変えずに理由をすべて出して止まります
+- **CHANGELOG**：「Unreleased」に手書きの項目があれば、それをそのまま今回の版の項目にします。無ければ、直前のタグ以降のコミットの件名を使います。版の節は版を上げるコミットに入るので、タグの時点の `CHANGELOG.md` にその版の節が載ります
+- **prepare の PR をマージするまで、ほかの PR をマージしない**：マージすると、その変更はタグに入るのに、今回の版の CHANGELOG には載りません
+- **止まる条件**：どちらの段階でも、版番号の形が違う、直前のタグより新しくない、main にいない、未コミットの変更がある、同じタグが手元か origin にある、手元の main が origin とずれている、分割先のリポジトリに届かない。`prepare` ではさらに、`CHANGELOG.md` にもうその版の節がある、`release/<version>` ブランチが手元か origin にある。`publish` ではさらに、`CHANGELOG.md` にその版の節が無い、相互依存が `^<version>` になっていない（どちらも、prepare の PR がまだマージされていないということ）。どれかに当たると、何も変えずに理由をすべて出して止まります
 
-確認の後で失敗したときは、どこまで進んだかを確かめてから再開します。
+途中で失敗したときは、どこまで進んだかを確かめてから再開します。
 
-- **タグがまだ origin に無い**（`git ls-remote --tags origin <version>` で見えない）：パッケージはまだ公開されていません（main には `chore: prepare release` のコミットだけが push されていることがあります）。`git status` で、まだコミットされていない変更（`CHANGELOG.md` と `composer.json` 群）を確かめて元に戻し、`bin/release.sh` をやり直します
-- **タグが origin にある**：公開は始まっています。`CHANGELOG.md` は元に戻さないでください（戻すと、同じ項目が次の版でもう一度公開されます）。次の順で残りを済ませます
-  1. まだ公開されていないパッケージについてだけ、下のコマンドを実行する（前回の失敗で残った一時タグと作業ブランチは、自動で消してからやり直します）
-  2. `CHANGELOG.md` を `chore: update CHANGELOG.md` としてコミットし、main を push する
+- **prepare が PR を作る前に止まった**：main には何も入っていません。`git switch -f main` で main に戻り（書き換えた `CHANGELOG.md` と `composer.json` 群は捨てる）、`git branch -D release/<version>` でブランチを消してから、`bin/release.sh prepare` をやり直します。ブランチを push した後なら、`git push origin --delete release/<version>` で origin のブランチも消します
+- **publish でタグがまだ origin に無い**（`git ls-remote --tags origin <version>` で見えない）：何も公開されていません。手元にだけタグがあれば `git tag -d <version>` で消してから、`bin/release.sh publish` をやり直します
+- **publish でタグが origin にある**：公開は始まっています。まだ公開されていないパッケージについてだけ、下のコマンドを実行します（前回の失敗で残った一時タグと作業ブランチは、自動で消してからやり直します）
 
 ```bash
-sh -c '. bin/lib/package-release.sh; package_release_publish 0.1.1 packages/feed'
+sh -c '. bin/lib/package-release.sh; package_release_publish 0.1.2 packages/feed'
 ```
 
 ## 出典

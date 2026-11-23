@@ -20,12 +20,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class PreflightTest extends TestCase
 {
-    /**
-     * What merging the prepare pull request for 0.1.0 leaves on main.
-     */
-    private const string STAMPED = "printf '# Changelog\\n\\n## Unreleased\\n\\n## [0.1.0] - 2026-11-23\\n\\n- first\\n' > CHANGELOG.md"
-        . " && git commit -q -am 'chore: prepare release 0.1.0' && git push -q origin main";
-
     #[Test]
     #[DataProvider('readyStates')]
     public function passesOnACleanMainInStepWithOrigin(string $step, string $setup): void
@@ -50,7 +44,7 @@ final class PreflightTest extends TestCase
     public static function readyStates(): iterable
     {
         yield 'prepare' => ['prepare', 'true'];
-        yield 'publish after the prepare pull request' => ['publish', self::STAMPED];
+        yield 'publish after the prepare pull request' => ['publish', Sandbox::PREPARED];
     }
 
     #[Test]
@@ -86,12 +80,12 @@ final class PreflightTest extends TestCase
         yield 'not newer than the latest tag' => ['prepare', 'git tag 0.2.0', '0.1.5', 'newer than 0.2.0'];
         yield 'patch below the latest tag' => ['prepare', 'git tag 0.1.10', '0.1.9', 'newer than 0.1.10'];
         yield 'unknown step' => ['ship', 'true', '0.1.0', 'ship'];
-        yield 'section already stamped' => ['prepare', self::STAMPED, '0.1.0', 'publish'];
+        yield 'section already stamped' => ['prepare', Sandbox::PREPARED, '0.1.0', 'publish'];
         yield 'release branch on origin' => ['prepare', 'git push -q origin main:refs/heads/release/0.1.0', '0.1.0', 'release/0.1.0'];
         yield 'prepare not merged' => ['publish', 'true', '0.1.0', 'prepare'];
         yield 'mutual require not bumped' => [
             'publish',
-            "printf '%s\\n' '{\"require\": {\"jmaxml/core\": \"^0.0.1\"}}' > packages/feed/composer.json && " . self::STAMPED,
+            "printf '%s\\n' '{\"require\": {\"jmaxml/core\": \"^0.0.1\"}}' > packages/feed/composer.json && " . Sandbox::PREPARED,
             '0.1.0',
             'packages/feed/composer.json',
         ];
